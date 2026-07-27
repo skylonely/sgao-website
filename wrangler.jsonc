@@ -1,0 +1,11 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "noisy-math-2b8d",
+  "main": "worker/index.ts",
+  "compatibility_date": "2026-07-27",
+  "assets": {
+    "directory": "./dist-static",
+    "binding": "ASSETS",
+    "html_handling": "auto-trailing-slash"
+  }
+}
