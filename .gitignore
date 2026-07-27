@@ -147,3 +147,6 @@ vite.config.ts.timestamp-*
 /.wrangler/
 /dist-static/
 /work/
+# VitePress
+docs/.vitepress/dist
+docs/.vitepress/cache
