@@ -53,6 +53,12 @@ const colors = [
   "blue",
 ] as const;
 
+const legacyCategoryMap: Record<string, string> = {
+  anime: "tools",
+  game: "tools",
+  movie: "tools",
+};
+
 function readStorage<T>(key: string, fallback: T): T {
   if (typeof window === "undefined") return fallback;
   try {
@@ -133,7 +139,19 @@ export default function Navigator() {
     setCardMode(readStorage<CardMode>("qifei-card-mode", "grid"));
     setFavorites(readStorage<string[]>("qifei-favorites", []));
     setHistory(readStorage<string[]>("qifei-history", []));
-    setCustomSites(readStorage<NavSite[]>("qifei-custom-sites", []));
+    const savedCustomSites = readStorage<NavSite[]>("qifei-custom-sites", []);
+    const migratedCustomSites = savedCustomSites.map((site) => {
+      const category = legacyCategoryMap[site.category];
+      return category ? { ...site, category } : site;
+    });
+    setCustomSites(migratedCustomSites);
+    if (
+      migratedCustomSites.some(
+        (site, index) => site !== savedCustomSites[index],
+      )
+    ) {
+      writeStorage("qifei-custom-sites", migratedCustomSites);
+    }
     setCustomNavigations(
       readStorage<NavigationItem[]>("qifei-custom-navigations", []),
     );
