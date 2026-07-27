@@ -103,6 +103,9 @@ export default function Navigator() {
   const [resetConfirmOpen, setResetConfirmOpen] = useState(false);
   const [deleteNavigationConfirm, setDeleteNavigationConfirm] =
     useState<NavigationItem | null>(null);
+  const [deleteSiteConfirm, setDeleteSiteConfirm] = useState<NavSite | null>(
+    null,
+  );
   const [engineOpen, setEngineOpen] = useState(false);
   const [toast, setToast] = useState("");
   const [showTop, setShowTop] = useState(false);
@@ -162,6 +165,7 @@ export default function Navigator() {
         setSettingsOpen(false);
         setResetConfirmOpen(false);
         setDeleteNavigationConfirm(null);
+        setDeleteSiteConfirm(null);
         setEngineOpen(false);
         setMobileNav(false);
       }
@@ -412,13 +416,28 @@ export default function Navigator() {
     showToast("导航已删除，其中的网站已移至实用工具");
   }
 
-  function deleteSite(event: MouseEvent, site: NavSite) {
+  function requestDeleteSite(event: MouseEvent, site: NavSite) {
     event.preventDefault();
     event.stopPropagation();
     if (!site.isCustom) return;
-    const next = customSites.filter((item) => item.id !== site.id);
+    setDeleteSiteConfirm(site);
+  }
+
+  function deleteSite(id: string) {
+    const next = customSites.filter((item) => item.id !== id);
     setCustomSites(next);
     writeStorage("qifei-custom-sites", next);
+    setFavorites((current) => {
+      const nextFavorites = current.filter((siteId) => siteId !== id);
+      writeStorage("qifei-favorites", nextFavorites);
+      return nextFavorites;
+    });
+    setHistory((current) => {
+      const nextHistory = current.filter((siteId) => siteId !== id);
+      writeStorage("qifei-history", nextHistory);
+      return nextHistory;
+    });
+    setDeleteSiteConfirm(null);
     showToast("自定义网站已移除");
   }
 
@@ -854,8 +873,8 @@ export default function Navigator() {
                         {site.isCustom && (
                           <button
                             className="danger"
-                            onClick={(event) => deleteSite(event, site)}
-                            aria-label="删除自定义网站"
+                            onClick={(event) => requestDeleteSite(event, site)}
+                            aria-label={`删除${site.name}`}
                           >
                             ×
                           </button>
@@ -1374,6 +1393,50 @@ export default function Navigator() {
                 onClick={() =>
                   deleteNavigation(deleteNavigationConfirm.id)
                 }
+              >
+                确认删除
+              </button>
+            </div>
+          </section>
+        </div>
+      )}
+
+      {deleteSiteConfirm && (
+        <div className="modal-layer confirm-layer">
+          <button
+            className="modal-mask"
+            aria-label="取消删除网站"
+            onClick={() => setDeleteSiteConfirm(null)}
+          />
+          <section
+            className="confirm-modal"
+            role="alertdialog"
+            aria-modal="true"
+            aria-labelledby="delete-site-title"
+            aria-describedby="delete-site-description"
+          >
+            <div className="confirm-icon" aria-hidden="true">
+              !
+            </div>
+            <span className="confirm-kicker">DELETE WEBSITE</span>
+            <h2 id="delete-site-title">
+              删除“{deleteSiteConfirm.name}”？
+            </h2>
+            <p id="delete-site-description">
+              删除后将无法恢复，这个网站的收藏和访问记录也会一并移除。
+            </p>
+            <div className="delete-navigation-preview">
+              <SiteMark site={deleteSiteConfirm} />
+              <div>
+                <strong>{deleteSiteConfirm.name}</strong>
+                <small>{deleteSiteConfirm.url}</small>
+              </div>
+            </div>
+            <div className="confirm-actions">
+              <button onClick={() => setDeleteSiteConfirm(null)}>取消</button>
+              <button
+                className="confirm-danger"
+                onClick={() => deleteSite(deleteSiteConfirm.id)}
               >
                 确认删除
               </button>
