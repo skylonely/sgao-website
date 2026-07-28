@@ -474,7 +474,7 @@ export default function Navigator() {
     const blob = new Blob([data], { type: "application/json" });
     const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
-    link.download = "qifei-nav-backup.json";
+    link.download = "sgao-website-backup.json";
     link.click();
     URL.revokeObjectURL(link.href);
     showToast("导航数据已导出");
@@ -977,7 +977,7 @@ export default function Navigator() {
             <button onClick={() => setAddOpen(true)}>推荐网站</button>
             <button onClick={() => setSettingsOpen(true)}>数据管理</button>
             <a
-              href="https://github.com/liuzi6612/nav"
+              href="https://github.com/skylonely/sgao-website"
               target="_blank"
               rel="noreferrer"
             >
