@@ -61,6 +61,10 @@ export default defineConfig({
             link: "/cloudflare/image-center",
           },
           {
+            text: "Image Center R2 迁移",
+            link: "/cloudflare/image-center-r2-migration",
+          },
+          {
             text: "Image Repository（图片仓库）",
             link: "/cloudflare/image-repository",
           },

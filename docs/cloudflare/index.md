@@ -18,4 +18,5 @@
 ### 图片 CDN
 
 - [Image Center（图片中心）](./image-center)
+- [Image Center R2 迁移](./image-center-r2-migration)
 - [Image Repository（图片仓库）](./image-repository)
