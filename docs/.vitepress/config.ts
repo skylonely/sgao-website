@@ -56,6 +56,14 @@ export default defineConfig({
           { text: "域名绑定", link: "/cloudflare/domain" },
           { text: "Pages", link: "/cloudflare/pages" },
           { text: "Workers", link: "/cloudflare/workers" },
+          {
+            text: "Image Center（图片中心）",
+            link: "/cloudflare/image-center",
+          },
+          {
+            text: "Image Repository（图片仓库）",
+            link: "/cloudflare/image-repository",
+          },
         ],
       },
       {
