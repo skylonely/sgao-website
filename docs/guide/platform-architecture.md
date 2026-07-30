@@ -140,7 +140,7 @@ https://img.sgao.cc/docs/example.png
 | 后端 | Cloudflare Worker、TypeScript |
 | 对象存储 | Cloudflare R2 |
 | 代码与备份 | GitHub |
-| 部署 | Cloudflare Workers、Cloudflare Pages |
+| 部署 | Cloudflare Workers |
 | 域名与安全 | Cloudflare |
 
 ## 九、发展路线
@@ -169,7 +169,6 @@ https://img.sgao.cc/docs/example.png
 ## 十、相关文档
 
 - [Cloudflare 图片中心](/cloudflare/image-center)
-- [图片中心迁移到 Cloudflare R2](/cloudflare/image-center-r2-migration)
-- [图片仓库使用说明](/cloudflare/image-repository)
+- [DNS 与域名配置](/cloudflare/dns-domain)
 - [Cloudflare Workers 自动部署](/cloudflare/workers-auto-deploy)
 - [文档写作规范](/guide/writing-standard)

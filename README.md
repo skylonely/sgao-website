@@ -1,110 +1,101 @@
 # 🌐 sgao-website
 
-Personal website and navigation system for **sgao.cc**.
+`sgao-website` 是 SGAO Platform 的主站与知识库项目，包含网址导航、VitePress 文档站和 Cloudflare Worker 部署配置。
 
-基于 Cloudflare Workers 构建的个人网站与导航系统，用于管理个人链接、技术文档以及项目入口。
+## 在线服务
 
-## ✨ Features
+| 地址 | 用途 |
+| --- | --- |
+| [sgao.cc](https://sgao.cc) | 主站与网址导航 |
+| [docs.sgao.cc](https://docs.sgao.cc) | SGAO 知识库 |
+| [img.sgao.cc](https://img.sgao.cc) | 图片中心与 CDN |
 
-- 个人主页展示
-- 网站导航入口
-- 技术文档聚合
-- Cloudflare Workers 部署
-- 全球 CDN 加速访问
-- 简洁、高性能、低成本
+完整说明参见 [SGAO Platform 架构](https://docs.sgao.cc/guide/platform-architecture)。
 
-## 🏗️ Architecture
+## 技术栈
 
-```
-User
- │
- ▼
-sgao.cc
- │
- ▼
-Cloudflare Workers
- │
- ▼
-sgao-website
-```
-
-## 🛠️ Tech Stack
-
-- Cloudflare Workers
-- TypeScript
-- Vite
+- Next.js、React、TypeScript
+- vinext、Vite
+- VitePress
+- Cloudflare Workers、Cloudflare R2
 - Wrangler
 
-## 📦 Installation
+## 项目结构
 
-Install dependencies:
+```text
+sgao-website/
+├── app/                    # 主站页面与组件
+├── docs/                   # VitePress 知识库
+│   ├── .vitepress/         # 文档站配置与主题
+│   ├── cloudflare/         # Cloudflare 实践文档
+│   ├── guide/              # 平台架构与写作规范
+│   └── index.md            # 知识库首页
+├── public/                 # 主站静态资源
+├── worker/                 # 主站 Cloudflare Worker 入口
+├── package.json            # 依赖与脚本
+├── wrangler.jsonc          # 主站 Worker 配置
+└── wrangler.docs.jsonc     # 知识库 Worker 配置
+```
+
+## 本地开发
+
+安装依赖：
 
 ```bash
 npm install
 ```
 
-## 🚀 Development
-
-Run local development server:
+启动主站：
 
 ```bash
 npm run dev
 ```
 
-## 📤 Deployment
-
-Deploy to Cloudflare Workers:
+启动知识库：
 
 ```bash
-npm run deploy
+npm run docs:dev
 ```
 
-## 📁 Project Structure
+## 构建验证
 
-```
-sgao-website
-│
-├── src/                    # Website source code
-│
-├── public/                 # Static assets
-│
-├── package.json            # Project configuration
-│
-├── wrangler.jsonc          # Cloudflare Workers configuration
-│
-└── README.md
+构建主站：
+
+```bash
+npm run build
 ```
 
-## 🌐 Online Website
+构建知识库：
 
-Main Website:
+```bash
+npm run docs:build
+```
 
-https://sgao.cc
+## 部署
 
-Image CDN:
+主站和知识库使用不同的 Worker，可以独立部署。
 
-https://img.sgao.cc
+部署主站：
 
-## 🔗 Related Projects
+```bash
+npm run build
+npx wrangler deploy
+```
 
-### sgao-image-center
+部署知识库：
 
-Image service and management center:
+```bash
+npm run docs:build
+npx wrangler deploy --config wrangler.docs.jsonc
+```
 
-https://github.com/skylonely/sgao-image-center
+详细流程参见 [Cloudflare Workers 双站点自动部署](https://docs.sgao.cc/cloudflare/workers-auto-deploy)。
 
-### sgao-images
+## 相关项目
 
-Image asset repository:
+- [sgao-image-center](https://github.com/skylonely/sgao-image-center)：图片中心 Worker、上传后台和 API
+- [sgao-images](https://github.com/skylonely/sgao-images)：可选图片备份与资源仓库
 
-https://github.com/skylonely/sgao-images
+## 文档维护
 
-## 📝 Notes
-
-This project is the main website entrance of the **sgao.cc personal cloud infrastructure**.
-
-It integrates website navigation, documentation and related personal projects.
-
----
-
-Built with ❤️ by skylonely
+新增文档前请阅读 [文档写作规范](https://docs.sgao.cc/guide/writing-standard)。知识库只展示已有实际内容的页面，暂不使用只有标题或“后续补充”的占位文档。

@@ -64,11 +64,7 @@ sgao-website/
 ├── docs/
 │   ├── .vitepress/
 │   ├── cloudflare/
-│   ├── github/
-│   ├── docker/
-│   ├── vscode/
-│   ├── mac/
-│   ├── ai/
+│   ├── guide/
 │   └── index.md
 ├── dist-static/
 ├── worker/
@@ -438,12 +434,12 @@ docs/
 ├── index.md
 ├── cloudflare/
 │   ├── index.md
-│   └── workers-auto-deploy.md
-├── github/
-├── docker/
-├── vscode/
-├── mac/
-└── ai/
+│   ├── workers-auto-deploy.md
+│   ├── dns-domain.md
+│   └── image-center.md
+└── guide/
+    ├── platform-architecture.md
+    └── writing-standard.md
 ```
 
 推荐首页内容：
@@ -451,15 +447,12 @@ docs/
 ```text
 SGAO 知识库
 
-记录每一次踩坑
-沉淀每一次经验
+记录真实实践
+沉淀可复用经验
 
+平台架构
 Cloudflare
-GitHub
-Docker
-VSCode
-Mac
-AI
+文档写作规范
 ```
 
 ## 十六、常见问题
@@ -556,17 +549,13 @@ sgao-docs
 ```text
 sgao.cc
 ├── 首页
-├── AI
-├── 工具
+├── 网址导航
 └── 知识库入口
 
 docs.sgao.cc
-├── Cloudflare
-├── GitHub
-├── Docker
-├── VSCode
-├── Mac
-└── AI
+├── 平台架构
+├── Cloudflare 实践
+└── 文档写作规范
 ```
 
 完成清单：

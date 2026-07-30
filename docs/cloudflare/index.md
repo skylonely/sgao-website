@@ -1,22 +1,22 @@
 # Cloudflare
 
-记录 Cloudflare Workers、DNS、域名配置、图片 CDN 与自动部署相关内容。
+本分类记录 SGAO Platform 已经实际使用的 Cloudflare 配置与维护经验。目前只展示有完整内容、能够直接执行和验证的文档。
 
 ## 文档
 
-### 基础配置
+### [Workers 双站点自动部署](./workers-auto-deploy)
 
-- [DNS 配置](./dns)
-- [域名绑定](./domain)
-- [Pages](./pages)
-- [Workers](./workers)
+说明 `sgao.cc` 主站和 `docs.sgao.cc` 知识库如何从同一个 GitHub 仓库分别构建、部署到两个 Worker。
 
-### 自动部署
+### [DNS 与域名配置](./dns-domain)
 
-- [Workers 自动部署](./workers-auto-deploy)
+说明 `sgao.cc` 域名体系、DNS 记录、代理状态、Worker Custom Domain 和常见故障处理。
 
-### 图片 CDN
+### [Image Center（图片中心）](./image-center)
 
-- [Image Center（图片中心）](./image-center)
-- [Image Center R2 迁移](./image-center-r2-migration)
-- [Image Repository（图片仓库）](./image-repository)
+说明 `img.sgao.cc` 如何通过 Cloudflare Worker、R2 和分层缓存提供图片上传、管理与访问服务。
+
+## 相关内容
+
+- [SGAO Platform 架构](/guide/platform-architecture)
+- [文档写作规范](/guide/writing-standard)
