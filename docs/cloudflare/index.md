@@ -12,6 +12,10 @@
 
 说明 `sgao.cc` 域名体系、DNS 记录、代理状态、Worker Custom Domain 和常见故障处理。
 
+### [Spaceship 域名接入 Cloudflare Worker](./spaceship-worker-deployment)
+
+记录从 Spaceship 购买域名、修改 Nameserver、清理冲突记录，到绑定 Worker Custom Domain 的完整实际流程。
+
 ### [Image Center（图片中心）](./image-center)
 
 说明 `img.sgao.cc` 如何通过 Cloudflare Worker、R2 和分层缓存提供图片上传、管理与访问服务。

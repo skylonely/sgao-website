@@ -62,6 +62,11 @@ hero:
         <span>域名解析、代理状态和 Worker 绑定</span>
         <i>→</i>
       </a>
+      <a class="portal-card" href="/cloudflare/spaceship-worker-deployment">
+        <strong>Spaceship 域名部署</strong>
+        <span>购买域名、接入 Cloudflare 并绑定 Worker</span>
+        <i>→</i>
+      </a>
       <a class="portal-card" href="/cloudflare/image-center">
         <strong>Image Center</strong>
         <span>R2 图片存储、上传、访问与缓存</span>
@@ -88,6 +93,9 @@ hero:
         </a>
         <a href="/cloudflare/dns-domain">
           <span>DNS 与域名配置</span><i>→</i>
+        </a>
+        <a href="/cloudflare/spaceship-worker-deployment">
+          <span>Spaceship Worker 部署指南</span><i>→</i>
         </a>
       </div>
     </section>

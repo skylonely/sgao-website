@@ -18,6 +18,10 @@ export default defineConfig({
             link: "/cloudflare/workers-auto-deploy",
           },
           { text: "DNS 与域名配置", link: "/cloudflare/dns-domain" },
+          {
+            text: "Spaceship 域名部署",
+            link: "/cloudflare/spaceship-worker-deployment",
+          },
           { text: "Image Center", link: "/cloudflare/image-center" },
         ],
       },
@@ -43,6 +47,10 @@ export default defineConfig({
             link: "/cloudflare/workers-auto-deploy",
           },
           { text: "DNS 与域名配置", link: "/cloudflare/dns-domain" },
+          {
+            text: "Spaceship 域名部署",
+            link: "/cloudflare/spaceship-worker-deployment",
+          },
           {
             text: "Image Center（图片中心）",
             link: "/cloudflare/image-center",

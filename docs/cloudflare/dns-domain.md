@@ -193,6 +193,6 @@ curl -I https://img.sgao.cc/docs/guide.png
 ## 九、相关文章
 
 - [SGAO Platform 架构](/guide/platform-architecture)
+- [Spaceship 域名接入 Cloudflare Worker](./spaceship-worker-deployment)
 - [Workers 双站点自动部署](./workers-auto-deploy)
 - [Image Center（图片中心）](./image-center)
-
