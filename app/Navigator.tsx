@@ -687,7 +687,7 @@ export default function Navigator() {
                 >
                   <span className="engine-dot" />
                   {engineMap[engine].short}
-                  <i>⌄</i>
+                  <span className="engine-chevron" aria-hidden="true" />
                 </button>
                 {engineOpen && (
                   <div className="engine-menu">
@@ -722,7 +722,7 @@ export default function Navigator() {
                 placeholder={
                   engine === "local"
                     ? "搜索网站、工具或关键词..."
-                    : `使用 ${engineMap[engine].label} 搜索...`
+                    : `使用 ${engineMap[engine].label}...`
                 }
                 aria-label="搜索"
               />
