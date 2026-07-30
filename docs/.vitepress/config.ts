@@ -121,7 +121,14 @@ export default defineConfig({
           { text: "MCP", link: "/ai/mcp" },
         ],
       },
-      { text: "📐 文档规范", link: "/guide/writing-standard" },
+      {
+        text: "📐 平台与规范",
+        collapsed: false,
+        items: [
+          { text: "SGAO Platform 架构", link: "/guide/platform-architecture" },
+          { text: "文档写作规范", link: "/guide/writing-standard" },
+        ],
+      },
     ],
 
     socialLinks: [

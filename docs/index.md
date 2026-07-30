@@ -167,6 +167,7 @@ hero:
         </div>
       </div>
       <div class="portal-links">
+        <a href="/guide/platform-architecture"><span>SGAO Platform 架构</span><i>→</i></a>
         <a href="/cloudflare/"><span>Cloudflare</span><i>→</i></a>
         <a href="/github/"><span>GitHub</span><i>→</i></a>
         <a href="/docker/"><span>Docker</span><i>→</i></a>
