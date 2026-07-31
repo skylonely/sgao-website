@@ -99,3 +99,5 @@ npx wrangler deploy --config wrangler.docs.jsonc
 ## 文档维护
 
 新增文档前请阅读 [文档写作规范](https://docs.sgao.cc/guide/writing-standard)。知识库只展示已有实际内容的页面，暂不使用只有标题或“后续补充”的占位文档。
+
+test: verify GitHub contributions
