@@ -380,6 +380,71 @@ export const systemArchitectBook: BookModule = {
         },
       ],
     },
+    {
+      text: "第四章 · 嵌入式技术",
+      items: [
+        {
+          text: "01 第四章导读",
+          link: "/ruankao/system-architect/chapters/chapter-04/01-embedded-technology",
+          description: "了解嵌入式技术知识框架、学习目标与推荐路线。",
+        },
+        {
+          text: "02 微处理器体系结构",
+          link: "/ruankao/system-architect/chapters/chapter-04/02-microprocessor-architecture",
+          description: "比较冯·诺依曼结构与哈佛结构。",
+        },
+        {
+          text: "03 微处理器分类",
+          link: "/ruankao/system-architect/chapters/chapter-04/03-microprocessor-classification",
+          description: "区分 MCU、MPU、DSP 与 SoC 的特点和用途。",
+        },
+        {
+          text: "04 多核处理器",
+          link: "/ruankao/system-architect/chapters/chapter-04/04-multi-core-processor",
+          description: "理解 SMP、AMP 与多核任务调度。",
+        },
+        {
+          text: "05 嵌入式软件",
+          link: "/ruankao/system-architect/chapters/chapter-04/05-embedded-software",
+          description: "掌握 BSP、BootLoader 与设备驱动的职责。",
+        },
+        {
+          text: "06 嵌入式系统",
+          link: "/ruankao/system-architect/chapters/chapter-04/06-embedded-system",
+          description: "学习系统组成、特点与层次结构。",
+        },
+        {
+          text: "07 实时操作系统",
+          link: "/ruankao/system-architect/chapters/chapter-04/07-real-time-operating-system",
+          description: "理解 EOS、RTOS、硬实时与软实时。",
+        },
+        {
+          text: "08 嵌入式软件设计",
+          link: "/ruankao/system-architect/chapters/chapter-04/08-embedded-software-design",
+          description: "掌握交叉开发、交叉编译和交叉调试。",
+        },
+        {
+          text: "09 软件开发工具",
+          link: "/ruankao/system-architect/chapters/chapter-04/09-development-tools",
+          description: "区分编辑器、GCC、GDB 与 JTAG 的作用。",
+        },
+        {
+          text: "10 章节练习",
+          link: "/ruankao/system-architect/chapters/chapter-04/10-exercises",
+          description: "通过选择题、判断题和简答题巩固知识。",
+        },
+        {
+          text: "11 历年真题复习",
+          link: "/ruankao/system-architect/chapters/chapter-04/11-past-exams",
+          description: "整理高频考点、典型题型和考前速记。",
+        },
+        {
+          text: "12 第四章总结",
+          link: "/ruankao/system-architect/chapters/chapter-04/12-summary",
+          description: "回顾知识体系、易错点与复习路线。",
+        },
+      ],
+    },
   ],
 };
 
