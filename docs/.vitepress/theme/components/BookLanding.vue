@@ -32,7 +32,7 @@ const firstChapter = computed(() => book.value.sections[0]?.items[0]);
       <div class="book-stats">
         <div><strong>{{ chapterCount }}</strong><span>完整章节</span></div>
         <div><strong>{{ book.sections.length }}</strong><span>学习阶段</span></div>
-        <div><strong>{{ book.version }}</strong><span>当前版本</span></div>
+        <div><strong>体系化</strong><span>从原理到实战</span></div>
         <div><strong>实战</strong><span>原理与案例并重</span></div>
       </div>
     </section>

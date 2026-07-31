@@ -2,144 +2,38 @@
 outline: deep
 ---
 
-# 第八章：Git Flow——企业级 Git 工作流
+# 第八章：Git 工作流与团队协作
 
 > **一句话理解：**
 >
-> **工作流（Workflow）决定团队如何协作，而不仅仅是如何使用 Git。**
+> **Git 工作流不是 Git 的功能，而是团队约定如何使用 Git 的规则。**
 
 ---
 
-## 本章知识地图
+## 🎯 学习目标
 
-```text
-Git 工作流
-├── Git Flow
-├── GitHub Flow
-├── Trunk-Based Development
-├── Pull Request
-├── Code Review
-├── CI/CD
-└── AI Coding
-```
+完成本章后，你将能够：
 
----
-
-## 本章目标
-
-完成本章学习后，你将能够：
-
-- 理解为什么会有 Git 工作流
-- 掌握 Git Flow、GitHub Flow、Trunk-Based Development
+- 理解 Git Flow、GitHub Flow、Trunk-Based Development 的区别
 - 根据团队规模选择合适的工作流
-- 理解现代 CI/CD 与 AI Coding 的关系
+- 建立统一的分支协作规范
+- 理解 AI Coding 时代的软件开发流程
 
 ---
 
-## 🏛️ 设计思想（Design Philosophy）
-
-Git 只是工具。
-
-真正影响团队效率的是：
-
-> **大家是否遵循统一的协作规则。**
-
-如果每个人都按自己的方式开发：
-
-- 分支混乱
-- 提交混乱
-- 发布混乱
-
-于是便诞生了 Git 工作流。
-
----
-
-## 📈 演进历史（Evolution）
-
-```text
-CVS
- │
-SVN
- │
-Git
- │
-Git Flow（2010）
- │
-GitHub Flow
- │
-CI/CD
- │
-Trunk-Based Development
- │
-AI Coding（ChatGPT / Codex）
-```
-
-软件交付越来越快，工作流也不断演进。
-
----
-
-## 一、Git Flow
-
-适合：
-
-- 长期维护产品
-- 多版本并行
-- 发布流程严格
-
-### 分支结构
-
-```text
-main
-│
-develop
-├── feature/*
-├── release/*
-└── hotfix/*
-```
-
-#### 生命周期
+## 🚀 一分钟读懂
 
 ```text
 需求
  │
  ▼
-feature
+Feature Branch
  │
  ▼
-develop
+开发 + AI 辅助编码
  │
  ▼
-release
- │
- ▼
-main
-```
-
-优点：
-
-- 版本清晰
-- 发布可控
-
-缺点：
-
-- 分支较多
-- 流程复杂
-
----
-
-## 二、GitHub Flow
-
-一句话：
-
-> **只有一个长期存在的 main。**
-
-流程：
-
-```text
-main
- │
- ▼
-feature
+Commit
  │
  ▼
 Pull Request
@@ -148,251 +42,310 @@ Pull Request
 Code Review
  │
  ▼
-Merge
+GitHub Actions
  │
  ▼
-Deploy
+部署
 ```
-
-适合：
-
-- Web 项目
-- SaaS
-- 创业团队
-
-优点：
-
-- 简单
-- 上手快
-- 持续部署友好
 
 ---
 
-## 三、Trunk-Based Development
+## 📖 故事引入
 
-设计理念：
+两支团队都在使用 Git：
 
-> 尽量减少长期分支。
+- A 团队：任何人直接提交到 `main`
+- B 团队：统一分支、Code Review、自动测试后再合并
+
+几个月后：
+
+- A 团队历史混乱、冲突频发、回滚困难。
+- B 团队上线稳定、协作顺畅。
+
+区别不在 Git，而在**工作流**。
+
+---
+
+## 🏛️ 为什么需要工作流？
+
+Git 提供的是能力：
+
+- Branch
+- Commit
+- Merge
+
+工作流规定的是：
+
+- 什么时候建分支
+- 谁可以合并
+- 谁负责评审
+- 什么时候发布
+
+统一规则可以显著降低协作成本。
+
+---
+
+## Git Flow
+
+典型分支：
+
+```text
+main
+ │
+develop
+ ├── feature/*
+ ├── release/*
+ └── hotfix/*
+```
+
+**适合：**
+
+- 大型项目
+- 固定版本发布
+- 多团队协作
+
+**优点：**
+
+- 职责清晰
+- 发布流程规范
+
+**缺点：**
+
+- 分支较多
+- 学习成本较高
+
+---
+
+## GitHub Flow
 
 流程：
 
 ```text
 main
  │
- ├── 短生命周期分支
+feature/*
  │
- └── 每天多次合并
-```
-
-通常配合：
-
-- 自动测试
-- Feature Flag
-- CI/CD
-
-适合：
-
-- DevOps
-- 高频发布团队
-
----
-
-## 三种工作流对比
-
-| 项目类型 | 推荐工作流 |
-| --- | --- |
-| 个人项目 | GitHub Flow |
-| 创业团队 | GitHub Flow |
-| 企业业务系统 | Git Flow |
-| 高频发布平台 | Trunk-Based |
-| 开源项目 | GitHub Flow |
-
----
-
-## Pull Request 为什么重要？
-
-Pull Request（PR）不仅是合并代码。
-
-更重要的是：
-
-- Code Review
-- 自动测试
-- 团队讨论
-- 风险控制
-
-推荐流程：
-
-```text
-Feature
- │
- ▼
-Push
- │
- ▼
 Pull Request
  │
- ▼
 Review
  │
- ▼
-CI
- │
- ▼
 Merge
 ```
 
+特点：
+
+- 只有长期维护的 `main`
+- 功能开发使用短生命周期分支
+- 合并后立即部署
+
+**适合：**
+
+- Web
+- SaaS
+- 持续交付团队
+
 ---
 
-## 🚨 事故案例
+## Trunk-Based Development
 
-某团队所有人直接 Push 到 main：
+核心思想：
+
+所有开发者围绕主干（Trunk）协作。
 
 ```text
 main
-├── 登录（未完成）
-├── 支付（未完成）
-├── 修复 Bug
-└── 实验代码
+ │
+短分支
+ │
+快速合并
 ```
 
-一次发布导致：
+特点：
 
-- Bug 修复上线
-- 未完成功能也一起上线
+- 分支生命周期短
+- 高频提交
+- 高频部署
 
-正确做法：
+要求：
 
-所有开发先进入 Feature Branch，经 PR 后再合并。
-
----
-
-## 📖 企业规范（Enterprise Practice）
-
-建议：
-
-- 一个功能，一个分支
-- 一个分支，一个 PR
-- PR 至少一人 Review
-- CI 全绿再 Merge
-- Merge 后立即删除 Feature Branch
+- 自动测试完善
+- CI/CD 成熟
 
 ---
 
-## 🤖 AI Coding 工作流
+## 📊 三种工作流对比
 
-现代推荐流程：
+| 工作流 | 适用场景 | 优点 | 挑战 |
+| --- | --- | --- | --- |
+| Git Flow | 版本制软件 | 流程规范 | 分支较多 |
+| GitHub Flow | Web / SaaS | 简洁高效 | 依赖持续部署 |
+| Trunk-Based | 高速迭代 | 冲突少、反馈快 | 自动化要求高 |
+
+---
+
+## 🤖 AI Coding 时代的新工作流
+
+现代开发流程正在发生变化：
 
 ```text
-需求
- │
- ▼
+需求分析
+   │
+   ▼
 ChatGPT / Codex
- │
- ▼
+   │
+   ▼
 Feature Branch
- │
- ▼
-人工 Review
- │
- ▼
+   │
+   ▼
+开发与自测
+   │
+   ▼
+Commit
+   │
+   ▼
 Pull Request
- │
- ▼
-CI 自动测试
- │
- ▼
-Merge
- │
- ▼
-Cloudflare / Production
+   │
+   ▼
+AI Review + 人工 Review
+   │
+   ▼
+GitHub Actions
+   │
+   ▼
+自动测试
+   │
+   ▼
+自动部署
 ```
 
-AI 可以提升效率，但：
+AI 可以提高开发效率，但不能替代：
 
-> **AI 不应绕过 Review 与测试。**
+- 需求确认
+- 架构设计
+- Code Review
+- 最终质量把关
 
 ---
 
-## 🧪 实验室（Lab）
+## 🏢 企业实践
 
-创建功能分支：
+建议统一规范：
 
-```bash
-git switch -c feature/login
+- 一个需求一个分支
+- Pull Request 至少一位评审
+- 必须通过自动测试
+- 禁止直接提交到 `main`
+- 发布版本统一打 Tag
+
+---
+
+## ⚠️ 常见误区
+
+❌ 工作流越复杂越专业。
+
+实际上，应选择最符合团队规模和业务特点的方案。
+
+---
+
+❌ 使用 AI 后可以跳过 Code Review。
+
+AI 会提高效率，但不能保证业务逻辑完全正确。
+
+---
+
+## 🏆 Senior Tips
+
+随着团队成长，可以逐步升级：
+
+```text
+个人开发
+   │
+GitHub Flow
+   │
+Git Flow
+   │
+Trunk-Based + CI/CD
 ```
 
-提交：
+流程应服务于团队，而不是增加负担。
 
-```bash
-git add .
-git commit -m "feat(login): add login"
-git push origin feature/login
+---
+
+## 🧪 Lab
+
+假设团队有：
+
+- 3 名前端
+- 2 名后端
+- 1 名测试
+
+请设计：
+
+1. 分支命名规范
+2. Pull Request 流程
+3. 发布流程
+4. Hotfix 流程
+
+并说明为什么这样设计。
+
+---
+
+## 🔗 知识关联
+
+```text
+第七章
+Merge
+Rebase
+Conflict
+      │
+      ▼
+第八章
+Git Flow
+GitHub Flow
+Trunk-Based
+      │
+      ▼
+第九章
+GitHub
+Pull Request
+Review
+Issues
 ```
 
-然后：
+---
 
-- 创建 Pull Request
-- 请同事 Review
-- Merge 到 main
+## ✅ 本章速查
+
+**推荐选择**
+
+- 个人项目：GitHub Flow
+- 中小团队：GitHub Flow + CI
+- 大型团队：Git Flow 或 Trunk-Based
+
+**一句话总结**
+
+优秀团队的核心竞争力，不是工具，而是统一、可执行、可持续演进的协作流程。
 
 ---
 
 ## 🧠 思考题
 
-为什么越来越多互联网公司从 Git Flow 转向 GitHub Flow 或 Trunk-Based？
-
-提示：
-
-思考：
-
-- 发布频率
-- 自动化
-- CI/CD
+如果你的团队已经使用 ChatGPT、Codex 等 AI 工具，哪些开发环节可以交给
+AI？哪些环节仍应由开发者负责？
 
 ---
 
-## 面试官会怎么问？
+## 📚 下一章预告
 
-**Q：Git Flow 和 GitHub Flow 最大区别？**
+**第九章：《GitHub 与现代协作》**
 
-答：
-
-Git Flow 分支更多，适合版本管理严格的项目；GitHub Flow 更简单，围绕
-main + Feature Branch + Pull Request，适合持续交付。
-
-**Q：什么时候选择 Trunk-Based？**
-
-答：
-
-当团队拥有完善的自动测试、CI/CD 和快速发布能力时，Trunk-Based
-能显著减少分支维护成本。
-
----
-
-## 本章总结
-
-没有一种工作流适合所有团队。
-
-选择原则：
-
-- 发布频率越高，流程越简单。
-- 自动化越完善，越适合短生命周期分支。
-- 团队越大，越需要统一规范。
-
----
-
-## 下一章预告
-
-**第九章：《GitHub——现代协作开发平台》**
-
-我们将进入 GitHub 世界，系统介绍：
+我们将深入介绍：
 
 - Repository
-- Fork
-- Star
 - Issue
 - Pull Request
-- Actions
-- Releases
-- Pages
-- GitHub 与 AI 开发
+- Code Review
+- Release
+- Projects
+
+理解 GitHub 如何成为现代软件工程的协作平台。

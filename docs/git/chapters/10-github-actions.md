@@ -2,179 +2,125 @@
 outline: deep
 ---
 
-# 第十章：GitHub Actions——自动化与 CI/CD
+# 第十章：GitHub Actions 与 CI/CD
 
 > **一句话理解：**
 >
-> **GitHub Actions = GitHub
-> 内置的自动化平台，让代码提交后自动完成测试、构建、发布和部署。**
+> **GitHub Actions 是把一次 Git
+> 提交自动连接到测试、构建和部署的桥梁，让软件交付从手工操作走向自动化。**
 
 ---
 
-## 🎯 学习目标（Learning Outcomes）
+## 🎯 学习目标
 
 完成本章后，你将能够：
 
-- 理解 CI 与 CD 的区别
-- 理解 Workflow、Job、Step、Runner 的关系
-- 编写基础 GitHub Actions Workflow
-- 自动构建并部署项目
-- 排查常见 Workflow 失败原因
+- 理解 CI/CD 的核心思想
+- 理解 GitHub Actions 的工作原理
+- 掌握 Workflow、Job、Step、Runner 的关系
+- 编写简单的 GitHub Actions Workflow
+- 将 GitHub Actions 应用于实际项目自动部署
 
 ---
 
-## 🏗️ 系统架构图（Architecture）
+## 🚀 一分钟读懂
 
 ```text
-Developer
-    │
 git push
     │
     ▼
-GitHub Repository
+GitHub
     │
     ▼
 GitHub Actions
     │
- ┌── Test
- ├── Build
- ├── Lint
- └── Deploy
+    ▼
+Install
     │
     ▼
-Cloudflare / GitHub Pages / Docker
+Lint
+    │
+    ▼
+Test
+    │
+    ▼
+Build
+    │
+    ▼
+Deploy
 ```
 
 ---
 
-## 本章知识地图
+## 📖 故事引入
 
-```text
-GitHub Actions
-├── CI/CD
-├── Workflow
-├── Event
-├── Job
-├── Step
-├── Runner
-├── Secrets
-├── Cache
-└── Deploy
-```
+假设团队每天发布几十次代码。
 
----
+如果每次都需要手动：
 
-## 🏛️ 设计思想（Design Philosophy）
-
-过去开发流程通常依赖人工：
-
-```text
-写代码 → 测试 → 打包 → 上传服务器
-```
-
-效率低且容易出错。
-
-GitHub Actions
-将这些步骤自动化，实现**持续集成（CI）**与**持续交付（CD）**。
-
----
-
-## 📈 演进历史（Evolution）
-
-```text
-手工部署
-   │
-Jenkins
-   │
-GitHub Actions
-   │
-Cloud CI
-   │
-AI 自动化开发
-```
-
----
-
-## 一、CI 与 CD
-
-**CI（Continuous Integration）**：持续集成。
-
-开发者频繁提交代码，由系统自动执行测试、检查和构建。
-
-**CD（Continuous Delivery / Deployment）**：持续交付或持续部署。
-
-代码通过验证后，自动发布到目标环境。
-
----
-
-## 二、GitHub Actions 的四个核心概念
-
-### Workflow
-
-一次自动化流程。
-
-保存在：
-
-```text
-.github/workflows/*.yml
-```
-
----
-
-### Event
-
-Workflow 的触发条件，例如：
-
-```yaml
-on:
-  push:
-    branches:
-      - main
-```
-
----
-
-### Job
-
-Workflow 中的一组任务。
-
-一个 Workflow 可以包含多个 Job。
-
----
-
-### Step
-
-Job 中的具体执行步骤，例如：
-
-- Checkout
 - 安装依赖
-- 构建
-- 测试
-- 部署
+- 执行测试
+- 打包
+- 上传服务器
+
+不仅效率低，而且容易出错。
+
+GitHub Actions 的目标，就是把这些重复工作自动完成。
 
 ---
 
-### Runner
+## 🏛️ 什么是 CI/CD？
 
-真正执行 Workflow 的运行环境。
+**CI（Continuous Integration，持续集成）**
 
-常见：
+每次提交代码后，自动执行：
 
-```yaml
-runs-on: ubuntu-latest
+- 编译
+- 检查
+- 测试
+
+确保新代码不会破坏已有功能。
+
+**CD（Continuous Delivery / Deployment）**
+
+通过自动化流程，将通过验证的代码持续交付或部署到目标环境。
+
+---
+
+## GitHub Actions 工作模型
+
+```text
+Event
+   │
+   ▼
+Workflow
+   │
+   ▼
+Job
+   │
+   ▼
+Step
+   │
+   ▼
+Runner
 ```
 
+- **Event**：触发事件，例如 `push`、`pull_request`
+- **Workflow**：完整自动化流程
+- **Job**：一组任务
+- **Step**：任务中的具体步骤
+- **Runner**：执行 Workflow 的运行环境
+
 ---
 
-## 三、第一个 Workflow
+## 第一个 Workflow
 
 ```yaml
-name: Build
+name: CI
 
 on:
   push:
-    branches:
-      - main
+    branches: [main]
 
 jobs:
   build:
@@ -186,225 +132,191 @@ jobs:
       - name: Install
         run: npm install
 
-      - name: Build
-        run: npm run build
+      - name: Test
+        run: npm test
 ```
 
-当代码推送到 main 后，将自动执行安装与构建。
+一次 `git push` 即可自动执行整个流程。
 
 ---
 
-## 四、Secrets
-
-不要把密钥写进代码。
-
-正确做法：
-
-```text
-Repository
-
-↓
-
-Settings
-
-↓
-
-Secrets and variables
-
-↓
-
-Actions
-```
-
-例如：
-
-- API_KEY
-- CLOUDFLARE_API_TOKEN
-- R2_ACCESS_KEY
-
----
-
-## 五、Cache
-
-安装依赖往往最耗时。
-
-可以开启缓存：
-
-```yaml
-uses: actions/cache
-```
-
-减少重复下载，提高构建速度。
-
----
-
-## 六、自动部署
-
-典型流程：
+## 🔄 Workflow 生命周期
 
 ```text
 Push
  │
  ▼
-Actions
+Checkout
  │
- ├── Test
- ├── Build
- └── Deploy
-      │
-      ▼
-Cloudflare Pages
+ ▼
+Install
+ │
+ ▼
+Lint
+ │
+ ▼
+Test
+ │
+ ▼
+Build
+ │
+ ▼
+Deploy
 ```
 
-这也是现代前端项目最常见的发布方式。
+任何一步失败，Workflow 都会停止并反馈错误。
 
 ---
 
-## 🏢 企业实践（Enterprise Practice）
+## 🌍 真实案例：自动部署文档网站
 
-建议：
-
-- 每次提交自动执行 Lint
-- 自动运行单元测试
-- Build 成功才能 Merge
-- 使用 Secrets 管理敏感信息
-- 主分支开启保护策略
-
----
-
-## 🚨 事故案例（Case Study）
-
-开发者将 Cloudflare API Token 写入仓库。
-
-结果：
-
-- Token 泄露
-- 被第三方调用
-- 服务受到影响
-
-**经验：**
-
-任何密钥都应放入 GitHub Secrets，而不是代码仓库。
-
----
-
-## 💡 常见误区（Common Mistakes）
-
-- ❌ Workflow 放错目录
-- ❌ YAML 缩进错误
-- ❌ Secret 写进代码
-- ❌ 所有步骤放在一个 Job 中
-- ❌ 构建失败仍继续部署
-
----
-
-## 🤖 AI Coding 实践
-
-ChatGPT / Codex 可以：
-
-- 生成 Workflow
-- 优化 YAML
-- 排查构建错误
-
-但仍需：
-
-- 人工检查权限
-- 验证 Secrets
-- 阅读执行日志
-
----
-
-## ✅ 最佳实践清单（Checklist）
-
-- [ ] Workflow 放在 `.github/workflows`
-- [ ] 使用 Secrets
-- [ ] 自动执行测试
-- [ ] 自动构建
-- [ ] 自动部署
-- [ ] 开启依赖缓存
-- [ ] 保持日志清晰
-
----
-
-## 🧪 实验室（Lab）
-
-创建：
+假设维护一个文档站点：
 
 ```text
-.github/workflows/build.yml
+docs/
 ```
 
-提交：
+开发流程：
 
-```bash
-git add .
-git commit -m "ci: add github actions"
+```text
+修改 Markdown
+      │
+      ▼
+git commit
+      │
+      ▼
 git push
+      │
+      ▼
+GitHub Actions
+      │
+      ▼
+构建静态文件
+      │
+      ▼
+部署到 Cloudflare Pages
+      │
+      ▼
+网站自动更新
 ```
 
-观察 GitHub Actions 是否自动执行。
+整个过程无需手动上传文件。
+
+---
+
+## 🏢 企业实践
+
+推荐流水线包含：
+
+- 安装依赖
+- 代码格式检查
+- 静态分析
+- 单元测试
+- 构建
+- 安全扫描
+- 自动部署
+
+生产环境通常还会增加人工审批环节。
+
+---
+
+## ⚠️ 常见误区
+
+❌ GitHub Actions 只能用于部署。
+
+实际上，它可以执行几乎任何自动化任务。
+
+---
+
+❌ 所有 Workflow 都应自动部署生产环境。
+
+建议区分：
+
+- 开发环境
+- 测试环境
+- 生产环境
+
+采用不同策略。
+
+---
+
+## 🏆 Senior Tips
+
+设计流水线时遵循：
+
+- 快速失败（Fail Fast）
+- 可重复执行
+- 最小权限
+- Secrets 不写入代码仓库
+- 小步发布、快速回滚
+
+---
+
+## 🧪 Lab
+
+创建 `.github/workflows/ci.yml`：
+
+1. Push 自动触发
+2. 安装依赖
+3. 执行测试
+4. 构建项目
+
+尝试增加一个故意失败的步骤，观察 Workflow 的执行结果。
+
+---
+
+## 🔗 知识关联
+
+```text
+第九章
+Repository
+PR
+Review
+      │
+      ▼
+第十章
+Workflow
+Job
+Step
+Runner
+CI/CD
+      │
+      ▼
+第十一章
+恢复
+Reset
+Restore
+Reflog
+```
+
+---
+
+## ✅ 本章速查
+
+**Workflow 组成**
+
+- Event
+- Workflow
+- Job
+- Step
+- Runner
+
+**一句话总结**
+
+GitHub Actions 将 Git、测试、构建和部署连接成一条自动化交付流水线。
 
 ---
 
 ## 🧠 思考题
 
-为什么现代团队越来越倾向于"Push 即部署"？
-
-思考：
-
-- 自动化
-- 可重复性
-- 减少人为错误
+如果团队每天发布 30 次代码，没有 CI/CD
+会遇到哪些问题？自动化能够解决哪些环节，又有哪些工作仍需要人工参与？
 
 ---
 
-## 面试官会怎么问？
-
-**Q：Workflow、Job、Step 有什么关系？**
-
-答：
-
-Workflow 是完整流程；Workflow 包含一个或多个 Job；Job 又由多个 Step
-组成。
-
-**Q：为什么使用 GitHub Secrets？**
-
-答：
-
-用于安全管理敏感信息，避免密钥泄露到代码仓库。
-
----
-
-## 📚 延伸阅读（Further Reading）
-
-建议继续学习：
-
-- Docker 与 GitHub Actions
-- Cloudflare Pages 自动部署
-- Cloudflare Workers 自动发布
-- GitHub CLI
-- GitHub API
-- Dependabot
-
----
-
-## 本章总结
-
-GitHub Actions 将重复性的开发工作自动化，使团队能够更专注于业务开发。
-
-它不仅是 CI/CD 工具，更是现代软件工程的重要组成部分。
-
----
-
-## 下一章预告
+## 📚 下一章预告
 
 **第十一章：《Git 实战与事故恢复》**
 
-我们将通过真实案例学习：
-
-- 误删 Commit 如何恢复
-- reset、revert、restore 的区别
-- reflog 的使用
-- Cherry-pick
-- Stash
-- 常见 Git 事故处理流程
+学习如何使用 Reset、Restore、Revert、Reflog
+等工具，在误操作后快速恢复项目。

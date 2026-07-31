@@ -2,423 +2,352 @@
 outline: deep
 ---
 
-# 第五章：Git 常用命令（开发实战篇）
+# 第五章：Git 常用命令与开发实践
 
-> **这一章不只是教命令，而是教你在真实开发中什么时候用、为什么用。**
+> **一句话理解：**
+>
+> **Git 命令不是独立存在的，每一个命令都对应着 Git
+> 底层对象和状态的变化。**
 
 ---
 
-## 本章知识地图
+## 🎯 学习目标
+
+完成本章后，你将能够：
+
+- 掌握最常用 Git 命令
+- 理解每个命令为什么存在
+- 建立完整的日常开发流程
+- 编写高质量 Commit
+- 避免常见操作失误
+
+---
+
+## 🚀 一分钟读懂
 
 ```text
-Git 命令体系
-
-初始化
-├── git init
-└── git clone
-
-查看状态
-├── git status
-├── git diff
-└── git log
-
-提交
-├── git add
-├── git commit
-└── git restore
-
-文件操作
-├── git mv
-└── git rm
-
-同步
-├── git fetch
-├── git pull
-└── git push
+开始开发
+    │
+git pull
+    │
+git switch -c feature/login
+    │
+编写代码
+    │
+git status
+    │
+git diff
+    │
+git add
+    │
+git commit
+    │
+git push
+    │
+Pull Request
 ```
 
 ---
 
-## 本章目标
+## 📖 故事引入
 
-学习完成后，你能够：
+假设今天需要开发一个登录功能。
 
-- 独立完成一个 Git 开发流程
-- 理解每条命令存在的原因
-- 知道哪些命令危险、哪些命令安全
-- 建立每天开发的 Git 使用习惯
+正确的流程不是一上来就 `git commit`，而是按开发节奏组织每一步操作。
+
+理解流程，比记住命令更重要。
 
 ---
 
-## 一、初始化项目
+## 🏛️ 设计思想
 
-### git init
+Git 的命令可以分为四类：
 
-**作用：** 将普通目录变成 Git 仓库。
+| 类型 | 目标 |
+| --- | --- |
+| 查看状态 | 了解当前发生了什么 |
+| 组织修改 | 决定哪些内容进入本次提交 |
+| 记录历史 | 创建新的 Commit |
+| 协作同步 | 与远程仓库共享历史 |
+
+---
+
+## 🌍 一天的真实开发流程
+
+### ① 同步最新代码
 
 ```bash
-git init
+git pull
 ```
 
-#### 为什么会有这个命令？
+**为什么存在？**
 
-Git 需要创建 `.git` 目录，用来保存对象数据库、提交历史、分支信息等。
-
-#### 开发场景
-
-新建一个前端项目：
-
-```bash
-mkdir vue-demo
-cd vue-demo
-git init
-```
-
-危险指数：⭐☆☆☆☆（安全）
+确保本地基于最新代码开发，减少冲突。
 
 ---
 
-### git clone
-
-**作用：** 从远程仓库复制一个完整仓库。
+### ② 创建功能分支
 
 ```bash
-git clone https://github.com/user/project.git
+git switch -c feature/login
 ```
 
-#### 开发场景
+**为什么存在？**
 
-加入团队项目时，第一步通常就是 `git clone`。
-
-危险指数：⭐☆☆☆☆（安全）
+一个功能一个分支，降低风险。
 
 ---
 
-## 二、查看状态
-
-### git status
-
-这是开发过程中最常用的命令。
+### ③ 查看状态
 
 ```bash
 git status
 ```
 
-#### 为什么需要它？
+这是使用频率最高的 Git 命令。
 
-任何提交之前，都建议先确认：
+作用：
 
-- 哪些文件修改了？
-- 哪些已经进入暂存区？
-- 当前位于哪个分支？
+- 查看修改
+- 查看暂存区
+- 查看当前分支
 
-#### 开发建议
-
-一天可能执行几十次 `git status`，它应该成为肌肉记忆。
-
-危险指数：⭐☆☆☆☆
+> 💡 建议每次提交前都执行一次。
 
 ---
 
-### git diff
-
-查看尚未提交的修改。
+### ④ 查看差异
 
 ```bash
 git diff
 ```
 
-#### 开发场景
+查看工作区修改。
 
-AI 帮你生成了一段代码。
-
-提交前：
+查看暂存区：
 
 ```bash
-git diff
+git diff --cached
 ```
 
-认真阅读每一处变化。
+**为什么存在？**
 
-危险指数：⭐☆☆☆☆
+提交前先检查，避免误提交。
 
 ---
 
-### git log
-
-查看提交历史。
+### ⑤ 添加到暂存区
 
 ```bash
-git log --oneline
+git add login.vue
 ```
 
-常用参数：
-
-```bash
-git log --graph --oneline --decorate
-```
-
-可以更直观地查看提交关系。
-
-危险指数：⭐☆☆☆☆
-
----
-
-## 三、提交代码
-
-### git add
+或者：
 
 ```bash
 git add .
 ```
 
-#### 为什么不是直接 commit？
+**为什么存在？**
 
-因为 Git 引入了**暂存区**。
-
-你可以：
-
-```bash
-git add src/Login.vue
-```
-
-只提交登录功能，而不是整个项目。
-
-危险指数：⭐☆☆☆☆
+决定本次 Commit 包含哪些修改。
 
 ---
 
-### git commit
+### ⑥ 创建 Commit
 
 ```bash
-git commit -m "feat(login): add login page"
+git commit -m "feat: add login page"
 ```
 
-#### 推荐提交规范
+Commit 应该：
 
-```text
-feat: 新功能
-fix: 修复 Bug
-docs: 文档
-style: 样式
-refactor: 重构
-test: 测试
-chore: 维护
-```
-
-危险指数：⭐☆☆☆☆
+- 小
+- 独立
+- 可回滚
 
 ---
 
-## 四、恢复修改
-
-### git restore
-
-恢复工作区修改：
+### ⑦ 推送远程
 
 ```bash
-git restore README.md
+git push origin feature/login
 ```
 
-恢复暂存区：
-
-```bash
-git restore --staged README.md
-```
-
-#### 开发场景
-
-修改了一堆内容，发现方向错了，可以恢复。
-
-⚠️ 注意：
-
-恢复后，未提交的修改可能无法找回。
-
-危险指数：⭐⭐⭐☆☆
+随后创建 Pull Request。
 
 ---
 
-## 五、文件操作
+## 📦 Commit Message 规范
 
-### git mv
+推荐采用 Conventional Commits：
 
-移动文件并保留历史。
+| 类型 | 用途 |
+| --- | --- |
+| feat | 新功能 |
+| fix | 修复 Bug |
+| docs | 文档 |
+| refactor | 重构 |
+| test | 测试 |
+| chore | 工程维护 |
+| ci | CI/CD |
+
+例如：
 
 ```bash
-git mv old.js new.js
+git commit -m "fix: resolve login timeout"
 ```
-
-危险指数：⭐☆☆☆☆
 
 ---
 
-### git rm
+## 🏢 企业实践
 
-删除文件。
+建议团队统一：
 
-```bash
-git rm test.js
-```
-
-如果只是删除工作区文件，不希望 Git 跟踪：
-
-```bash
-git rm --cached test.js
-```
-
-危险指数：⭐⭐⭐☆☆
+- 一个功能一个 Branch
+- 一个 Commit 一件事
+- Push 前执行 `git diff`
+- Commit Message 保持一致
+- 所有修改通过 Pull Request 合并
 
 ---
 
-## 六、同步远程仓库
+## ⚠️ 常见误区
 
-### git fetch
+❌ 不看 `git status` 就提交
 
-获取远程更新，但**不会自动合并**。
-
-```bash
-git fetch
-```
-
-适合先查看远程变化。
-
-危险指数：⭐☆☆☆☆
+容易遗漏文件。
 
 ---
 
-### git pull
+❌ 一个 Commit 包含多个功能
 
-拉取并合并远程代码。
-
-```bash
-git pull origin main
-```
-
-开发前建议先执行，减少冲突。
-
-危险指数：⭐⭐☆☆☆
+后续 Review 和回滚都会变得困难。
 
 ---
 
-### git push
+❌ 直接在 main 分支开发
 
-上传本地提交。
-
-```bash
-git push origin main
-```
-
-#### 开发建议
-
-不要未经 Review 就直接推送到生产主分支。
-
-危险指数：⭐⭐☆☆☆
+应始终使用 Feature Branch。
 
 ---
 
-## 七、一天开发流程（推荐）
+## 🏆 Senior Tips
 
-```text
-开始工作
-   │
-git pull
-   │
-开发代码
-   │
+每次提交前执行：
+
+```bash
 git status
-   │
+git diff --cached
+```
+
+问自己两个问题：
+
+1. 这次 Commit 是否只完成一件事？
+2. 如果明天需要回滚，我是否愿意只撤销这一次提交？
+
+如果答案都是"是"，通常说明 Commit 质量不错。
+
+---
+
+## 🧪 Lab
+
+模拟一次开发：
+
+```bash
+git switch -c feature/demo
+
+echo "demo" > demo.txt
+
+git status
 git diff
-   │
-git add
-   │
-git commit
-   │
-git push
-结束工作
-```
 
----
+git add demo.txt
 
-## AI 时代 Git 工作流
+git diff --cached
 
-```text
-ChatGPT / Codex
-        │
-生成代码
-        │
-git diff（人工 Review）
-        │
-本地运行测试
-        │
-git add
-        │
-git commit
-        │
-git push
-```
+git commit -m "feat: add demo"
 
-> **原则：永远不要未经检查就提交 AI 生成的代码。**
-
----
-
-## 实验室（Lab）
-
-```bash
-mkdir git-lab
-cd git-lab
-git init
-
-echo "Hello Git" > README.md
-
-git status
-git add README.md
-git status
-git commit -m "docs: first commit"
 git log --oneline
 ```
 
-观察每一步状态变化。
+观察：
+
+每一步命令如何影响 Git 状态。
 
 ---
 
-## 面试官会怎么问？
+## 🔗 知识关联
 
-**Q：git fetch 和 git pull 有什么区别？**
-
-答：
-
-- `git fetch`：只获取远程更新，不合并。
-- `git pull`：获取更新并尝试合并到当前分支。
-
----
-
-## 本章总结
-
-真正高频使用的命令其实只有十几个：
-
-- git init
-- git clone
-- git status
-- git diff
-- git add
-- git commit
-- git log
-- git restore
-- git fetch
-- git pull
-- git push
-
-熟练掌握它们，就足以完成绝大多数日常开发工作。
+```text
+第四章
+Blob
+Tree
+Commit
+Hash
+      │
+      ▼
+第五章
+status
+diff
+add
+commit
+push
+      │
+      ▼
+第六章
+Branch
+HEAD
+switch
+merge
+```
 
 ---
 
-## 下一章预告
+## ✅ 本章速查
 
-**第六章：《Branch（分支）——Git 最强大的功能》**
+**每日开发流程**
 
-我们将深入讲解：
+```text
+Pull
+ ↓
+Branch
+ ↓
+Code
+ ↓
+Status
+ ↓
+Diff
+ ↓
+Add
+ ↓
+Commit
+ ↓
+Push
+```
 
-- 为什么需要分支？
-- main、develop、feature 有什么区别？
-- 如何创建、切换、删除分支？
-- 企业项目为什么几乎不会直接在 main 上开发？
+**一句话总结**
+
+Git 命令真正管理的是代码状态，而不是代码本身。
+
+---
+
+## 🧠 思考题
+
+为什么优秀团队会要求：
+
+- 小 Commit
+- 高频 Commit
+- 清晰 Commit Message
+
+这些要求会如何影响后续 Review、回滚和协作？
+
+---
+
+## 📚 下一章预告
+
+**第六章：《Branch 与分支管理》**
+
+理解 Branch、HEAD 和引用，你会发现：
+
+> Branch 并不是代码副本，而只是一个指向 Commit 的指针。

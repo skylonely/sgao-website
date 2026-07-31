@@ -6,91 +6,99 @@ outline: deep
 
 > **一句话理解：**
 >
-> **Git 最强大的能力不是"提交代码"，而是"恢复代码"。**
+> **Git
+> 最重要的价值之一，不是避免错误，而是在错误发生后能够快速、安全地恢复。**
 
 ---
 
-## 🎯 学习目标（Learning Outcomes）
+## 🎯 学习目标
 
-学完本章，你将能够：
+完成本章后，你将能够：
 
-- 区分 `reset`、`restore`、`revert` 的使用场景
-- 熟练使用 `stash`、`reflog`、`cherry-pick`
-- 独立处理常见 Git 事故
-- 建立安全的 Git 操作习惯
+- 理解 `restore`、`reset`、`revert` 的区别
+- 掌握 `reflog` 的恢复能力
+- 学会使用 `stash` 暂存未完成工作
+- 使用 `cherry-pick` 精准迁移提交
+- 面对常见 Git 事故时快速恢复
 
 ---
 
-## 🏗️ 架构图（Architecture）
+## 🚀 一分钟读懂
 
 ```text
-Git Accident
-
-      │
-      ▼
-
-发现问题
-      │
-      ▼
-
-判断事故类型
-      │
-      ├── 文件恢复
-      ├── Commit恢复
-      ├── Branch恢复
-      └── 远程恢复
-      │
-      ▼
-
-选择工具
+误删文件
+    │
 restore
-reset
-revert
-stash
+
+提交错了
+    │
+reset / revert
+
+分支丢了
+    │
 reflog
+
+临时切需求
+    │
+stash
+
+迁移提交
+    │
 cherry-pick
 ```
 
 ---
 
-## 🏛️ 设计思想（Design Philosophy）
+## 📖 故事引入
 
-Git 的设计目标之一就是：
+周五晚上，开发完成准备下班。
 
-> **尽量让错误可以恢复。**
+突然发现：
 
-因此，大多数"删除"其实只是改变引用，而不是立即删除对象。
+- 提交到了错误分支
+- `reset --hard` 之后代码没了
+- 不小心删除了分支
+- `push --force` 覆盖了远程历史
 
-这也是为什么很多 Git 事故都可以挽回。
+这些都是团队开发中真实发生过的事故。
+
+Git 提供了一整套恢复工具，但前提是知道什么时候使用哪一种。
 
 ---
 
-## 一、Git 的三种"撤销"
+## 🏛️ 恢复工具总览
 
-### git restore
+| 场景 | 推荐命令 |
+| --- | --- |
+| 恢复工作区文件 | `git restore` |
+| 回退本地提交 | `git reset` |
+| 撤销已发布提交 | `git revert` |
+| 找回历史 | `git reflog` |
+| 暂存现场 | `git stash` |
+| 迁移提交 | `git cherry-pick` |
 
-适用：
+---
 
-- 放弃工作区修改
-- 恢复某个文件
+## 🔄 git restore
+
+恢复工作区文件：
 
 ```bash
 git restore README.md
 ```
 
-✅ 推荐场景：
+适用：
 
-刚改坏一个文件，还没有提交。
+- 修改尚未提交
+- 放弃本地改动
+
+不会影响已经存在的 Commit。
 
 ---
 
-### git reset
+## ⏪ git reset
 
-作用：
-
-移动 HEAD。
-
-常见模式：
+回退本地历史：
 
 ```bash
 git reset --soft HEAD~1
@@ -98,86 +106,37 @@ git reset --mixed HEAD~1
 git reset --hard HEAD~1
 ```
 
-| 模式 | Commit | 暂存区 | 工作区 |
-| --- | --- | --- | --- |
-| soft | 回退 | 保留 | 保留 |
-| mixed | 回退 | 清除 | 保留 |
-| hard | 回退 | 清除 | 清除 |
+区别：
 
-⚠️ `--hard` 风险最高。
+- **soft**：保留暂存区和工作区
+- **mixed**（默认）：保留工作区
+- **hard**：工作区、暂存区一起回退
 
----
-
-### git revert
-
-不是删除历史。
-
-而是：
-
-> **新增一次反向 Commit。**
-
-```bash
-git revert HEAD
-```
-
-适用于：
-
-已经 Push 到公共仓库的提交。
+> ⚠️ `--hard` 前请确认没有需要保留的修改。
 
 ---
 
-## 🧭 决策指南（Decision Guide）
+## ↩️ git revert
 
-| 场景 | 推荐命令 |
-| --- | --- |
-| 修改未提交，想放弃 | `restore` |
-| 最近一次提交有问题，未 Push | `reset --soft` |
-| 已 Push，需要撤销 | `revert` |
-| 临时保存修改 | `stash` |
-| 恢复误删提交 | `reflog` |
-| 复制某个 Commit | `cherry-pick` |
+撤销已经共享的提交：
+
+```bash
+git revert <commit>
+```
+
+特点：
+
+- 不改写历史
+- 新建一个"反向提交"
+- 适合公共分支
 
 ---
 
-## 二、stash —— 临时保险箱
+## 🧭 git reflog
 
-开发到一半：
+Git 的"后悔药"。
 
-领导要求：
-
-立即修 Bug。
-
-可以：
-
-```bash
-git stash
-```
-
-处理 Bug：
-
-```bash
-git switch hotfix/login
-```
-
-回来继续：
-
-```bash
-git stash pop
-```
-
-推荐：
-
-不要长期保存大量 Stash。
-
----
-
-## 三、reflog —— Git 的"后悔药"
-
-一句话：
-
-> **只要 Commit 还在 reflog 中，就有机会恢复。**
-
-查看：
+查看 HEAD 历史：
 
 ```bash
 git reflog
@@ -189,96 +148,81 @@ git reflog
 git reset --hard HEAD@{3}
 ```
 
-很多误删 Commit 都可以通过 reflog 找回。
+> ⚠️ 该命令会同步覆盖工作区和暂存区。执行前先用 `git status` 确认当前修改已提交或备份，并核对目标记录。
+
+即使分支删除、Reset 后，也常常可以借助 reflog 找回。
 
 ---
 
-## 四、cherry-pick
+## 📦 git stash
 
-适合：
-
-把某一次提交复制到另一个分支。
+临时保存未完成修改：
 
 ```bash
-git cherry-pick <commit-id>
+git stash
+git switch hotfix
+...
+git switch feature/login
+git stash pop
 ```
 
-典型场景：
+适用：
 
-Bug 修复：
-
-需要同时同步到：
-
-- main
-- release
-
-无需重新开发。
+- 紧急修复线上问题
+- 中途切换任务
 
 ---
 
-## 🚨 真实事故复盘（Postmortem）
+## 🎯 git cherry-pick
 
-### 事故一：误执行 reset --hard
+把指定 Commit 应用到当前分支：
 
-#### 场景
+```bash
+git cherry-pick <commit>
+```
 
-开发一天后：
+适用：
+
+- Bug 修复迁移
+- 多版本维护
+- 不需要合并整个分支
+
+---
+
+## 🌍 真实事故案例
+
+### 案例一：误执行 reset --hard
+
+现象：
 
 ```bash
 git reset --hard HEAD~1
 ```
 
-所有未提交修改消失。
+发现代码消失。
 
-#### 排查
+恢复步骤：
 
-- 是否已 Commit？
-- 是否还有 Stash？
-- reflog 是否仍存在？
-
-#### 恢复
-
-优先：
-
-```bash
-git reflog
-```
-
-找到正确 Commit。
+1. `git reflog`
+2. 找到丢失 Commit
+3. `git reset --hard <hash>`
 
 ---
 
-### 事故二：push --force 覆盖团队代码
+### 案例二：提交到了 main
 
-#### 场景
-
-```bash
-git push --force
-```
-
-覆盖公共分支。
-
-#### 影响
-
-- 同事无法 Push
-- CI 失败
-- 提交历史混乱
-
-#### 正确做法
-
-优先使用：
+处理：
 
 ```bash
-git push --force-with-lease
+git branch feature/login
+git switch feature/login
 ```
 
-它会检查远程是否已变化，更安全。
+再根据情况重置 main。
 
 ---
 
-### 事故三：误删分支
-
-删除：
+### 案例三：误删分支
 
 ```bash
 git branch -D feature/login
@@ -288,165 +232,123 @@ git branch -D feature/login
 
 ```bash
 git reflog
-git branch feature/login <commit-id>
+git checkout -b feature/login <commit>
 ```
-
-只要 Commit 还在，就能恢复。
 
 ---
 
-## 🏢 企业实践（Enterprise Practice）
+## 🏢 企业实践
 
 建议：
 
-- 主分支禁止 Force Push
-- 开启 Branch Protection
-- 每次大改先建分支
-- Merge 前同步 main
-- 定期清理已合并分支
+- 不直接对公共分支执行 `reset --hard`
+- 已 Push 的提交优先使用 `revert`
+- 公共分支禁止直接使用 `push --force`；确需改写历史时，应经过团队确认并优先使用 `--force-with-lease`
+- 重要发布前打 Tag
 
 ---
 
-## 💡 常见误区（Common Mistakes）
+## ⚠️ 常见误区
 
-❌ 已 Push 还使用 reset
+❌ `reset` 和 `revert` 一样。
 
-应使用：
+实际上：
 
-```bash
-git revert
-```
-
----
-
-❌ 长时间不提交
-
-Commit 越小：
-
-恢复越容易。
+- `reset` 修改历史
+- `revert` 保留历史
 
 ---
 
-❌ 依赖 stash 保存几个月
+❌ 删除分支意味着数据永久丢失。
 
-Stash：
-
-只是临时工具。
+很多情况下仍可通过 `reflog` 找回。
 
 ---
 
 ## 🏆 Senior Tips
 
-✔ Commit 要小而频繁
+恢复前先问自己三个问题：
 
-✔ 不要害怕 Commit
+1. 修改是否已经 Push？
+2. 是否有人基于这段历史开发？
+3. 是否必须改写历史？
 
-✔ 大改之前：
-
-```bash
-git switch -c backup/temp
-```
-
-✔ 遇到事故：
-
-不要连续执行命令。
-
-先：
-
-```bash
-git status
-git log
-git reflog
-```
-
-确认现场。
+如果答案不确定，优先使用 `revert`。
 
 ---
 
-## 🧪 实验室（Lab）
+## 🧪 Lab
 
-创建三个 Commit：
-
-```bash
-echo A > test.txt
-git add .
-git commit -m "A"
-
-echo B >> test.txt
-git commit -am "B"
-
-echo C >> test.txt
-git commit -am "C"
-```
-
-然后：
+尝试：
 
 ```bash
-git reset --hard HEAD~1
+git stash
+git stash list
+git stash pop
+
 git reflog
+
+git cherry-pick <commit>
 ```
 
-尝试恢复。
+记录每条命令对历史的影响。
+
+---
+
+## 🔗 知识关联
+
+```text
+第十章
+CI/CD
+Workflow
+      │
+      ▼
+第十一章
+restore
+reset
+revert
+reflog
+stash
+cherry-pick
+      │
+      ▼
+第十二章
+AI 工程实践
+最佳实践
+```
+
+---
+
+## ✅ 本章速查
+
+| 问题 | 工具 |
+| --- | --- |
+| 放弃未提交修改 | restore |
+| 回退本地提交 | reset |
+| 撤销已发布提交 | revert |
+| 找回历史 | reflog |
+| 临时保存 | stash |
+| 精准迁移 | cherry-pick |
+
+**一句话总结：**
+
+Git 不怕犯错，关键是理解每一种恢复工具的边界。
 
 ---
 
 ## 🧠 思考题
 
-为什么 Git 能恢复很多"删除"操作？
+为什么很多团队规定：
 
-提示：
+> 已经推送到公共仓库的历史，优先使用 `git revert`，而不是 `git reset`？
 
-思考：
-
-Commit 是否真的立即被删除？
+请结合团队协作和历史一致性进行分析。
 
 ---
 
-## 面试官会怎么问？
+## 📚 下一章预告
 
-**Q：reset、restore、revert 最大区别？**
+**第十二章：《AI 时代 Git 最佳实践》**
 
-参考回答：
-
-- restore：恢复文件。
-- reset：移动 HEAD。
-- revert：新增一次反向提交，不改写历史。
-
----
-
-**Q：reflog 为什么重要？**
-
-答：
-
-因为它记录了 HEAD 的移动历史，是恢复误操作的重要依据。
-
----
-
-## 📚 延伸阅读（Further Reading）
-
-推荐继续学习：
-
-- Git 官方《Reset Demystified》
-- Interactive Rebase
-- Git Bisect
-- Git Hooks
-- Git LFS
-
----
-
-## 本章总结
-
-真正优秀的 Git 工程师，并不是从不犯错。
-
-而是：
-
-> **知道如何安全地恢复每一次错误。**
-
----
-
-## 下一章预告
-
-**第十二章：《Git 最佳实践与 AI 开发工作流》**
-
-我们将总结整个 Git 体系，并结合
-ChatGPT、Codex、CI/CD、Cloudflare、Docker，构建一套完整的现代开发工作流。
+我们将把前十一章内容串联起来，构建一套从需求、AI 辅助开发、Code
+Review、CI/CD 到部署上线的现代软件工程工作流。

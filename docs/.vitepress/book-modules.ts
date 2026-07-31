@@ -16,7 +16,6 @@ export interface BookModule {
   base: string;
   kicker: string;
   summary: string;
-  version: string;
   audience: {
     title: string;
     description: string;
@@ -36,17 +35,16 @@ export const gitBook: BookModule = {
   base: "/git/",
   kicker: "BOOK MODULE · 01",
   summary:
-    "从版本控制为什么诞生开始，逐步掌握 Git 原理、日常命令、分支协作、GitHub、CI/CD、事故恢复和 AI 时代开发工作流。",
-  version: "v1.0",
+    "从 Git 的设计思想出发，系统掌握工作原理、底层数据结构、常用命令、团队协作、GitHub、CI/CD、事故恢复与 AI Coding。",
   audience: {
-    title: "从初学者到独立开发者",
+    title: "从初学者到团队负责人",
     description:
-      "适合前端开发者、独立开发者、AI Coding 使用者，以及希望系统补齐 Git 与 GitHub 工程实践的人。",
+      "适合第一次系统学习 Git 的开发者、希望补齐底层原理与团队规范的工程师，以及正在使用 ChatGPT、Codex 等 AI 工具进行开发的人。",
   },
   outcome: {
-    title: "建立完整的软件交付思维",
+    title: "从会使用，到会理解、会设计",
     description:
-      "不仅会使用命令，还能理解 Git 的底层模型，选择团队工作流，处理常见事故，并把自动化接入真实项目。",
+      "不仅掌握日常命令，还能理解 Git 的底层模型，为项目选择工作流，处理常见事故，并设计稳定的代码评审与自动化交付流程。",
   },
   sections: [
     {
