@@ -220,6 +220,76 @@ export const systemArchitectBook: BookModule = {
         },
       ],
     },
+    {
+      text: "第二章 · 操作系统",
+      items: [
+        {
+          text: "01 第二章导读",
+          link: "/ruankao/system-architect/chapters/chapter-02/01-operating-system",
+          description: "了解操作系统知识框架、学习目标与推荐路线。",
+        },
+        {
+          text: "02 操作系统概述",
+          link: "/ruankao/system-architect/chapters/chapter-02/02-os-overview",
+          description: "掌握操作系统的作用、特征、功能与常见分类。",
+        },
+        {
+          text: "03 进程组成与状态",
+          link: "/ruankao/system-architect/chapters/chapter-02/03-process-state",
+          description: "理解进程、PCB 以及三状态和五状态模型。",
+        },
+        {
+          text: "04 前趋图与资源图",
+          link: "/ruankao/system-architect/chapters/chapter-02/04-precedence-graph",
+          description: "分析任务依赖、并发关系与执行顺序。",
+        },
+        {
+          text: "05 进程同步与 PV 操作",
+          link: "/ruankao/system-architect/chapters/chapter-02/05-process-sync",
+          description: "掌握同步、互斥、信号量及 PV 操作。",
+        },
+        {
+          text: "06 进程调度",
+          link: "/ruankao/system-architect/chapters/chapter-02/06-process-scheduling",
+          description: "比较常见调度算法并理解核心评价指标。",
+        },
+        {
+          text: "07 死锁",
+          link: "/ruankao/system-architect/chapters/chapter-02/07-deadlock",
+          description: "理解死锁条件、处理策略和资源分配图。",
+        },
+        {
+          text: "08 存储管理",
+          link: "/ruankao/system-architect/chapters/chapter-02/08-memory-management",
+          description: "学习分页、分段、段页式与地址转换。",
+        },
+        {
+          text: "09 页面置换算法",
+          link: "/ruankao/system-architect/chapters/chapter-02/09-page-replacement",
+          description: "掌握 OPT、FIFO、LRU、LFU 及缺页分析。",
+        },
+        {
+          text: "10 设备管理",
+          link: "/ruankao/system-architect/chapters/chapter-02/10-device-management",
+          description: "理解 I/O 控制、DMA、缓冲与 Spooling。",
+        },
+        {
+          text: "11 文件管理",
+          link: "/ruankao/system-architect/chapters/chapter-02/11-file-management",
+          description: "掌握目录、文件分配、访问方式与保护机制。",
+        },
+        {
+          text: "12 本章练习",
+          link: "/ruankao/system-architect/chapters/chapter-02/12-exercises",
+          description: "围绕第二章核心考点进行系统自测。",
+        },
+        {
+          text: "13 第二章总结",
+          link: "/ruankao/system-architect/chapters/chapter-02/13-summary",
+          description: "回顾知识框架、高频考点与复习路线。",
+        },
+      ],
+    },
   ],
 };
 

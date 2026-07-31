@@ -69,7 +69,7 @@ hero:
         <span class="portal-book-index">BOOK 02</span>
         <div>
           <strong>系统架构设计师</strong>
-          <p>软考专题：从计算机硬件开始，结合考点、真题、练习与工程视角持续建设</p>
+          <p>软考专题：已更新计算机硬件与操作系统，结合考点、练习和工程视角持续建设</p>
         </div>
         <i>开始阅读 →</i>
       </a>
@@ -119,7 +119,7 @@ hero:
       </div>
       <div class="portal-links">
         <a href="/ruankao/system-architect/">
-          <span>系统架构设计师 · 第一章计算机硬件</span><i>→</i>
+          <span>系统架构设计师 · 已更新至第二章操作系统</span><i>→</i>
         </a>
         <a href="/git/">
           <span>Git 完整专栏（12 章）</span><i>→</i>
