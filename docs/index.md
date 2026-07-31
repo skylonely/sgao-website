@@ -45,6 +45,11 @@ hero:
         <span>API、CLI、Prompt、MCP、Skill 与 Agent</span>
         <i>→</i>
       </a>
+      <a class="portal-card" href="/git/">
+        <strong>Git 与 GitHub</strong>
+        <span>版本控制、协作流程、Actions 与 Pages</span>
+        <i>→</i>
+      </a>
     </div>
   </section>
 
@@ -90,6 +95,9 @@ hero:
         </div>
       </div>
       <div class="portal-links">
+        <a href="/git/github-complete-guide">
+          <span>一篇文章搞定 GitHub（2026 完整版）</span><i>→</i>
+        </a>
         <a href="/ai/api-cli-prompt-mcp-skill-agent">
           <span>API、CLI、Prompt、MCP、Skill 与 Agent</span><i>→</i>
         </a>

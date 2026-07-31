@@ -2,13 +2,23 @@ import { defineConfig } from "vitepress";
 
 export default defineConfig({
   title: "SGAO Knowledge Base",
-  description: "SGAO 平台架构、AI 基础与 Cloudflare 实践知识库",
+  description: "SGAO 平台架构、开发工具、AI 基础与 Cloudflare 实践知识库",
   lang: "zh-CN",
   themeConfig: {
     siteTitle: "SGAO",
     nav: [
       { text: "首页", link: "/" },
       { text: "平台架构", link: "/guide/platform-architecture" },
+      {
+        text: "Git 与 GitHub",
+        items: [
+          { text: "Git 与 GitHub 文档", link: "/git/" },
+          {
+            text: "GitHub 2026 完整指南",
+            link: "/git/github-complete-guide",
+          },
+        ],
+      },
       {
         text: "AI 基础",
         items: [
@@ -45,6 +55,17 @@ export default defineConfig({
         items: [
           { text: "SGAO Platform 架构", link: "/guide/platform-architecture" },
           { text: "文档写作规范", link: "/guide/writing-standard" },
+        ],
+      },
+      {
+        text: "🔀 Git 与 GitHub",
+        link: "/git/",
+        collapsed: false,
+        items: [
+          {
+            text: "GitHub 2026 完整指南",
+            link: "/git/github-complete-guide",
+          },
         ],
       },
       {
