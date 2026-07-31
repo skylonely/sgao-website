@@ -1,11 +1,10 @@
 # SGAO Platform 架构
 
-> 架构版本：v2.0  
 > 更新时间：2026-07-30
 
 SGAO Platform 是以统一域名体系为入口、以 Cloudflare 为基础设施的一站式个人数字平台。平台目前整合主站、知识库和图片中心，并为博客、在线工具、开放 API 与统一后台预留扩展空间。
 
-![SGAO Platform 架构图 v2.0](https://img.sgao.cc/docs/guide.png)
+![SGAO Platform 架构图](https://img.sgao.cc/docs/guide.png)
 
 ## 一、整体架构
 

@@ -1,10 +1,8 @@
 # Cloudflare 图片中心（Image Center）
 
-> 当前版本：v1.2
->
 > 更新时间：2026-07-30
 
-Image Center 是 SGAO Platform 的统一图片存储与访问服务。当前版本以 Cloudflare R2 作为主要存储，通过 Cloudflare Worker 提供上传、管理、访问和缓存能力，并统一使用 `img.sgao.cc` 对外提供图片地址。
+Image Center 是 SGAO Platform 的统一图片存储与访问服务。当前方案以 Cloudflare R2 作为主要存储，通过 Cloudflare Worker 提供上传、管理、访问和缓存能力，并统一使用 `img.sgao.cc` 对外提供图片地址。
 
 ## 一、当前架构
 

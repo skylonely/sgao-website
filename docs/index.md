@@ -109,13 +109,13 @@ hero:
       </div>
       <div class="portal-links">
         <a href="/git/">
-          <span>Git 完整专栏 v1.0（12 章）</span><i>→</i>
+          <span>Git 完整专栏（12 章）</span><i>→</i>
         </a>
         <a href="/ai/api-cli-prompt-mcp-skill-agent">
           <span>API、CLI、Prompt、MCP、Skill 与 Agent</span><i>→</i>
         </a>
         <a href="/guide/platform-architecture">
-          <span>SGAO Platform 架构 v2.0</span><i>→</i>
+          <span>SGAO Platform 架构</span><i>→</i>
         </a>
         <a href="/cloudflare/image-center">
           <span>Image Center R2 架构</span><i>→</i>
