@@ -445,6 +445,91 @@ export const systemArchitectBook: BookModule = {
         },
       ],
     },
+    {
+      text: "第五章 · 计算机网络",
+      items: [
+        {
+          text: "01 第五章导读",
+          link: "/ruankao/system-architect/chapters/chapter-05/01-computer-network",
+          description: "了解计算机网络知识框架、高频考点与推荐学习路线。",
+        },
+        {
+          text: "02 网络功能与分类",
+          link: "/ruankao/system-architect/chapters/chapter-05/02-network-overview",
+          description: "掌握网络功能、性能指标、分类方式与拓扑结构。",
+        },
+        {
+          text: "03 通信技术",
+          link: "/ruankao/system-architect/chapters/chapter-05/03-communication-technology",
+          description: "理解信道、信号处理、复用技术、多址技术与 5G。",
+        },
+        {
+          text: "04 OSI 七层模型",
+          link: "/ruankao/system-architect/chapters/chapter-05/04-osi-model",
+          description: "掌握 OSI 各层功能、典型协议与网络设备。",
+        },
+        {
+          text: "05 TCP/IP 协议族",
+          link: "/ruankao/system-architect/chapters/chapter-05/05-tcp-ip",
+          description: "学习 TCP/IP 四层模型及常见网络协议。",
+        },
+        {
+          text: "06 网络设备",
+          link: "/ruankao/system-architect/chapters/chapter-05/06-network-devices",
+          description: "区分集线器、网桥、交换机、路由器与网关。",
+        },
+        {
+          text: "07 路由技术",
+          link: "/ruankao/system-architect/chapters/chapter-05/07-routing",
+          description: "理解路由器、MTU、IGP 与 EGP。",
+        },
+        {
+          text: "08 传输介质",
+          link: "/ruankao/system-architect/chapters/chapter-05/08-transmission-media",
+          description: "比较双绞线、同轴电缆、光纤与无线介质。",
+        },
+        {
+          text: "09 通信与交换方式",
+          link: "/ruankao/system-architect/chapters/chapter-05/09-communication-switching",
+          description: "区分单工、半双工、全双工及常见交换方式。",
+        },
+        {
+          text: "10 IP 地址",
+          link: "/ruankao/system-architect/chapters/chapter-05/10-ip-address",
+          description: "掌握 IPv4 分类、子网掩码与 CIDR。",
+        },
+        {
+          text: "11 IPv6",
+          link: "/ruankao/system-architect/chapters/chapter-05/11-ipv6",
+          description: "理解 IPv6 地址表示、特点及与 IPv4 的区别。",
+        },
+        {
+          text: "12 网络规划与设计",
+          link: "/ruankao/system-architect/chapters/chapter-05/12-network-planning",
+          description: "学习网络规划原则、设计流程与核心内容。",
+        },
+        {
+          text: "13 网络存储",
+          link: "/ruankao/system-architect/chapters/chapter-05/13-network-storage",
+          description: "比较 NAS 与 SAN 的访问方式和应用特点。",
+        },
+        {
+          text: "14 章节练习",
+          link: "/ruankao/system-architect/chapters/chapter-05/14-exercises",
+          description: "通过选择题、判断题和简答题巩固知识。",
+        },
+        {
+          text: "15 历年真题复习",
+          link: "/ruankao/system-architect/chapters/chapter-05/15-past-exams",
+          description: "整理高频考点、典型题型与考前速记。",
+        },
+        {
+          text: "16 第五章总结",
+          link: "/ruankao/system-architect/chapters/chapter-05/16-summary",
+          description: "回顾知识体系、易错点与复习路线。",
+        },
+      ],
+    },
   ],
 };
 
