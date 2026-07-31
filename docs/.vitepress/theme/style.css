@@ -304,6 +304,11 @@
   transform: translateX(3px);
 }
 
+.portal-book-list {
+  display: grid;
+  gap: 18px;
+}
+
 .portal-book-card {
   display: grid;
   grid-template-columns: auto 1fr auto;

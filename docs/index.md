@@ -56,14 +56,24 @@ hero:
         <p>按章节连续学习，从基础认知走到真实项目实践</p>
       </div>
     </div>
-    <a class="portal-book-card" href="/git/">
-      <span class="portal-book-index">BOOK 01</span>
-      <div>
-        <strong>Git 完整专栏</strong>
-        <p>12 章系统课程：原理、命令、分支、协作、CI/CD、事故恢复与 AI 工作流</p>
-      </div>
-      <i>开始阅读 →</i>
-    </a>
+    <div class="portal-book-list">
+      <a class="portal-book-card" href="/git/">
+        <span class="portal-book-index">BOOK 01</span>
+        <div>
+          <strong>Git 完整专栏</strong>
+          <p>12 章系统课程：原理、命令、分支、协作、CI/CD、事故恢复与 AI 工作流</p>
+        </div>
+        <i>开始阅读 →</i>
+      </a>
+      <a class="portal-book-card" href="/ruankao/system-architect/">
+        <span class="portal-book-index">BOOK 02</span>
+        <div>
+          <strong>系统架构设计师</strong>
+          <p>软考专题：从计算机硬件开始，结合考点、真题、练习与工程视角持续建设</p>
+        </div>
+        <i>开始阅读 →</i>
+      </a>
+    </div>
   </section>
 
   <section class="portal-section">
@@ -108,6 +118,9 @@ hero:
         </div>
       </div>
       <div class="portal-links">
+        <a href="/ruankao/system-architect/">
+          <span>系统架构设计师 · 第一章计算机硬件</span><i>→</i>
+        </a>
         <a href="/git/">
           <span>Git 完整专栏（12 章）</span><i>→</i>
         </a>

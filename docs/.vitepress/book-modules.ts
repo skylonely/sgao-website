@@ -141,8 +141,91 @@ export const gitBook: BookModule = {
   ],
 };
 
+export const systemArchitectBook: BookModule = {
+  id: "systemArchitect",
+  title: "系统架构设计师",
+  icon: "🏗️",
+  base: "/ruankao/system-architect/",
+  kicker: "BOOK MODULE · 02",
+  summary:
+    "面向软考系统架构设计师的体系化知识专题，从考试重点出发，结合工程实践、架构思维与 AI 辅助学习方法持续建设。",
+  audience: {
+    title: "备考系统架构设计师的学习者",
+    description:
+      "适合准备软考系统架构设计师考试的开发者、技术负责人和架构方向学习者，也适合希望系统补齐计算机基础与架构知识的人。",
+  },
+  outcome: {
+    title: "建立考试与工程相结合的知识体系",
+    description:
+      "理解高频考点背后的工作原理，能够完成知识梳理、真题复习和综合练习，并把基础知识迁移到真实系统设计中。",
+  },
+  sections: [
+    {
+      text: "第一章 · 计算机硬件",
+      items: [
+        {
+          text: "01 第一章导读",
+          link: "/ruankao/system-architect/chapters/01-computer-hardware",
+          description: "了解本章定位、知识地图、考情与推荐学习路线。",
+        },
+        {
+          text: "02 计算机组成",
+          link: "/ruankao/system-architect/chapters/02-computer-organization",
+          description: "掌握计算机五大组成部分及其数据流转方式。",
+        },
+        {
+          text: "03 CPU",
+          link: "/ruankao/system-architect/chapters/03-cpu",
+          description: "理解 CPU 的功能、结构、寄存器与执行过程。",
+        },
+        {
+          text: "04 校验码",
+          link: "/ruankao/system-architect/chapters/04-checksum",
+          description: "学习码距、奇偶校验与 CRC 的基本原理。",
+        },
+        {
+          text: "05 指令系统",
+          link: "/ruankao/system-architect/chapters/05-instruction-system",
+          description: "掌握指令格式、执行过程与常见寻址方式。",
+        },
+        {
+          text: "06 存储系统",
+          link: "/ruankao/system-architect/chapters/06-storage-system",
+          description: "理解存储层次、Cache 与局部性原理。",
+        },
+        {
+          text: "07 输入输出技术",
+          link: "/ruankao/system-architect/chapters/07-io",
+          description: "比较程序控制、中断和 DMA 三种传输方式。",
+        },
+        {
+          text: "08 总线",
+          link: "/ruankao/system-architect/chapters/08-bus",
+          description: "区分数据总线、地址总线和控制总线。",
+        },
+        {
+          text: "09 历年真题",
+          link: "/ruankao/system-architect/chapters/09-past-exams",
+          description: "按知识点复习原资料中的历年真题。",
+        },
+        {
+          text: "10 综合练习",
+          link: "/ruankao/system-architect/chapters/10-exercises",
+          description: "通过选择题、判断题和思考题巩固知识。",
+        },
+        {
+          text: "11 第一章总结",
+          link: "/ruankao/system-architect/chapters/11-summary",
+          description: "集中回顾核心知识、高频考点与易错点。",
+        },
+      ],
+    },
+  ],
+};
+
 export const bookModules = {
   git: gitBook,
+  systemArchitect: systemArchitectBook,
 };
 
 export function createBookSidebar(book: BookModule) {

@@ -1,5 +1,9 @@
 import { defineConfig } from "vitepress";
-import { createBookSidebar, gitBook } from "./book-modules";
+import {
+  createBookSidebar,
+  gitBook,
+  systemArchitectBook,
+} from "./book-modules";
 
 export default defineConfig({
   title: "SGAO Knowledge Base",
@@ -11,6 +15,7 @@ export default defineConfig({
       { text: "首页", link: "/" },
       { text: "平台架构", link: "/guide/platform-architecture" },
       { text: "Git 专栏", link: "/git/" },
+      { text: "软考专题", link: "/ruankao/system-architect/" },
       {
         text: "AI 基础",
         items: [
@@ -42,6 +47,7 @@ export default defineConfig({
 
     sidebar: {
       "/git/": createBookSidebar(gitBook),
+      "/ruankao/system-architect/": createBookSidebar(systemArchitectBook),
       "/": [
         {
           text: "📐 平台与规范",
