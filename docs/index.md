@@ -8,11 +8,11 @@ hero:
     沉淀可复用经验
   actions:
     - theme: brand
+      text: 阅读 Git 专栏
+      link: /git/
+    - theme: alt
       text: 查看平台架构
       link: /guide/platform-architecture
-    - theme: alt
-      text: Cloudflare 文档
-      link: /cloudflare/
 ---
 
 <div id="knowledge-sections" class="docs-portal">
@@ -45,12 +45,25 @@ hero:
         <span>API、CLI、Prompt、MCP、Skill 与 Agent</span>
         <i>→</i>
       </a>
-      <a class="portal-card" href="/git/">
-        <strong>Git 与 GitHub</strong>
-        <span>版本控制、协作流程、Actions 与 Pages</span>
-        <i>→</i>
-      </a>
     </div>
+  </section>
+
+  <section class="portal-section">
+    <div class="portal-heading">
+      <span class="portal-heading-icon">📘</span>
+      <div>
+        <h2>系列专栏</h2>
+        <p>按章节连续学习，从基础认知走到真实项目实践</p>
+      </div>
+    </div>
+    <a class="portal-book-card" href="/git/">
+      <span class="portal-book-index">BOOK 01</span>
+      <div>
+        <strong>Git 完整专栏</strong>
+        <p>12 章系统课程：原理、命令、分支、协作、CI/CD、事故恢复与 AI 工作流</p>
+      </div>
+      <i>开始阅读 →</i>
+    </a>
   </section>
 
   <section class="portal-section">
@@ -95,8 +108,8 @@ hero:
         </div>
       </div>
       <div class="portal-links">
-        <a href="/git/github-complete-guide">
-          <span>一篇文章搞定 GitHub（2026 完整版）</span><i>→</i>
+        <a href="/git/">
+          <span>Git 完整专栏 v1.0（12 章）</span><i>→</i>
         </a>
         <a href="/ai/api-cli-prompt-mcp-skill-agent">
           <span>API、CLI、Prompt、MCP、Skill 与 Agent</span><i>→</i>

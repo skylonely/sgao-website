@@ -1,4 +1,5 @@
 import { defineConfig } from "vitepress";
+import { createBookSidebar, gitBook } from "./book-modules";
 
 export default defineConfig({
   title: "SGAO Knowledge Base",
@@ -9,16 +10,7 @@ export default defineConfig({
     nav: [
       { text: "首页", link: "/" },
       { text: "平台架构", link: "/guide/platform-architecture" },
-      {
-        text: "Git 与 GitHub",
-        items: [
-          { text: "Git 与 GitHub 文档", link: "/git/" },
-          {
-            text: "GitHub 2026 完整指南",
-            link: "/git/github-complete-guide",
-          },
-        ],
-      },
+      { text: "Git 专栏", link: "/git/" },
       {
         text: "AI 基础",
         items: [
@@ -48,58 +40,54 @@ export default defineConfig({
       { text: "文档规范", link: "/guide/writing-standard" },
     ],
 
-    sidebar: [
-      {
-        text: "📐 平台与规范",
-        collapsed: false,
-        items: [
-          { text: "SGAO Platform 架构", link: "/guide/platform-architecture" },
-          { text: "文档写作规范", link: "/guide/writing-standard" },
-        ],
-      },
-      {
-        text: "🔀 Git 与 GitHub",
-        link: "/git/",
-        collapsed: false,
-        items: [
-          {
-            text: "GitHub 2026 完整指南",
-            link: "/git/github-complete-guide",
-          },
-        ],
-      },
-      {
-        text: "🤖 AI 基础",
-        link: "/ai/",
-        collapsed: false,
-        items: [
-          {
-            text: "API、CLI、Prompt、MCP、Skill 与 Agent",
-            link: "/ai/api-cli-prompt-mcp-skill-agent",
-          },
-        ],
-      },
-      {
-        text: "📚 Cloudflare",
-        link: "/cloudflare/",
-        collapsed: false,
-        items: [
-          {
-            text: "Workers 双站点自动部署",
-            link: "/cloudflare/workers-auto-deploy",
-          },
-          { text: "DNS 与域名配置", link: "/cloudflare/dns-domain" },
-          {
-            text: "Spaceship 域名部署",
-            link: "/cloudflare/spaceship-worker-deployment",
-          },
-          {
-            text: "Image Center（图片中心）",
-            link: "/cloudflare/image-center",
-          },
-        ],
-      },
-    ],
+    sidebar: {
+      "/git/": createBookSidebar(gitBook),
+      "/": [
+        {
+          text: "📐 平台与规范",
+          collapsed: false,
+          items: [
+            {
+              text: "SGAO Platform 架构",
+              link: "/guide/platform-architecture",
+            },
+            { text: "文档写作规范", link: "/guide/writing-standard" },
+            { text: "Book Module 规范", link: "/guide/book-module-standard" },
+          ],
+        },
+        {
+          text: "🤖 AI 基础",
+          link: "/ai/",
+          collapsed: false,
+          items: [
+            {
+              text: "API、CLI、Prompt、MCP、Skill 与 Agent",
+              link: "/ai/api-cli-prompt-mcp-skill-agent",
+            },
+          ],
+        },
+        {
+          text: "📚 Cloudflare",
+          link: "/cloudflare/",
+          collapsed: false,
+          items: [
+            {
+              text: "Workers 双站点自动部署",
+              link: "/cloudflare/workers-auto-deploy",
+            },
+            { text: "DNS 与域名配置", link: "/cloudflare/dns-domain" },
+            {
+              text: "Spaceship 域名部署",
+              link: "/cloudflare/spaceship-worker-deployment",
+            },
+            {
+              text: "Image Center（图片中心）",
+              link: "/cloudflare/image-center",
+            },
+          ],
+        },
+      ],
+    },
 
     socialLinks: [
       {
