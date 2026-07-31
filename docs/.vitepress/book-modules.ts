@@ -290,6 +290,96 @@ export const systemArchitectBook: BookModule = {
         },
       ],
     },
+    {
+      text: "第三章 · 数据库系统",
+      items: [
+        {
+          text: "01 第三章导读",
+          link: "/ruankao/system-architect/chapters/chapter-03/01-database-system",
+          description: "了解数据库系统知识框架、学习目标与推荐路线。",
+        },
+        {
+          text: "02 数据库系统概述",
+          link: "/ruankao/system-architect/chapters/chapter-03/02-database-overview",
+          description: "区分数据、数据库、DBMS 与数据库系统。",
+        },
+        {
+          text: "03 三级模式两级映像",
+          link: "/ruankao/system-architect/chapters/chapter-03/03-three-schema",
+          description: "理解数据库抽象层次和两类数据独立性。",
+        },
+        {
+          text: "04 数据库设计",
+          link: "/ruankao/system-architect/chapters/chapter-03/04-database-design",
+          description: "掌握数据库设计六个阶段与 E-R 图设计。",
+        },
+        {
+          text: "05 数据模型",
+          link: "/ruankao/system-architect/chapters/chapter-03/05-data-model",
+          description: "学习数据模型、E-R 模型及关系模型转换。",
+        },
+        {
+          text: "06 关系代数",
+          link: "/ruankao/system-architect/chapters/chapter-03/06-relational-algebra",
+          description: "掌握集合运算、投影、选择与自然连接。",
+        },
+        {
+          text: "07 函数依赖",
+          link: "/ruankao/system-architect/chapters/chapter-03/07-functional-dependency",
+          description: "理解部分依赖、传递依赖与 Armstrong 公理。",
+        },
+        {
+          text: "08 键与约束",
+          link: "/ruankao/system-architect/chapters/chapter-03/08-keys-and-constraints",
+          description: "区分各类键并掌握完整性约束。",
+        },
+        {
+          text: "09 规范化",
+          link: "/ruankao/system-architect/chapters/chapter-03/09-normalization",
+          description: "掌握 1NF、2NF、3NF 和 BCNF 的判定。",
+        },
+        {
+          text: "10 模式分解",
+          link: "/ruankao/system-architect/chapters/chapter-03/10-schema-decomposition",
+          description: "理解无损连接、函数依赖保持与属性闭包。",
+        },
+        {
+          text: "11 并发控制",
+          link: "/ruankao/system-architect/chapters/chapter-03/11-concurrency-control",
+          description: "学习事务、ACID 特性和典型并发问题。",
+        },
+        {
+          text: "12 封锁协议",
+          link: "/ruankao/system-architect/chapters/chapter-03/12-lock-protocol",
+          description: "比较三级封锁协议及其解决的并发问题。",
+        },
+        {
+          text: "13 SQL",
+          link: "/ruankao/system-architect/chapters/chapter-03/13-sql",
+          description: "掌握 SQL 分类、常用查询与连接操作。",
+        },
+        {
+          text: "14 新型数据库",
+          link: "/ruankao/system-architect/chapters/chapter-03/14-new-database",
+          description: "了解 NoSQL 类型、特点与典型应用场景。",
+        },
+        {
+          text: "15 章节练习",
+          link: "/ruankao/system-architect/chapters/chapter-03/15-exercises",
+          description: "通过选择题和综合分析题巩固核心知识。",
+        },
+        {
+          text: "16 历年真题复习",
+          link: "/ruankao/system-architect/chapters/chapter-03/16-past-exams",
+          description: "整理高频题型、复习清单与答题模板。",
+        },
+        {
+          text: "17 第三章总结",
+          link: "/ruankao/system-architect/chapters/chapter-03/17-summary",
+          description: "回顾知识体系、高频考点和学习路线。",
+        },
+      ],
+    },
   ],
 };
 
