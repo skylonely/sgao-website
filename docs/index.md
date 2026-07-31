@@ -40,6 +40,11 @@ hero:
         <span>统一文档结构、命名和维护方式</span>
         <i>→</i>
       </a>
+      <a class="portal-card" href="/ai/">
+        <strong>AI 基础</strong>
+        <span>API、CLI、Prompt、MCP、Skill 与 Agent</span>
+        <i>→</i>
+      </a>
     </div>
   </section>
 
@@ -85,6 +90,9 @@ hero:
         </div>
       </div>
       <div class="portal-links">
+        <a href="/ai/api-cli-prompt-mcp-skill-agent">
+          <span>API、CLI、Prompt、MCP、Skill 与 Agent</span><i>→</i>
+        </a>
         <a href="/guide/platform-architecture">
           <span>SGAO Platform 架构 v2.0</span><i>→</i>
         </a>
