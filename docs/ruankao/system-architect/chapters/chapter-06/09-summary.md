@@ -19,3 +19,7 @@ title: 第六章总结
 - MBSE 与 SysML。
 
 > 本章整体考试频率相对较低，系统工程相关内容更值得重点掌握。
+
+## 下一章
+
+[下一章：系统配置与性能评价](../chapter-07/01-system-config-performance)

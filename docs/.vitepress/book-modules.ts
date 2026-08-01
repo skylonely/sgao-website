@@ -580,6 +580,51 @@ export const systemArchitectBook: BookModule = {
         },
       ],
     },
+    {
+      text: "第七章 · 系统配置与性能评价",
+      items: [
+        {
+          text: "01 第七章导读",
+          link: "/ruankao/system-architect/chapters/chapter-07/01-system-config-performance",
+          description: "了解系统配置与性能评价的知识范围和章节目录。",
+        },
+        {
+          text: "02 性能指标",
+          link: "/ruankao/system-architect/chapters/chapter-07/02-performance-index",
+          description: "掌握计算机、网络设备、操作系统和数据库的性能指标。",
+        },
+        {
+          text: "03 性能评价方法",
+          link: "/ruankao/system-architect/chapters/chapter-07/03-performance-evaluation",
+          description: "理解时钟频率、KIPS、MIPS、PDR 等评价方法。",
+        },
+        {
+          text: "04 Benchmark 基准测试",
+          link: "/ruankao/system-architect/chapters/chapter-07/04-benchmark",
+          description: "区分整数、浮点、SPEC 与 TPC 基准测试。",
+        },
+        {
+          text: "05 阿姆达尔定律",
+          link: "/ruankao/system-architect/chapters/chapter-07/05-amdahl-law",
+          description: "掌握加速比公式并完成典型性能计算。",
+        },
+        {
+          text: "06 章节练习",
+          link: "/ruankao/system-architect/chapters/chapter-07/06-exercises",
+          description: "通过练习题巩固性能指标、基准测试和定律计算。",
+        },
+        {
+          text: "07 历年真题复习",
+          link: "/ruankao/system-architect/chapters/chapter-07/07-past-exams",
+          description: "整理性能评价高频考点与经典计算题。",
+        },
+        {
+          text: "08 第七章总结",
+          link: "/ruankao/system-architect/chapters/chapter-07/08-summary",
+          description: "回顾 RASIS、PDR、Benchmark 与阿姆达尔定律。",
+        },
+      ],
+    },
   ],
 };
 
