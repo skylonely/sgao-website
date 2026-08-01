@@ -760,6 +760,121 @@ export const systemArchitectBook: BookModule = {
         },
       ],
     },
+    {
+      text: "第十章 · 软件工程",
+      items: [
+        {
+          text: "01 第十章导读",
+          link: "/ruankao/system-architect/chapters/chapter-10/01-software-engineering",
+          description: "了解软件工程、需求、设计、测试与维护的知识地图。",
+        },
+        {
+          text: "02 软件工程概述",
+          link: "/ruankao/system-architect/chapters/chapter-10/02-software-engineering-overview",
+          description: "掌握软件危机、软件生命周期、工程目标和 PDCA。",
+        },
+        {
+          text: "03 CMM 与 CMMI",
+          link: "/ruankao/system-architect/chapters/chapter-10/03-capability-maturity-model",
+          description: "理解能力成熟度五级模型及 CMMI 表示方式。",
+        },
+        {
+          text: "04 软件过程模型",
+          link: "/ruankao/system-architect/chapters/chapter-10/04-software-process-model",
+          description: "比较瀑布、V、原型、增量、螺旋、敏捷和 CBSD。",
+        },
+        {
+          text: "05 逆向工程",
+          link: "/ruankao/system-architect/chapters/chapter-10/05-reverse-engineering",
+          description: "掌握逆向工程、重构、再工程及其应用场景。",
+        },
+        {
+          text: "06 软件需求",
+          link: "/ruankao/system-architect/chapters/chapter-10/06-software-requirements",
+          description: "理解软件需求分类、功能需求和非功能需求。",
+        },
+        {
+          text: "07 需求获取",
+          link: "/ruankao/system-architect/chapters/chapter-10/07-requirements-acquisition",
+          description: "掌握访谈、问卷、观察、原型等需求获取方法。",
+        },
+        {
+          text: "08 需求分析",
+          link: "/ruankao/system-architect/chapters/chapter-10/08-requirements-analysis",
+          description: "学习 DFD、数据字典、实体关系和状态模型。",
+        },
+        {
+          text: "09 需求定义",
+          link: "/ruankao/system-architect/chapters/chapter-10/09-requirements-definition",
+          description: "掌握 SRS、需求规格说明和需求基线。",
+        },
+        {
+          text: "10 需求验证",
+          link: "/ruankao/system-architect/chapters/chapter-10/10-requirements-validation",
+          description: "理解正确性、完整性、一致性和可验证性检查。",
+        },
+        {
+          text: "11 需求管理",
+          link: "/ruankao/system-architect/chapters/chapter-10/11-requirements-management",
+          description: "掌握需求变更、追踪、版本和配置控制。",
+        },
+        {
+          text: "12 过程设计",
+          link: "/ruankao/system-architect/chapters/chapter-10/12-process-design",
+          description: "学习结构化设计、流程图、IPO、PAD 和模块化。",
+        },
+        {
+          text: "13 系统设计",
+          link: "/ruankao/system-architect/chapters/chapter-10/13-system-design",
+          description: "掌握高内聚、低耦合、模块设计和系统架构。",
+        },
+        {
+          text: "14 UI 设计",
+          link: "/ruankao/system-architect/chapters/chapter-10/14-ui-design",
+          description: "理解人机界面设计原则、风格和可用性。",
+        },
+        {
+          text: "15 软件测试",
+          link: "/ruankao/system-architect/chapters/chapter-10/15-software-testing",
+          description: "掌握测试层次、黑盒/白盒、Alpha/Beta 和回归测试。",
+        },
+        {
+          text: "16 测试用例设计",
+          link: "/ruankao/system-architect/chapters/chapter-10/16-test-case-design",
+          description: "学习等价类、边界值、判定表、路径和覆盖测试。",
+        },
+        {
+          text: "17 调试与软件质量",
+          link: "/ruankao/system-architect/chapters/chapter-10/17-debug-quality",
+          description: "区分测试与调试，掌握软件质量和质量保证。",
+        },
+        {
+          text: "18 系统转换与维护",
+          link: "/ruankao/system-architect/chapters/chapter-10/18-system-conversion-maintenance",
+          description: "理解系统转换方式、维护类型和遗留系统。",
+        },
+        {
+          text: "19 净室软件工程与 CBSD",
+          link: "/ruankao/system-architect/chapters/chapter-10/19-cleanroom-cbsd",
+          description: "掌握净室软件工程和基于构件的软件开发。",
+        },
+        {
+          text: "20 章节练习",
+          link: "/ruankao/system-architect/chapters/chapter-10/20-exercises",
+          description: "通过选择题、判断题和综合题巩固本章知识。",
+        },
+        {
+          text: "21 历年真题复习",
+          link: "/ruankao/system-architect/chapters/chapter-10/21-past-exams",
+          description: "按软件过程、需求、测试和维护复盘真题。",
+        },
+        {
+          text: "22 第十章总结",
+          link: "/ruankao/system-architect/chapters/chapter-10/22-summary",
+          description: "用知识图和对照表完成软件工程考前复习。",
+        },
+      ],
+    },
   ],
 };
 
