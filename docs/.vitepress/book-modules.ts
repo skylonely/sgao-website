@@ -700,6 +700,66 @@ export const systemArchitectBook: BookModule = {
         },
       ],
     },
+    {
+      text: "第九章 · 系统安全",
+      items: [
+        {
+          text: "01 第九章导读",
+          link: "/ruankao/system-architect/chapters/chapter-09/01-system-security",
+          description: "了解信息安全、密码技术、网络攻击与安全协议的知识地图。",
+        },
+        {
+          text: "02 信息安全基础",
+          link: "/ruankao/system-architect/chapters/chapter-09/02-information-security-overview",
+          description: "掌握保密性、完整性、可用性、可控性和不可否认性。",
+        },
+        {
+          text: "03 信息安全技术",
+          link: "/ruankao/system-architect/chapters/chapter-09/03-information-security-technology",
+          description: "学习对称加密、非对称加密、摘要、签名、PKI 与 CA。",
+        },
+        {
+          text: "04 访问控制",
+          link: "/ruankao/system-architect/chapters/chapter-09/04-access-control",
+          description: "理解主体、客体、权限以及 ACM、ACL 模型。",
+        },
+        {
+          text: "05 网络攻击与防护",
+          link: "/ruankao/system-architect/chapters/chapter-09/05-attack-defense",
+          description: "掌握 ARP、DNS、IP 欺骗、SYN Flood 与 DDoS。",
+        },
+        {
+          text: "06 安全体系与等级保护",
+          link: "/ruankao/system-architect/chapters/chapter-09/06-security-evaluation",
+          description: "理解安全保障体系、等级保护和风险评估。",
+        },
+        {
+          text: "07 网络安全技术",
+          link: "/ruankao/system-architect/chapters/chapter-09/07-network-security",
+          description: "比较防火墙、IDS、IPS、蜜罐和 VPN。",
+        },
+        {
+          text: "08 网络安全协议",
+          link: "/ruankao/system-architect/chapters/chapter-09/08-network-security-protocol",
+          description: "掌握 HTTPS、SSH、PGP、SET、IPSec 和 Kerberos。",
+        },
+        {
+          text: "09 章节练习",
+          link: "/ruankao/system-architect/chapters/chapter-09/09-exercises",
+          description: "通过选择题、判断题和综合题巩固本章知识。",
+        },
+        {
+          text: "10 历年真题复习",
+          link: "/ruankao/system-architect/chapters/chapter-09/10-past-exams",
+          description: "按密码技术、攻击防护和协议用途复盘真题。",
+        },
+        {
+          text: "11 第九章总结",
+          link: "/ruankao/system-architect/chapters/chapter-09/11-summary",
+          description: "用一页知识图和对照表完成考前复习。",
+        },
+      ],
+    },
   ],
 };
 
