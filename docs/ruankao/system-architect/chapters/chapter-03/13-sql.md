@@ -34,13 +34,16 @@ title: SQL（Structured Query Language）
 ```mermaid
 mindmap
   root((SQL))
-    DDL
-    DML
-    DCL
-    SELECT
-    JOIN
-    GROUP BY
-    ORDER BY
+    数据定义与控制
+      DDL
+      DCL
+    数据操作
+      DML
+      SELECT
+    查询组织
+      JOIN
+      GROUP BY
+      ORDER BY
 ```
 
 ## 1. SQL 分类
@@ -193,4 +196,3 @@ SQL 是关系数据库的标准语言，也是数据库章节的重要内容。�
 ## 下一节
 
 ➡ [继续阅读：新型数据库](./14-new-database)
-

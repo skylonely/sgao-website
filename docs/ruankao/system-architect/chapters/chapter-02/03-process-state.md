@@ -34,10 +34,15 @@ title: 进程组成与状态（Process State）
 ```mermaid
 mindmap
   root((进程))
-    PCB
-    三状态
-    五状态
+    进程描述
+      PCB
+    进程状态
+      三状态
+      五状态
     状态转换
+      就绪
+      运行
+      阻塞
 ```
 
 ## 1. 什么是进程
@@ -146,4 +151,3 @@ PCB
 ## 下一节
 
 ➡ [继续阅读：前趋图与资源图](./04-precedence-graph)
-

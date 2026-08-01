@@ -29,9 +29,14 @@ title: 网络功能与分类（Network Overview）
 ```mermaid
 mindmap
   root((网络))
-    功能
-    分类
-    拓扑
+    网络功能
+      功能
+      性能指标
+    网络分类
+      覆盖范围
+      网络类型
+    网络拓扑
+      拓扑结构
 ```
 
 ## 网络功能
@@ -117,4 +122,3 @@ A[拓扑]
 ## 下一节
 
 [下一节：通信技术](./03-communication-technology)
-

@@ -41,12 +41,14 @@ title: 页面置换算法（Page Replacement）
 ```mermaid
 mindmap
   root((页面置换))
-    缺页
-    OPT
-    FIFO
-    LRU
-    LFU
-    缺页率
+    缺页管理
+      缺页
+      缺页率
+    置换算法
+      OPT
+      FIFO
+      LRU
+      LFU
 ```
 
 ## 1. 页面置换概述
@@ -163,4 +165,3 @@ LFU → 使用次数最少
 ## 下一节
 
 ➡ [继续阅读：设备管理](./10-device-management)
-

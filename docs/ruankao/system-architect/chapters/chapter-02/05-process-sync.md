@@ -36,11 +36,13 @@ title: 进程同步、互斥与 PV 操作（Process Synchronization）
 ```mermaid
 mindmap
   root((PV操作))
-    同步
-    互斥
+    并发控制
+      同步
+      互斥
     信号量
-    P操作
-    V操作
+      信号量
+      P操作
+      V操作
 ```
 
 ## 1. 同步与互斥
@@ -161,4 +163,3 @@ PV
 ## 下一节
 
 ➡ [继续阅读：进程调度](./06-process-scheduling)
-

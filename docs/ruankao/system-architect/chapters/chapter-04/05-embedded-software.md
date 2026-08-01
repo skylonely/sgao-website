@@ -36,10 +36,12 @@ title: 嵌入式软件（Embedded Software）
 ```mermaid
 mindmap
   root((嵌入式软件))
-    BSP
-    BootLoader
-    设备驱动
-    应用程序
+    平台支撑
+      BSP
+      BootLoader
+      设备驱动
+    应用层
+      应用程序
 ```
 
 ## 1. 嵌入式软件概述
@@ -149,4 +151,3 @@ BSP
 ## 下一节
 
 ➡ [继续阅读：嵌入式系统](./06-embedded-system)
-

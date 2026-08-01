@@ -36,11 +36,13 @@ title: 路由技术（Routing）
 ```mermaid
 mindmap
   root((路由技术))
-    路由
-    路由器
-    MTU
-    IGP
-    EGP
+    路由基础
+      路由
+      路由器
+      MTU
+    路由协议
+      IGP
+      EGP
 ```
 
 ## 1. 路由概述
@@ -135,4 +137,3 @@ IGP、EGP，是理解网络层数据转发的重要基础。
 ## 下一节
 
 [下一节：传输介质](./08-transmission-media)
-

@@ -35,11 +35,13 @@ title: 软件开发工具（Development Tools）
 ```mermaid
 mindmap
   root((开发工具))
-    编辑器
-    编译器
-    GCC
-    GDB
-    JTAG
+    编辑与构建
+      编辑器
+      编译器
+      GCC
+    调试与下载
+      GDB
+      JTAG
 ```
 
 ## 1. 开发工具链概述
@@ -146,4 +148,3 @@ GCC、GDB、JTAG 的作用和区别。
 ## 下一节
 
 ➡ [继续阅读：章节练习](./10-exercises)
-

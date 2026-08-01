@@ -35,11 +35,14 @@ title: 多核处理器（Multi-core Processor）
 ```mermaid
 mindmap
   root((多核处理器))
-    多核处理器
-    SMP
-    AMP
-    全局队列调度
-    局部队列调度
+    并行硬件
+      多核处理器
+    调度模型
+      SMP
+      AMP
+    调度策略
+      全局队列调度
+      局部队列调度
 ```
 
 ## 1. 多核处理器
@@ -159,4 +162,3 @@ AMP：不同核心
 ## 下一节
 
 ➡ [继续阅读：嵌入式软件](./05-embedded-software)
-

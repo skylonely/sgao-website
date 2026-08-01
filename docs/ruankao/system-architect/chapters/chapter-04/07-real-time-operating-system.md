@@ -35,12 +35,15 @@ title: 嵌入式实时操作系统（Real-Time Operating System）
 
 ```mermaid
 mindmap
-  root((RTOS))
-    EOS
-    RTOS
-    硬实时
-    软实时
-    实时任务调度
+  root((实时操作系统))
+    操作系统类型
+      EOS
+      RTOS
+    实时性分类
+      硬实时
+      软实时
+    任务调度
+      实时任务调度
 ```
 
 ## 1. 嵌入式操作系统（EOS）

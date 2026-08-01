@@ -35,11 +35,12 @@ title: 网络存储（Network Storage）
 ```mermaid
 mindmap
   root((网络存储))
-    网络存储
-    NAS
-    SAN
-    集中存储
-    数据共享
+    存储模式
+      NAS
+      SAN
+    核心能力
+      集中存储
+      数据共享
 ```
 
 ## 1. 网络存储概述
@@ -117,4 +118,3 @@ SAN：专用存储网络
 ## 下一节
 
 [下一节：章节练习](./14-exercises)
-

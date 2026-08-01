@@ -35,12 +35,15 @@ title: 设备管理（Device Management）
 ```mermaid
 mindmap
   root((设备管理))
-    设备分类
+    设备基础
+      设备分类
+      缓冲
     I/O控制
-    中断
-    DMA
-    缓冲
-    Spooling
+      I/O控制
+      中断
+      DMA
+    假脱机
+      Spooling
 ```
 
 ## 1. 设备管理概述
@@ -148,4 +151,3 @@ Spooling → 假脱机
 ## 下一节
 
 ➡ [继续阅读：文件管理](./11-file-management)
-

@@ -34,10 +34,16 @@ title: 微处理器分类（Microprocessor Classification）
 ```mermaid
 mindmap
   root((微处理器分类))
-    MCU
-    MPU
-    DSP
-    SoC
+    控制与通用处理器
+      MCU
+      MPU
+    专用处理器
+      DSP
+      SoC
+    选型关注点
+      集成度
+      实时性
+      运算能力
 ```
 
 ## 分类方式
