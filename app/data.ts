@@ -22,6 +22,34 @@ export const categories = [
 
 export const defaultSites: NavSite[] = [
   {
+    id: "knowledge-base",
+    name: "知识库",
+    url: "https://docs.sgao.cc/",
+    desc: "系统化沉淀与持续维护的知识专题",
+    category: "featured",
+    tags: ["知识", "文档"],
+    mark: "知",
+  },
+  {
+    id: "image-management",
+    name: "图片管理",
+    url: "https://img.sgao.cc/admin/",
+    desc: "管理图片资源与图片中心内容",
+    category: "featured",
+    tags: ["图片", "管理"],
+    mark: "图",
+  },
+  {
+    id: "github",
+    name: "GitHub",
+    url: "https://github.com/",
+    desc: "全球开发者的代码与协作平台",
+    category: "featured",
+    tags: ["开源", "开发"],
+    mark: "G",
+    badge: "推荐",
+  },
+  {
     id: "bilibili",
     name: "哔哩哔哩",
     url: "https://www.bilibili.com/",
@@ -30,15 +58,6 @@ export const defaultSites: NavSite[] = [
     tags: ["视频", "社区"],
     mark: "B",
     badge: "热门",
-  },
-  {
-    id: "douban",
-    name: "豆瓣",
-    url: "https://www.douban.com/",
-    desc: "电影、读书与生活方式社区",
-    category: "featured",
-    tags: ["评分", "发现"],
-    mark: "豆",
   },
   {
     id: "zhihu",
@@ -50,15 +69,6 @@ export const defaultSites: NavSite[] = [
     mark: "知",
   },
   {
-    id: "weread",
-    name: "微信读书",
-    url: "https://weread.qq.com/",
-    desc: "随时随地阅读优质电子书",
-    category: "featured",
-    tags: ["阅读", "书评"],
-    mark: "读",
-  },
-  {
     id: "cloudmusic",
     name: "网易云音乐",
     url: "https://music.163.com/",
@@ -66,16 +76,6 @@ export const defaultSites: NavSite[] = [
     category: "featured",
     tags: ["音乐", "歌单"],
     mark: "音",
-  },
-  {
-    id: "github",
-    name: "GitHub",
-    url: "https://github.com/",
-    desc: "全球开发者的代码与协作平台",
-    category: "featured",
-    tags: ["开源", "开发"],
-    mark: "G",
-    badge: "推荐",
   },
   {
     id: "qidian",
