@@ -530,6 +530,56 @@ export const systemArchitectBook: BookModule = {
         },
       ],
     },
+    {
+      text: "第六章 · 其他计算机系统基础知识",
+      items: [
+        {
+          text: "01 第六章导读",
+          link: "/ruankao/system-architect/chapters/chapter-06/01-other-computer-systems",
+          description: "了解本章知识范围、学习目标与章节目录。",
+        },
+        {
+          text: "02 计算机语言",
+          link: "/ruankao/system-architect/chapters/chapter-06/02-computer-language",
+          description: "掌握机器语言、汇编语言、高级语言与指令地址码。",
+        },
+        {
+          text: "03 多媒体",
+          link: "/ruankao/system-architect/chapters/chapter-06/03-multimedia",
+          description: "理解媒体分类、多媒体系统组成与压缩技术。",
+        },
+        {
+          text: "04 VR 与 AR",
+          link: "/ruankao/system-architect/chapters/chapter-06/04-vr-ar",
+          description: "区分虚拟现实、增强现实及其典型分类。",
+        },
+        {
+          text: "05 系统工程",
+          link: "/ruankao/system-architect/chapters/chapter-06/05-system-engineering",
+          description: "掌握霍尔三维结构、生命周期与系统工程方法。",
+        },
+        {
+          text: "06 MBSE",
+          link: "/ruankao/system-architect/chapters/chapter-06/06-mbse",
+          description: "理解基于模型的系统工程及需求、行为、结构模型。",
+        },
+        {
+          text: "07 章节练习",
+          link: "/ruankao/system-architect/chapters/chapter-06/07-exercises",
+          description: "通过练习题巩固计算机语言、多媒体与系统工程知识。",
+        },
+        {
+          text: "08 历年真题复习",
+          link: "/ruankao/system-architect/chapters/chapter-06/08-past-exams",
+          description: "整理系统工程相关高频题型与答案。",
+        },
+        {
+          text: "09 第六章总结",
+          link: "/ruankao/system-architect/chapters/chapter-06/09-summary",
+          description: "回顾本章必背知识、重点方法与复习建议。",
+        },
+      ],
+    },
   ],
 };
 

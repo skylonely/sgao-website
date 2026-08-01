@@ -69,7 +69,7 @@ hero:
         <span class="portal-book-index">BOOK 02</span>
         <div>
           <strong>系统架构设计师</strong>
-          <p>软考专题：已更新计算机硬件、操作系统、数据库系统、嵌入式技术与计算机网络</p>
+          <p>软考专题：已更新计算机硬件、操作系统、数据库系统、嵌入式技术、计算机网络与其他基础知识</p>
         </div>
         <i>开始阅读 →</i>
       </a>
@@ -119,7 +119,7 @@ hero:
       </div>
       <div class="portal-links">
         <a href="/ruankao/system-architect/">
-          <span>系统架构设计师 · 已更新至第五章计算机网络</span><i>→</i>
+          <span>系统架构设计师 · 已更新至第六章其他计算机系统基础知识</span><i>→</i>
         </a>
         <a href="/git/">
           <span>Git 完整专栏（12 章）</span><i>→</i>
