@@ -875,6 +875,76 @@ export const systemArchitectBook: BookModule = {
         },
       ],
     },
+    {
+      text: "第十一章 · 面向对象技术",
+      items: [
+        {
+          text: "01 第十一章导读",
+          link: "/ruankao/system-architect/chapters/chapter-11/01-object-oriented",
+          description: "了解面向对象开发、UML 和设计模式的知识地图。",
+        },
+        {
+          text: "02 面向对象开发",
+          link: "/ruankao/system-architect/chapters/chapter-11/02-object-oriented-development",
+          description: "掌握对象、类、封装、继承、多态、OOA 与 OOD。",
+        },
+        {
+          text: "03 UML 概述",
+          link: "/ruankao/system-architect/chapters/chapter-11/03-uml-overview",
+          description: "理解 UML 的定位、组成和建模用途。",
+        },
+        {
+          text: "04 UML 关系",
+          link: "/ruankao/system-architect/chapters/chapter-11/04-uml-relationships",
+          description: "区分关联、聚合、组合、泛化和依赖关系。",
+        },
+        {
+          text: "05 UML 图",
+          link: "/ruankao/system-architect/chapters/chapter-11/05-uml-diagrams",
+          description: "掌握类图、用例图、顺序图、状态图和部署图。",
+        },
+        {
+          text: "06 UML 4+1 视图",
+          link: "/ruankao/system-architect/chapters/chapter-11/06-uml-4plus1",
+          description: "理解逻辑视图、开发视图、进程视图、物理视图和场景。",
+        },
+        {
+          text: "07 设计模式概述",
+          link: "/ruankao/system-architect/chapters/chapter-11/07-design-pattern-overview",
+          description: "掌握 GoF 23 种模式的三大分类和使用目的。",
+        },
+        {
+          text: "08 创建型模式",
+          link: "/ruankao/system-architect/chapters/chapter-11/08-creational-patterns",
+          description: "学习工厂、抽象工厂、单例、建造者和原型。",
+        },
+        {
+          text: "09 结构型模式",
+          link: "/ruankao/system-architect/chapters/chapter-11/09-structural-patterns",
+          description: "学习适配器、装饰器、代理、外观、桥接等模式。",
+        },
+        {
+          text: "10 行为型模式",
+          link: "/ruankao/system-architect/chapters/chapter-11/10-behavioral-patterns",
+          description: "学习策略、观察者、状态、模板方法等行为型模式。",
+        },
+        {
+          text: "11 章节练习",
+          link: "/ruankao/system-architect/chapters/chapter-11/11-exercises",
+          description: "通过选择题、判断题和综合题巩固本章知识。",
+        },
+        {
+          text: "12 历年真题复习",
+          link: "/ruankao/system-architect/chapters/chapter-11/12-past-exams",
+          description: "按面向对象、UML 和设计模式复盘真题。",
+        },
+        {
+          text: "13 第十一章总结",
+          link: "/ruankao/system-architect/chapters/chapter-11/13-summary",
+          description: "用知识图和模式分类完成考前复习。",
+        },
+      ],
+    },
   ],
 };
 
