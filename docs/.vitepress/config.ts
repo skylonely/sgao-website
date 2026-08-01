@@ -1,11 +1,12 @@
 import { defineConfig } from "vitepress";
+import { withMermaid } from "vitepress-plugin-mermaid";
 import {
   createBookSidebar,
   gitBook,
   systemArchitectBook,
 } from "./book-modules";
 
-export default defineConfig({
+export default withMermaid(defineConfig({
   title: "SGAO Knowledge Base",
   description: "SGAO 平台架构、开发工具、AI 基础与 Cloudflare 实践知识库",
   lang: "zh-CN",
@@ -102,4 +103,4 @@ export default defineConfig({
       },
     ],
   },
-});
+}));

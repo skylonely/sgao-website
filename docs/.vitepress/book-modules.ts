@@ -625,6 +625,81 @@ export const systemArchitectBook: BookModule = {
         },
       ],
     },
+    {
+      text: "第八章 · 信息系统基础知识",
+      items: [
+        {
+          text: "01 第八章导读",
+          link: "/ruankao/system-architect/chapters/chapter-08/01-information-system",
+          description: "了解信息系统基础知识的范围、重点与章节目录。",
+        },
+        {
+          text: "02 信息系统概述",
+          link: "/ruankao/system-architect/chapters/chapter-08/02-information-system-overview",
+          description: "掌握信息系统组成、能力、生命周期与常见类型。",
+        },
+        {
+          text: "03 信息系统开发方法",
+          link: "/ruankao/system-architect/chapters/chapter-08/03-development-methods",
+          description: "比较结构化开发、原型法、OO 与 SOA。",
+        },
+        {
+          text: "04 五大信息系统",
+          link: "/ruankao/system-architect/chapters/chapter-08/04-tps-mis-dss-es-oas",
+          description: "区分 TPS、MIS、DSS、ES 与 OAS 的定位和作用。",
+        },
+        {
+          text: "05 ERP",
+          link: "/ruankao/system-architect/chapters/chapter-08/05-erp",
+          description: "掌握 MRP、MRPⅡ、MPS、BOM 与 ERP 模块。",
+        },
+        {
+          text: "06 信息系统架构",
+          link: "/ruankao/system-architect/chapters/chapter-08/06-information-system-architecture",
+          description: "理解企业信息化、电子政务模式与系统架构。",
+        },
+        {
+          text: "07 信息化战略与战略规划",
+          link: "/ruankao/system-architect/chapters/chapter-08/07-information-strategy",
+          description: "掌握 BSP、CSF、SST、IE、VCA 与 SAM 方法。",
+        },
+        {
+          text: "08 CRM",
+          link: "/ruankao/system-architect/chapters/chapter-08/08-crm",
+          description: "理解客户关系管理的目标、模块及系统关系。",
+        },
+        {
+          text: "09 SCM",
+          link: "/ruankao/system-architect/chapters/chapter-08/09-scm",
+          description: "掌握供应链管理流程、特点及协同关系。",
+        },
+        {
+          text: "10 企业应用集成",
+          link: "/ruankao/system-architect/chapters/chapter-08/10-enterprise-application-integration",
+          description: "学习 EAI 的六种集成方式及其与 SOA 的区别。",
+        },
+        {
+          text: "11 电子商务",
+          link: "/ruankao/system-architect/chapters/chapter-08/11-ecommerce",
+          description: "区分 B2B、B2C、C2C 与 O2O 模式。",
+        },
+        {
+          text: "12 章节练习",
+          link: "/ruankao/system-architect/chapters/chapter-08/12-exercises",
+          description: "通过综合练习巩固信息系统核心概念。",
+        },
+        {
+          text: "13 历年真题复习",
+          link: "/ruankao/system-architect/chapters/chapter-08/13-past-exams",
+          description: "整理信息系统基础知识高频题型和考点。",
+        },
+        {
+          text: "14 第八章总结",
+          link: "/ruankao/system-architect/chapters/chapter-08/14-summary",
+          description: "回顾信息系统、企业管理系统与电子商务知识体系。",
+        },
+      ],
+    },
   ],
 };
 
