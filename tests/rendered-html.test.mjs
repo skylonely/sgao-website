@@ -33,7 +33,7 @@ test("server-renders the navigation product and metadata", async () => {
   assert.match(response.headers.get("content-type") ?? "", /^text\/html\b/i);
 
   const html = await response.text();
-  assert.match(html, /<title>起飞导航｜从这里，起飞。<\/title>/i);
+  assert.match(html, /<title>拾光导航｜从这里，起飞。<\/title>/i);
   assert.match(html, /从这里，<em>起飞。<\/em>/);
   assert.match(html, /今日推荐/);
   assert.match(html, /我的收藏/);

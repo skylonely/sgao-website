@@ -19,7 +19,7 @@ export async function generateMetadata(): Promise<Metadata> {
     requestHeaders.get("x-forwarded-proto") ||
     (host.startsWith("localhost") ? "http" : "https");
   const origin = `${protocol}://${host}`;
-  const title = "起飞导航｜从这里，起飞。";
+  const title = "拾光导航｜从这里，起飞。";
   const description =
     "精选影视、动漫、阅读、工具与开发资源，干净、快速、无广告弹窗。";
 
@@ -27,7 +27,7 @@ export async function generateMetadata(): Promise<Metadata> {
     metadataBase: new URL(origin),
     title,
     description,
-    keywords: ["网址导航", "影视", "动漫", "工具", "起飞导航"],
+    keywords: ["网址导航", "影视", "动漫", "工具", "拾光导航"],
     icons: {
       icon: "/favicon.svg",
       shortcut: "/favicon.svg",
@@ -37,14 +37,14 @@ export async function generateMetadata(): Promise<Metadata> {
       title,
       description,
       url: origin,
-      siteName: "起飞导航",
+      siteName: "拾光导航",
       locale: "zh_CN",
       images: [
         {
           url: `${origin}/og.png`,
           width: 1792,
           height: 1024,
-          alt: "起飞导航｜从这里，起飞。",
+          alt: "拾光导航｜从这里，起飞。",
         },
       ],
     },

@@ -3,7 +3,7 @@ import CopyCode from "./CopyCode";
 import styles from "./spaceship.module.css";
 
 export const metadata: Metadata = {
-  title: "Cloudflare + Spaceship Worker 部署指南｜起飞导航",
+  title: "Cloudflare + Spaceship Worker 部署指南｜拾光导航",
   description:
     "从 Spaceship 购买域名、接入 Cloudflare，到绑定 Cloudflare Worker 自定义域名的完整部署指南。",
 };
@@ -48,10 +48,10 @@ export default function SpaceshipGuidePage() {
   return (
     <main className={styles.page}>
       <header className={styles.topbar}>
-        <a className={styles.brand} href="/" aria-label="返回起飞导航首页">
+        <a className={styles.brand} href="/" aria-label="返回拾光导航首页">
           <span className={styles.brandMark}>↗</span>
           <span>
-            <strong>起飞导航</strong>
+            <strong>拾光导航</strong>
             <small>FLIGHT DOCS</small>
           </span>
         </a>

@@ -95,7 +95,7 @@ export default function Navigator() {
   const [cardMode, setCardMode] = useState<CardMode>("grid");
   const [engine, setEngine] = useState<SearchEngine>("local");
   const [query, setQuery] = useState("");
-  const [activeCategory, setActiveCategory] = useState("featured");
+  const [activeCategory, setActiveCategory] = useState("all");
   const [viewMode, setViewMode] = useState<ViewMode>("all");
   const [favorites, setFavorites] = useState<string[]>([]);
   const [history, setHistory] = useState<string[]>([]);
@@ -543,8 +543,8 @@ export default function Navigator() {
             <span>⌁</span>
           </span>
           <span className="brand-copy">
-            <strong>起飞导航</strong>
-            <small>TAKE OFF &amp; EXPLORE</small>
+            <strong>拾光导航</strong>
+            <small>DISCOVER &amp; COLLECT</small>
           </span>
         </button>
 
@@ -634,7 +634,7 @@ export default function Navigator() {
             ☰
           </button>
           <div className="breadcrumb">
-            <span>起飞导航</span>
+            <span>拾光导航</span>
             <i>/</i>
             <strong>
               {viewMode === "favorites"
@@ -967,7 +967,7 @@ export default function Navigator() {
           <div className="footer-brand">
             <span className="brand-mark small">⌁</span>
             <div>
-              <strong>起飞导航</strong>
+              <strong>拾光导航</strong>
               <p>干净、快速、值得信赖的网络入口。</p>
             </div>
           </div>
