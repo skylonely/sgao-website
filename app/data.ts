@@ -13,10 +13,10 @@ export type NavSite = {
 export const categories = [
   { id: "all", name: "全部网站", icon: "⌂", eyebrow: "ALL DESTINATIONS" },
   { id: "featured", name: "今日推荐", icon: "✦", eyebrow: "CURATED FOR YOU" },
-  { id: "reading", name: "阅读", icon: "▤", eyebrow: "READING ROOM" },
-  { id: "tools", name: "实用工具", icon: "⌘", eyebrow: "USEFUL TOOLS" },
-  { id: "design", name: "设计灵感", icon: "◇", eyebrow: "DESIGN PICKS" },
   { id: "dev", name: "开发者", icon: "⌗", eyebrow: "FOR DEVELOPERS" },
+  { id: "design", name: "设计灵感", icon: "◇", eyebrow: "DESIGN PICKS" },
+  { id: "tools", name: "实用工具", icon: "⌘", eyebrow: "USEFUL TOOLS" },
+  { id: "reading", name: "阅读", icon: "▤", eyebrow: "READING ROOM" },
 ] as const;
 
 export const defaultSites: NavSite[] = [
@@ -77,15 +77,6 @@ export const defaultSites: NavSite[] = [
     mark: "起",
   },
   {
-    id: "jjwxc",
-    name: "晋江文学城",
-    url: "https://www.jjwxc.net/",
-    desc: "原创网络文学阅读与创作平台",
-    category: "reading",
-    tags: ["文学", "原创"],
-    mark: "晋",
-  },
-  {
     id: "fanqie",
     name: "番茄小说",
     url: "https://fanqienovel.com/",
@@ -111,6 +102,15 @@ export const defaultSites: NavSite[] = [
     category: "reading",
     tags: ["英文", "免费"],
     mark: "G",
+  },
+  {
+    id: "jjwxc",
+    name: "晋江文学城",
+    url: "https://www.jjwxc.net/",
+    desc: "原创网络文学阅读与创作平台",
+    category: "reading",
+    tags: ["文学", "原创"],
+    mark: "晋",
   },
   {
     id: "goodreads",
