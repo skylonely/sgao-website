@@ -57,6 +57,7 @@ const legacyCategoryMap: Record<string, string> = {
   anime: "tools",
   game: "tools",
   movie: "tools",
+  music: "tools",
 };
 
 function readStorage<T>(key: string, fallback: T): T {
@@ -734,7 +735,7 @@ export default function Navigator() {
 
             <div className="hot-searches">
               <span>热门搜索</span>
-              {["影视", "AI 工具", "在线音乐", "图片处理"].map((item) => (
+              {["影视", "AI 工具", "图片处理"].map((item) => (
                 <button
                   key={item}
                   onClick={() => {

@@ -21,7 +21,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const origin = `${protocol}://${host}`;
   const title = "起飞导航｜从这里，起飞。";
   const description =
-    "精选影视、动漫、阅读、音乐、游戏、工具与开发资源，干净、快速、无广告弹窗。";
+    "精选影视、动漫、阅读、工具与开发资源，干净、快速、无广告弹窗。";
 
   return {
     metadataBase: new URL(origin),
