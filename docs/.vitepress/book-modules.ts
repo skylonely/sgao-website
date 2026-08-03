@@ -1085,6 +1085,66 @@ export const systemArchitectBook: BookModule = {
         },
       ],
     },
+    {
+      text: "第十四章 · 软件可靠性基础",
+      items: [
+        {
+          text: "01 第十四章导读",
+          link: "/ruankao/system-architect/chapters/chapter-14/index",
+          description: "了解软件可靠性、可靠性建模、设计、测试与评价的知识范围。",
+        },
+        {
+          text: "02 软件可靠性基本概念",
+          link: "/ruankao/system-architect/chapters/chapter-14/01-software-reliability-overview",
+          description: "掌握软件可靠性定义、特点、度量指标和 MTTF、MTTR、MTBF。",
+        },
+        {
+          text: "03 软件可靠性建模",
+          link: "/ruankao/system-architect/chapters/chapter-14/02-reliability-model",
+          description: "理解可靠性模型的组成、假设、分类与应用过程。",
+        },
+        {
+          text: "04 软件可靠性管理",
+          link: "/ruankao/system-architect/chapters/chapter-14/03-reliability-management",
+          description: "掌握可靠性计划、生命周期活动和可靠性保障过程。",
+        },
+        {
+          text: "05 软件可靠性设计",
+          link: "/ruankao/system-architect/chapters/chapter-14/04-reliability-design",
+          description: "学习容错、检错、冗余和 N 版本程序等可靠性设计技术。",
+        },
+        {
+          text: "06 容错设计",
+          link: "/ruankao/system-architect/chapters/chapter-14/05-fault-tolerance-design",
+          description: "理解容错技术、表决技术、恢复块和 N 版本程序设计。",
+        },
+        {
+          text: "07 高可用技术",
+          link: "/ruankao/system-architect/chapters/chapter-14/06-high-availability",
+          description: "比较双机热备、双机互备、双机双工、集群和负载均衡。",
+        },
+        {
+          text: "08 可靠性测试与评价",
+          link: "/ruankao/system-architect/chapters/chapter-14/07-reliability-testing",
+          description: "掌握运行剖面、可靠性测试流程、数据收集与评价预测。",
+        },
+        {
+          text: "09 章节练习",
+          link: "/ruankao/system-architect/chapters/chapter-14/08-exercises",
+          description: "通过选择题、判断题和计算题巩固软件可靠性知识。",
+        },
+        {
+          text: "10 历年真题复习",
+          link: "/ruankao/system-architect/chapters/chapter-14/09-past-exams",
+          description: "按可靠性指标、模型、容错和高可用技术复盘典型题型。",
+        },
+        {
+          text: "11 第十四章总结",
+          link: "/ruankao/system-architect/chapters/chapter-14/10-summary",
+          description: "用知识体系、公式对照表和思维导图完成考前复习。",
+        },
+      ],
+    },
   ],
 };
 
