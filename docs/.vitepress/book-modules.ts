@@ -945,6 +945,61 @@ export const systemArchitectBook: BookModule = {
         },
       ],
     },
+    {
+      text: "第十二章 · 项目管理",
+      items: [
+        {
+          text: "01 第十二章导读",
+          link: "/ruankao/system-architect/chapters/chapter-12/index",
+          description: "了解项目管理、进度、配置、质量和风险管理的知识范围。",
+        },
+        {
+          text: "02 项目管理概述",
+          link: "/ruankao/system-architect/chapters/chapter-12/01-project-management-overview",
+          description: "掌握项目管理目标、过程、知识体系与高频考点。",
+        },
+        {
+          text: "03 项目进度管理",
+          link: "/ruankao/system-architect/chapters/chapter-12/02-progress-management",
+          description: "学习活动定义、排序、估算、计划编制与进度控制。",
+        },
+        {
+          text: "04 关键路径法",
+          link: "/ruankao/system-architect/chapters/chapter-12/03-critical-path-method",
+          description: "掌握 CPM、ES、EF、LS、LF、浮动时间和关键路径计算。",
+        },
+        {
+          text: "05 软件配置管理",
+          link: "/ruankao/system-architect/chapters/chapter-12/04-software-configuration-management",
+          description: "理解配置项、基线、版本、状态报告、审计和 CCB。",
+        },
+        {
+          text: "06 质量管理",
+          link: "/ruankao/system-architect/chapters/chapter-12/05-quality-management",
+          description: "区分质量规划、质量保证和质量控制。",
+        },
+        {
+          text: "07 风险管理",
+          link: "/ruankao/system-architect/chapters/chapter-12/06-risk-management",
+          description: "掌握风险识别、分析、应对和监控流程。",
+        },
+        {
+          text: "08 章节练习",
+          link: "/ruankao/system-architect/chapters/chapter-12/07-exercises",
+          description: "通过选择题、判断题和关键路径计算巩固本章知识。",
+        },
+        {
+          text: "09 历年真题复习",
+          link: "/ruankao/system-architect/chapters/chapter-12/08-past-exams",
+          description: "按进度、配置、质量和风险管理复盘典型题型。",
+        },
+        {
+          text: "10 第十二章总结",
+          link: "/ruankao/system-architect/chapters/chapter-12/09-summary",
+          description: "用知识体系、对照表和思维导图完成考前复习。",
+        },
+      ],
+    },
   ],
 };
 
