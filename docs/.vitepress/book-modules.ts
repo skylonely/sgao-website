@@ -1000,6 +1000,91 @@ export const systemArchitectBook: BookModule = {
         },
       ],
     },
+    {
+      text: "第十三章 · 系统架构设计",
+      items: [
+        {
+          text: "01 第十三章导读",
+          link: "/ruankao/system-architect/chapters/chapter-13/index",
+          description: "了解软件架构、架构风格、架构评估与中间件的知识范围。",
+        },
+        {
+          text: "02 软件架构概述",
+          link: "/ruankao/system-architect/chapters/chapter-13/01-software-architecture-overview",
+          description: "掌握软件架构的定义、组成、作用和生命周期关系。",
+        },
+        {
+          text: "03 软件架构风格",
+          link: "/ruankao/system-architect/chapters/chapter-13/02-software-architecture-style",
+          description: "比较数据流、调用返回、独立构件、虚拟机和仓库风格。",
+        },
+        {
+          text: "04 软件构件",
+          link: "/ruankao/system-architect/chapters/chapter-13/03-component",
+          description: "理解构件定义、接口、复用和构件化开发。",
+        },
+        {
+          text: "05 层次架构",
+          link: "/ruankao/system-architect/chapters/chapter-13/04-layered-architecture",
+          description: "掌握 C/S、B/S、三层和多层架构的特点与对比。",
+        },
+        {
+          text: "06 MVC、MVP、MVVM",
+          link: "/ruankao/system-architect/chapters/chapter-13/05-mvc-mvp-mvvm",
+          description: "区分 MVC、MVP、MVVM 的组成、流程和适用场景。",
+        },
+        {
+          text: "07 SOA 面向服务架构",
+          link: "/ruankao/system-architect/chapters/chapter-13/06-soa",
+          description: "掌握 SOA 角色、服务模型、注册发现和 ESB。",
+        },
+        {
+          text: "08 Web Service",
+          link: "/ruankao/system-architect/chapters/chapter-13/07-web-service",
+          description: "理解 SOAP、WSDL、UDDI 及 Web Service 调用流程。",
+        },
+        {
+          text: "09 DSSA",
+          link: "/ruankao/system-architect/chapters/chapter-13/08-dssa",
+          description: "掌握领域工程、领域分析、设计和实现。",
+        },
+        {
+          text: "10 ABSD",
+          link: "/ruankao/system-architect/chapters/chapter-13/09-absd",
+          description: "理解基于架构的软件开发及架构需求、设计、实现和演化。",
+        },
+        {
+          text: "11 软件架构评估",
+          link: "/ruankao/system-architect/chapters/chapter-13/10-software-architecture-evaluation",
+          description: "掌握质量属性、场景驱动分析和架构权衡。",
+        },
+        {
+          text: "12 SAAM、ATAM、CBAM",
+          link: "/ruankao/system-architect/chapters/chapter-13/11-saam-atam-cbam",
+          description: "比较 SAAM、ATAM、CBAM 的目标、过程与适用场景。",
+        },
+        {
+          text: "13 中间件技术",
+          link: "/ruankao/system-architect/chapters/chapter-13/12-middleware-technology",
+          description: "了解 CORBA、COM/DCOM、EJB、J2EE 和 .NET 中间件。",
+        },
+        {
+          text: "14 章节练习",
+          link: "/ruankao/system-architect/chapters/chapter-13/13-exercises",
+          description: "通过选择题、判断题和综合题巩固系统架构设计知识。",
+        },
+        {
+          text: "15 历年真题复习",
+          link: "/ruankao/system-architect/chapters/chapter-13/14-past-exams",
+          description: "按架构风格、SOA、架构评估和中间件复盘典型题型。",
+        },
+        {
+          text: "16 第十三章总结",
+          link: "/ruankao/system-architect/chapters/chapter-13/15-summary",
+          description: "用知识体系、对比表和思维导图完成考前复习。",
+        },
+      ],
+    },
   ],
 };
 
