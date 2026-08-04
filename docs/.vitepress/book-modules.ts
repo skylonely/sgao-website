@@ -1355,6 +1355,81 @@ export const systemArchitectBook: BookModule = {
         },
       ],
     },
+    {
+      text: "补充二 · 知识产权与标准化",
+      items: [
+        {
+          text: "01 补充二导读",
+          link: "/ruankao/system-architect/chapters/supplement-02/index",
+          description: "了解知识产权基础、侵权判定和信息技术标准化知识范围。",
+        },
+        {
+          text: "02 知识产权概述",
+          link: "/ruankao/system-architect/chapters/supplement-02/01-intellectual-property-overview",
+          description: "掌握知识产权定义、类型、特点及信息技术领域相关问题。",
+        },
+        {
+          text: "03 知识产权保护期限",
+          link: "/ruankao/system-architect/chapters/supplement-02/02-intellectual-property-protection-period",
+          description: "理解著作权、软件著作权、专利权和商标权的保护期限。",
+        },
+        {
+          text: "04 知识产权人的确定",
+          link: "/ruankao/system-architect/chapters/supplement-02/03-determination-of-intellectual-property-owner",
+          description: "掌握职务作品、委托作品和合作开发作品的权利归属。",
+        },
+        {
+          text: "05 软件著作权",
+          link: "/ruankao/system-architect/chapters/supplement-02/04-software-copyright",
+          description: "学习软件著作权保护对象、权利归属和相关规则。",
+        },
+        {
+          text: "06 专利权",
+          link: "/ruankao/system-architect/chapters/supplement-02/05-patent-right",
+          description: "掌握专利类型、保护期限、权利归属及软件专利知识。",
+        },
+        {
+          text: "07 商标权",
+          link: "/ruankao/system-architect/chapters/supplement-02/06-trademark-right",
+          description: "理解商标注册、保护期限和侵权判断。",
+        },
+        {
+          text: "08 侵权判定",
+          link: "/ruankao/system-architect/chapters/supplement-02/07-infringement-judgment",
+          description: "掌握知识产权侵权原则、软件侵权和合理使用判断。",
+        },
+        {
+          text: "09 标准化概述",
+          link: "/ruankao/system-architect/chapters/supplement-02/08-standardization-overview",
+          description: "了解标准、标准化的定义、作用和基本原则。",
+        },
+        {
+          text: "10 标准分类",
+          link: "/ruankao/system-architect/chapters/supplement-02/09-standard-classification",
+          description: "区分国际、国家、行业、地方、企业及强制性、推荐性标准。",
+        },
+        {
+          text: "11 标准编号规则",
+          link: "/ruankao/system-architect/chapters/supplement-02/10-standard-code",
+          description: "掌握标准代号、顺序号和年份组成的编号规则。",
+        },
+        {
+          text: "12 章节练习",
+          link: "/ruankao/system-architect/chapters/supplement-02/11-exercises",
+          description: "通过综合练习巩固知识产权和标准化知识。",
+        },
+        {
+          text: "13 历年真题复习",
+          link: "/ruankao/system-architect/chapters/supplement-02/12-past-exams",
+          description: "按知识产权、侵权判定和标准化复盘典型题型。",
+        },
+        {
+          text: "14 补充二总结",
+          link: "/ruankao/system-architect/chapters/supplement-02/13-summary",
+          description: "用保护期限表、标准分类表和思维导图完成考前复习。",
+        },
+      ],
+    },
   ],
 };
 
