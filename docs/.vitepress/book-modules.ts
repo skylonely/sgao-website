@@ -1270,6 +1270,91 @@ export const systemArchitectBook: BookModule = {
         },
       ],
     },
+    {
+      text: "补充一 · 数学与经济管理",
+      items: [
+        {
+          text: "01 补充一导读",
+          link: "/ruankao/system-architect/chapters/supplement-01/index",
+          description: "了解图论、优化、概率模型、决策分析与数学建模的知识范围。",
+        },
+        {
+          text: "02 最小生成树",
+          link: "/ruankao/system-architect/chapters/supplement-01/01-minimum-spanning-tree",
+          description: "掌握最小生成树定义、Kruskal 算法和 Prim 算法。",
+        },
+        {
+          text: "03 最短路径",
+          link: "/ruankao/system-architect/chapters/supplement-01/02-shortest-path",
+          description: "学习最短路径模型、Dijkstra 算法和典型应用。",
+        },
+        {
+          text: "04 网络与最大流量",
+          link: "/ruankao/system-architect/chapters/supplement-01/03-maximum-flow",
+          description: "理解网络流、容量限制、增广路径和最大流问题。",
+        },
+        {
+          text: "05 线性规划",
+          link: "/ruankao/system-architect/chapters/supplement-01/04-linear-programming",
+          description: "掌握目标函数、约束条件和线性规划模型。",
+        },
+        {
+          text: "06 动态规划",
+          link: "/ruankao/system-architect/chapters/supplement-01/05-dynamic-programming",
+          description: "理解多阶段决策、状态转移和最优子结构。",
+        },
+        {
+          text: "07 伏格尔法",
+          link: "/ruankao/system-architect/chapters/supplement-01/06-vogel-method",
+          description: "掌握运输问题、罚数计算和运输方案优化。",
+        },
+        {
+          text: "08 博弈论",
+          link: "/ruankao/system-architect/chapters/supplement-01/07-game-theory",
+          description: "理解参与者、策略、收益和典型博弈模型。",
+        },
+        {
+          text: "09 状态转移矩阵与马尔可夫链",
+          link: "/ruankao/system-architect/chapters/supplement-01/08-markov-chain",
+          description: "掌握状态转移概率、转移矩阵和马尔可夫性质。",
+        },
+        {
+          text: "10 排队论",
+          link: "/ruankao/system-architect/chapters/supplement-01/09-queueing-theory",
+          description: "学习到达率、服务率、排队模型和性能指标。",
+        },
+        {
+          text: "11 决策论",
+          link: "/ruankao/system-architect/chapters/supplement-01/10-decision-theory",
+          description: "掌握确定型、风险型和不确定型决策方法。",
+        },
+        {
+          text: "12 决策树",
+          link: "/ruankao/system-architect/chapters/supplement-01/11-decision-tree",
+          description: "理解决策树结构、期望收益和方案选择。",
+        },
+        {
+          text: "13 数学建模",
+          link: "/ruankao/system-architect/chapters/supplement-01/12-mathematical-modeling",
+          description: "掌握数学建模流程、模型分类和应用方法。",
+        },
+        {
+          text: "14 章节练习",
+          link: "/ruankao/system-architect/chapters/supplement-01/13-exercises",
+          description: "通过综合练习巩固图论、优化、概率和决策知识。",
+        },
+        {
+          text: "15 历年真题复习",
+          link: "/ruankao/system-architect/chapters/supplement-01/14-past-exams",
+          description: "按数学模型和经济管理方法复盘典型题型。",
+        },
+        {
+          text: "16 补充一总结",
+          link: "/ruankao/system-architect/chapters/supplement-01/15-summary",
+          description: "用公式、方法对照表和思维导图完成考前复习。",
+        },
+      ],
+    },
   ],
 };
 
