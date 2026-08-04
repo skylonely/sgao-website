@@ -1145,6 +1145,66 @@ export const systemArchitectBook: BookModule = {
         },
       ],
     },
+    {
+      text: "第十五章 · 软件架构的演化和维护",
+      items: [
+        {
+          text: "01 第十五章导读",
+          link: "/ruankao/system-architect/chapters/chapter-15/index",
+          description: "了解软件架构演化、维护、大型网站演进和评估的知识范围。",
+        },
+        {
+          text: "02 软件架构演化概述",
+          link: "/ruankao/system-architect/chapters/chapter-15/01-software-architecture-evolution-overview",
+          description: "掌握架构演化的定义、原因、生命周期和目标。",
+        },
+        {
+          text: "03 面向对象架构演化",
+          link: "/ruankao/system-architect/chapters/chapter-15/02-object-oriented-architecture-evolution",
+          description: "理解对象、消息、复合片段和约束的演化。",
+        },
+        {
+          text: "04 软件架构演化方式",
+          link: "/ruankao/system-architect/chapters/chapter-15/03-software-architecture-evolution-methods",
+          description: "比较过程和函数、面向对象、构件及基于架构的演化方式。",
+        },
+        {
+          text: "05 软件架构演化原则",
+          link: "/ruankao/system-architect/chapters/chapter-15/04-software-architecture-evolution-principles",
+          description: "掌握成本、进度、风险、平滑演化、重构和重用原则。",
+        },
+        {
+          text: "06 软件架构演化评估",
+          link: "/ruankao/system-architect/chapters/chapter-15/05-software-architecture-evolution-evaluation",
+          description: "理解演化过程已知或未知时的评估与影响分析方法。",
+        },
+        {
+          text: "07 大型网站架构演化",
+          link: "/ruankao/system-architect/chapters/chapter-15/06-large-scale-website-architecture-evolution",
+          description: "掌握从单体、垂直架构到分布式服务的演进过程。",
+        },
+        {
+          text: "08 软件架构维护",
+          link: "/ruankao/system-architect/chapters/chapter-15/07-software-architecture-maintenance",
+          description: "学习架构知识管理、修改管理、版本管理和维护控制。",
+        },
+        {
+          text: "09 章节练习",
+          link: "/ruankao/system-architect/chapters/chapter-15/08-exercises",
+          description: "通过选择题和综合题巩固架构演化与维护知识。",
+        },
+        {
+          text: "10 历年真题复习",
+          link: "/ruankao/system-architect/chapters/chapter-15/09-past-exams",
+          description: "按演化方法、大型网站演进和维护管理复盘典型题型。",
+        },
+        {
+          text: "11 第十五章总结",
+          link: "/ruankao/system-architect/chapters/chapter-15/10-summary",
+          description: "用知识体系、对照表和思维导图完成考前复习。",
+        },
+      ],
+    },
   ],
 };
 
