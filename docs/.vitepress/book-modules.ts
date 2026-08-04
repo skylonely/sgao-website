@@ -1205,6 +1205,71 @@ export const systemArchitectBook: BookModule = {
         },
       ],
     },
+    {
+      text: "第十六章 · 未来信息综合技术",
+      items: [
+        {
+          text: "01 第十六章导读",
+          link: "/ruankao/system-architect/chapters/chapter-16/index",
+          description: "了解 CPS、AI、机器人、边缘计算、云计算和大数据等技术方向。",
+        },
+        {
+          text: "02 信息物理系统 CPS",
+          link: "/ruankao/system-architect/chapters/chapter-16/01-cyber-physical-system",
+          description: "掌握 CPS 的概念、特征、体系结构、关键技术和应用。",
+        },
+        {
+          text: "03 人工智能 AI",
+          link: "/ruankao/system-architect/chapters/chapter-16/02-artificial-intelligence",
+          description: "理解人工智能定义、发展目标、关键技术和应用方向。",
+        },
+        {
+          text: "04 机器学习",
+          link: "/ruankao/system-architect/chapters/chapter-16/03-machine-learning",
+          description: "掌握机器学习流程、监督学习、无监督学习和典型方法。",
+        },
+        {
+          text: "05 机器人技术",
+          link: "/ruankao/system-architect/chapters/chapter-16/04-robot",
+          description: "了解机器人发展阶段、机器人 4.0、核心技术和应用。",
+        },
+        {
+          text: "06 边缘计算",
+          link: "/ruankao/system-architect/chapters/chapter-16/05-edge-computing",
+          description: "掌握边缘计算体系结构、特点、云边协同和应用场景。",
+        },
+        {
+          text: "07 数字孪生体",
+          link: "/ruankao/system-architect/chapters/chapter-16/06-digital-twin",
+          description: "理解数字孪生体的概念、组成、关键技术和应用。",
+        },
+        {
+          text: "08 云计算",
+          link: "/ruankao/system-architect/chapters/chapter-16/07-cloud-computing",
+          description: "掌握云计算特点、体系结构、服务模式和部署模式。",
+        },
+        {
+          text: "09 大数据",
+          link: "/ruankao/system-architect/chapters/chapter-16/08-big-data",
+          description: "了解大数据特征、技术体系、处理流程和典型应用。",
+        },
+        {
+          text: "10 章节练习",
+          link: "/ruankao/system-architect/chapters/chapter-16/09-exercises",
+          description: "通过综合练习巩固 CPS、AI、云计算和大数据知识。",
+        },
+        {
+          text: "11 历年真题复习",
+          link: "/ruankao/system-architect/chapters/chapter-16/10-past-exams",
+          description: "按未来信息技术主题复盘典型考试题型。",
+        },
+        {
+          text: "12 第十六章总结",
+          link: "/ruankao/system-architect/chapters/chapter-16/11-summary",
+          description: "用知识体系、对照表和思维导图完成考前复习。",
+        },
+      ],
+    },
   ],
 };
 
