@@ -1430,6 +1430,71 @@ export const systemArchitectBook: BookModule = {
         },
       ],
     },
+    {
+      text: "案例分析专题",
+      items: [
+        {
+          text: "01 案例分析专题导读",
+          link: "/ruankao/system-architect/case-analysis/index",
+          description: "了解系统架构设计师案例分析的题型、考点与答题框架。",
+        },
+        {
+          text: "02 软件架构设计案例",
+          link: "/ruankao/system-architect/case-analysis/01-software-architecture-case",
+          description: "掌握架构风格、架构模式、分层设计和架构选择的案例分析。",
+        },
+        {
+          text: "03 软件质量属性案例",
+          link: "/ruankao/system-architect/case-analysis/02-quality-attribute-case",
+          description: "从需求识别质量属性，并选择对应的架构策略。",
+        },
+        {
+          text: "04 MVC、SOA、ESB 案例",
+          link: "/ruankao/system-architect/case-analysis/03-mvc-soa-esb-case",
+          description: "分析 MVC、SOA、ESB 的核心组件、适用场景和答题方法。",
+        },
+        {
+          text: "05 数据库系统案例",
+          link: "/ruankao/system-architect/case-analysis/04-database-case",
+          description: "覆盖数据库架构、性能优化、分库分表和分布式数据库案例。",
+        },
+        {
+          text: "06 NoSQL 数据库案例",
+          link: "/ruankao/system-architect/case-analysis/05-nosql-case",
+          description: "掌握 CAP、BASE、Key-Value 数据库和 NoSQL 应用场景。",
+        },
+        {
+          text: "07 嵌入式系统案例",
+          link: "/ruankao/system-architect/case-analysis/06-embedded-case",
+          description: "分析实时系统、可靠性、容错和 N 版本程序设计案例。",
+        },
+        {
+          text: "08 Web 应用开发案例",
+          link: "/ruankao/system-architect/case-analysis/07-web-application-case",
+          description: "覆盖 B/S、MVC、REST、缓存、CDN、负载均衡和高并发设计。",
+        },
+        {
+          text: "09 项目管理案例",
+          link: "/ruankao/system-architect/case-analysis/08-project-management-case",
+          description: "练习 Gantt、PERT、关键路径、风险、质量和配置管理案例。",
+        },
+        {
+          text: "10 信息安全案例",
+          link: "/ruankao/system-architect/case-analysis/09-security-case",
+          description: "分析身份认证、访问控制、密码、防火墙和安全架构案例。",
+        },
+        {
+          text: "11 历年案例真题",
+          link: "/ruankao/system-architect/case-analysis/10-past-exams",
+          description: "按案例类型整理高频考查方向、技术选择和答题模板。",
+        },
+        {
+          text: "12 案例分析冲刺总结",
+          link: "/ruankao/system-architect/case-analysis/11-summary",
+          description: "汇总案例分析答题框架、质量属性映射和考前策略。",
+        },
+      ],
+    },
   ],
 };
 
