@@ -8,11 +8,14 @@ hero:
     沉淀可复用经验
   actions:
     - theme: brand
-      text: 阅读 Git 专栏
-      link: /git/
+      text: 软考专题
+      link: /ruankao/system-architect/
     - theme: alt
-      text: 查看平台架构
+      text: 平台架构
       link: /guide/platform-architecture
+    - theme: alt
+      text: Git 专栏
+      link: /git/
 ---
 
 <div id="knowledge-sections" class="docs-portal">
