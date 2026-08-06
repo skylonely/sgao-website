@@ -1,6 +1,6 @@
 # 沈阳 + 丹东 + 大连 6日5晚旅行攻略（最终修正版）
 
-![沈阳、丹东、大连旅行路线](https://img.sgao.cc/travel/travel_shenyang.png)
+![沈阳、丹东、大连旅行路线](https://img.sgao.cc/travel/travel_shenyang_1.png)
 
 ## 时间
 
