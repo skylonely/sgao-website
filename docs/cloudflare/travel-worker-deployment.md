@@ -98,11 +98,13 @@ https://travel.sgao.cc/shenyang-dandong-dalian/itinerary
 https://travel.sgao.cc/shenyang-dandong-dalian/checklist
 ```
 
-同时确认原知识库隐藏地址仍能访问：
+同时确认原知识库路径已经停止提供旅行内容：
 
 ```text
 https://docs.sgao.cc/travel/shenyang-dandong-dalian/
 ```
+
+该地址应返回 404。旅行内容只通过 `travel.sgao.cc` 对外提供。
 
 ## 七、以后如何更新
 

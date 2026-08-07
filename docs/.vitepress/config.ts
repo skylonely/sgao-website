@@ -10,6 +10,7 @@ export default withMermaid(defineConfig({
   title: "SGAO Knowledge Base",
   description: "SGAO 平台架构、开发工具、AI 基础与 Cloudflare 实践知识库",
   lang: "zh-CN",
+  srcExclude: ["travel/**"],
   themeConfig: {
     siteTitle: "SGAO",
     nav: [
