@@ -291,7 +291,24 @@ button { color: inherit; }
   transform: translate(-50%, -50%);
 }
 .add-button span::after { transform: translate(-50%, -50%) rotate(90deg); }
-.mobile-menu { display: none; }
+.mobile-menu {
+  position: relative;
+  display: none;
+  font-size: 0;
+  line-height: 0;
+}
+.mobile-menu::before {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 12px;
+  height: 1.5px;
+  border-radius: 2px;
+  background: currentColor;
+  box-shadow: 0 -4px currentColor, 0 4px currentColor;
+  content: "";
+  transform: translate(-50%, -50%);
+}
 
 .hero {
   position: relative;
@@ -854,7 +871,7 @@ footer { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center
 @media (max-width: 680px) {
   .topbar { height: 62px; padding: 0 16px; }
   .breadcrumb span, .breadcrumb i { display: none; }
-  .round-button { width: 35px; height: 35px; }
+  .round-button, .mobile-menu { width: 35px; height: 35px; }
   .add-button { width: 35px; height: 35px; justify-content: center; gap: 0; padding: 0; border-radius: 50%; font-size: 0; }
   .hero { min-height: 350px; padding: 40px 20px 54px; }
   .hero::before { right: -18vw; width: 80vw; }
