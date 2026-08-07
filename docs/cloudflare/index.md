@@ -8,6 +8,10 @@
 
 说明 `sgao.cc` 主站和 `docs.sgao.cc` 知识库如何从同一个 GitHub 仓库分别构建、部署到两个 Worker。
 
+### [Travel 旅行站 Worker 创建与部署](./travel-worker-deployment)
+
+说明如何创建第三个 `sgao-travel` Worker、连接 GitHub 自动构建，并绑定 `travel.sgao.cc`。
+
 ### [DNS 与域名配置](./dns-domain)
 
 说明 `sgao.cc` 域名体系、DNS 记录、代理状态、Worker Custom Domain 和常见故障处理。

@@ -16,7 +16,10 @@
     "db:generate": "drizzle-kit generate",
     "docs:dev": "vitepress dev docs",
     "docs:build": "vitepress build docs",
-    "docs:preview": "vitepress preview docs"
+    "docs:preview": "vitepress preview docs",
+    "travel:dev": "vitepress dev travel",
+    "travel:build": "vitepress build travel",
+    "travel:preview": "vitepress preview travel"
   },
   "dependencies": {
     "drizzle-orm": "0.45.2",

@@ -82,6 +82,10 @@ export default withMermaid(defineConfig({
               text: "Workers 双站点自动部署",
               link: "/cloudflare/workers-auto-deploy",
             },
+            {
+              text: "Travel 旅行站部署",
+              link: "/cloudflare/travel-worker-deployment",
+            },
             { text: "DNS 与域名配置", link: "/cloudflare/dns-domain" },
             {
               text: "Spaceship 域名部署",
