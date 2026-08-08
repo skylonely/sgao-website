@@ -1495,6 +1495,206 @@ export const systemArchitectBook: BookModule = {
         },
       ],
     },
+    {
+      text: "案例分析二",
+      items: [
+        {
+          text: "12 云原生架构案例",
+          link: "/ruankao/system-architect/case-analysis-2/12-cloud-native-case",
+          description: "学习云原生架构设计与案例分析答题方法。",
+        },
+        {
+          text: "13 通信系统网络架构案例",
+          link: "/ruankao/system-architect/case-analysis-2/13-communication-network-case",
+          description: "学习通信系统与网络架构案例分析。",
+        },
+        {
+          text: "14 层次式架构设计案例",
+          link: "/ruankao/system-architect/case-analysis-2/14-layered-architecture-case",
+          description: "学习层次式架构设计与案例分析。",
+        },
+        {
+          text: "15 安全模型专题案例",
+          link: "/ruankao/system-architect/case-analysis-2/15-security-model-case",
+          description: "学习安全模型设计与案例分析。",
+        },
+        {
+          text: "16 微服务架构案例",
+          link: "/ruankao/system-architect/case-analysis-2/16-microservices-case",
+          description: "学习微服务架构设计与案例分析。",
+        },
+        {
+          text: "17 API 网关与服务治理案例",
+          link: "/ruankao/system-architect/case-analysis-2/17-api-gateway-case",
+          description: "学习 API 网关与服务治理案例分析。",
+        },
+        {
+          text: "18 分布式系统架构案例",
+          link: "/ruankao/system-architect/case-analysis-2/18-distributed-system-case",
+          description: "学习分布式系统架构设计与案例分析。",
+        },
+        {
+          text: "19 消息队列与异步架构案例",
+          link: "/ruankao/system-architect/case-analysis-2/19-message-queue-case",
+          description: "学习消息队列与异步架构案例分析。",
+        },
+        {
+          text: "20 分布式缓存架构案例",
+          link: "/ruankao/system-architect/case-analysis-2/20-data-cache-case",
+          description: "学习分布式缓存设计与案例分析。",
+        },
+        {
+          text: "21 数据库优化案例",
+          link: "/ruankao/system-architect/case-analysis-2/21-database-optimization-case",
+          description: "学习数据库优化与高性能数据库案例分析。",
+        },
+        {
+          text: "22 高并发系统架构案例",
+          link: "/ruankao/system-architect/case-analysis-2/22-high-concurrency-case",
+          description: "学习高并发系统架构设计与案例分析。",
+        },
+        {
+          text: "23 高可用系统架构案例",
+          link: "/ruankao/system-architect/case-analysis-2/23-high-availability-case",
+          description: "学习高可用系统架构设计与案例分析。",
+        },
+        {
+          text: "24 云计算架构案例",
+          link: "/ruankao/system-architect/case-analysis-2/24-cloud-computing-case",
+          description: "学习云计算架构设计与案例分析。",
+        },
+        {
+          text: "25 容器与 Kubernetes 架构案例",
+          link: "/ruankao/system-architect/case-analysis-2/25-container-kubernetes-case",
+          description: "学习容器与 Kubernetes 架构案例分析。",
+        },
+        {
+          text: "26 DevOps 与持续交付案例",
+          link: "/ruankao/system-architect/case-analysis-2/26-devops-case",
+          description: "学习 DevOps 与持续交付架构案例分析。",
+        },
+        {
+          text: "27 大数据架构案例",
+          link: "/ruankao/system-architect/case-analysis-2/27-big-data-case",
+          description: "学习大数据架构设计与案例分析。",
+        },
+        {
+          text: "28 人工智能架构案例",
+          link: "/ruankao/system-architect/case-analysis-2/28-ai-architecture-case",
+          description: "学习人工智能架构设计与案例分析。",
+        },
+        {
+          text: "29 区块链架构案例",
+          link: "/ruankao/system-architect/case-analysis-2/29-blockchain-case",
+          description: "学习区块链架构设计与案例分析。",
+        },
+        {
+          text: "30 物联网架构案例",
+          link: "/ruankao/system-architect/case-analysis-2/30-iot-architecture-case",
+          description: "学习物联网架构设计与案例分析。",
+        },
+        {
+          text: "31 边缘计算架构案例",
+          link: "/ruankao/system-architect/case-analysis-2/31-edge-computing-case",
+          description: "学习边缘计算架构设计与案例分析。",
+        },
+        {
+          text: "32 数字孪生架构案例",
+          link: "/ruankao/system-architect/case-analysis-2/32-digital-twin-case",
+          description: "学习数字孪生架构设计与案例分析。",
+        },
+        {
+          text: "33 绿色 IT 与低碳数据中心案例",
+          link: "/ruankao/system-architect/case-analysis-2/33-green-it-case",
+          description: "学习绿色 IT 与低碳数据中心架构案例分析。",
+        },
+        {
+          text: "34 Serverless 架构案例",
+          link: "/ruankao/system-architect/case-analysis-2/34-serverless-case",
+          description: "学习 Serverless 无服务器架构案例分析。",
+        },
+        {
+          text: "35 零信任安全架构案例",
+          link: "/ruankao/system-architect/case-analysis-2/35-zero-trust-security-case",
+          description: "学习零信任安全架构设计与案例分析。",
+        },
+        {
+          text: "36 机密计算架构案例",
+          link: "/ruankao/system-architect/case-analysis-2/36-confidential-computing-case",
+          description: "学习机密计算架构设计与案例分析。",
+        },
+        {
+          text: "37 联邦学习架构案例",
+          link: "/ruankao/system-architect/case-analysis-2/37-federated-learning-case",
+          description: "学习联邦学习架构设计与案例分析。",
+        },
+        {
+          text: "38 隐私计算架构案例",
+          link: "/ruankao/system-architect/case-analysis-2/38-privacy-computing-case",
+          description: "学习隐私计算架构设计与案例分析。",
+        },
+        {
+          text: "39 数据治理架构案例",
+          link: "/ruankao/system-architect/case-analysis-2/39-data-governance-case",
+          description: "学习数据治理架构设计与案例分析。",
+        },
+        {
+          text: "40 数据湖仓一体架构案例",
+          link: "/ruankao/system-architect/case-analysis-2/40-data-lakehouse-case",
+          description: "学习数据湖仓一体架构设计与案例分析。",
+        },
+        {
+          text: "41 实时数据架构案例",
+          link: "/ruankao/system-architect/case-analysis-2/41-real-time-data-architecture-case",
+          description: "学习实时数据架构设计与案例分析。",
+        },
+        {
+          text: "42 事件驱动架构案例",
+          link: "/ruankao/system-architect/case-analysis-2/42-event-driven-architecture-case",
+          description: "学习事件驱动架构设计与案例分析。",
+        },
+        {
+          text: "43 服务网格架构案例",
+          link: "/ruankao/system-architect/case-analysis-2/43-service-mesh-case",
+          description: "学习服务网格架构设计与案例分析。",
+        },
+        {
+          text: "44 云原生可观测性案例",
+          link: "/ruankao/system-architect/case-analysis-2/44-observability-case",
+          description: "学习云原生可观测性架构案例分析。",
+        },
+        {
+          text: "45 混沌工程与系统韧性案例",
+          link: "/ruankao/system-architect/case-analysis-2/45-chaos-engineering-case",
+          description: "学习混沌工程与系统韧性架构案例分析。",
+        },
+        {
+          text: "46 平台工程架构案例",
+          link: "/ruankao/system-architect/case-analysis-2/46-platform-engineering-case",
+          description: "学习平台工程架构设计与案例分析。",
+        },
+        {
+          text: "47 DevSecOps 架构案例",
+          link: "/ruankao/system-architect/case-analysis-2/47-devsecops-case",
+          description: "学习 DevSecOps 安全开发运营架构案例分析。",
+        },
+        {
+          text: "48 FinOps 架构案例",
+          link: "/ruankao/system-architect/case-analysis-2/48-finops-case",
+          description: "学习云成本优化与 FinOps 架构案例分析。",
+        },
+        {
+          text: "49 云原生治理架构案例",
+          link: "/ruankao/system-architect/case-analysis-2/49-cloud-native-governance-case",
+          description: "学习云原生治理架构设计与案例分析。",
+        },
+        {
+          text: "50 企业级架构治理案例",
+          link: "/ruankao/system-architect/case-analysis-2/50-enterprise-architecture-case",
+          description: "学习企业级架构治理与案例分析。",
+        },
+      ],
+    },
   ],
 };
 
