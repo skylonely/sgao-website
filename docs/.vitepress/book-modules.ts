@@ -1713,7 +1713,7 @@ export function createBookSidebar(book: BookModule) {
         { text: "专栏导读", link: book.base },
         ...book.sections.map((section) => ({
           text: section.text,
-          collapsed: false,
+          collapsed: true,
           items: section.items.map(({ text, link }) => ({ text, link })),
         })),
         ...(book.appendices?.length
