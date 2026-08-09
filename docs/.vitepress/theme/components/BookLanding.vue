@@ -11,6 +11,14 @@ const chapterCount = computed(() =>
   book.value.sections.reduce((total, section) => total + section.items.length, 0),
 );
 const firstChapter = computed(() => book.value.sections[0]?.items[0]);
+
+function chapterNumber(text: string) {
+  return text.match(/^\d+/)?.[0] ?? "";
+}
+
+function chapterTitle(text: string) {
+  return text.replace(/^\d+\s*/, "");
+}
 </script>
 
 <template>
@@ -73,9 +81,9 @@ const firstChapter = computed(() => book.value.sections[0]?.items[0]);
             class="book-chapter"
             :href="chapter.link"
           >
-            <b>{{ chapter.text.slice(0, 2) }}</b>
+            <b>{{ chapterNumber(chapter.text) }}</b>
             <div>
-              <strong>{{ chapter.text.slice(3) }}</strong>
+              <strong>{{ chapterTitle(chapter.text) }}</strong>
               <span>{{ chapter.description }}</span>
             </div>
             <i>→</i>
