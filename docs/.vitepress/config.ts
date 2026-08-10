@@ -1,6 +1,7 @@
 import { defineConfig } from "vitepress";
 import { withMermaid } from "vitepress-plugin-mermaid";
 import {
+  cloudflareBook,
   createBookSidebar,
   gitBook,
   systemArchitectBook,
@@ -15,9 +16,9 @@ export default withMermaid(defineConfig({
     siteTitle: "SGAO",
     nav: [
       { text: "首页", link: "/" },
+      { text: "软考专题", link: "/ruankao/system-architect/" },
       { text: "平台架构", link: "/guide/platform-architecture" },
       { text: "Git 专栏", link: "/git/" },
-      { text: "软考专题", link: "/ruankao/system-architect/" },
       {
         text: "AI 基础",
         items: [
@@ -28,28 +29,14 @@ export default withMermaid(defineConfig({
           },
         ],
       },
-      {
-        text: "Cloudflare",
-        items: [
-          { text: "Cloudflare 文档", link: "/cloudflare/" },
-          {
-            text: "Workers 自动部署",
-            link: "/cloudflare/workers-auto-deploy",
-          },
-          { text: "DNS 与域名配置", link: "/cloudflare/dns-domain" },
-          {
-            text: "Spaceship 域名部署",
-            link: "/cloudflare/spaceship-worker-deployment",
-          },
-          { text: "Image Center", link: "/cloudflare/image-center" },
-        ],
-      },
+      { text: "Cloudflare 专题", link: "/cloudflare/" },
       { text: "文档规范", link: "/guide/writing-standard" },
     ],
 
     sidebar: {
       "/git/": createBookSidebar(gitBook),
       "/ruankao/system-architect/": createBookSidebar(systemArchitectBook),
+      "/cloudflare/": createBookSidebar(cloudflareBook),
       "/": [
         {
           text: "📐 平台与规范",
@@ -71,30 +58,6 @@ export default withMermaid(defineConfig({
             {
               text: "API、CLI、Prompt、MCP、Skill 与 Agent",
               link: "/ai/api-cli-prompt-mcp-skill-agent",
-            },
-          ],
-        },
-        {
-          text: "📚 Cloudflare",
-          link: "/cloudflare/",
-          collapsed: false,
-          items: [
-            {
-              text: "Workers 双站点自动部署",
-              link: "/cloudflare/workers-auto-deploy",
-            },
-            {
-              text: "Travel 旅行站部署",
-              link: "/cloudflare/travel-worker-deployment",
-            },
-            { text: "DNS 与域名配置", link: "/cloudflare/dns-domain" },
-            {
-              text: "Spaceship 域名部署",
-              link: "/cloudflare/spaceship-worker-deployment",
-            },
-            {
-              text: "Image Center（图片中心）",
-              link: "/cloudflare/image-center",
             },
           ],
         },

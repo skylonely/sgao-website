@@ -2203,9 +2203,77 @@ export const systemArchitectBook: BookModule = {
   ],
 };
 
+export const cloudflareBook: BookModule = {
+  id: "cloudflare",
+  title: "Cloudflare 实战专题",
+  icon: "☁️",
+  base: "/cloudflare/",
+  kicker: "BOOK MODULE · 03",
+  summary:
+    "围绕 SGAO Platform 的真实落地过程，系统整理域名接入、DNS、Workers 自动部署、Custom Domain、R2 与多站点实践。",
+  audience: {
+    title: "希望用 Cloudflare 搭建个人平台的开发者",
+    description:
+      "适合拥有个人域名、准备部署静态站点或 Worker，并希望理解 DNS、Custom Domain、自动构建和 R2 的开发者。",
+  },
+  outcome: {
+    title: "独立完成从域名到多站点上线",
+    description:
+      "能够接管域名、规划 DNS，配置 Worker 自动部署和自定义域名，并使用 R2 与 Worker 建设图片中心。",
+  },
+  sections: [
+    {
+      text: "第一部分 · 域名与网络入口",
+      items: [
+        {
+          text: "01 Spaceship 域名接入 Cloudflare",
+          link: "/cloudflare/spaceship-worker-deployment",
+          description:
+            "从购买域名、修改 Nameserver 到完成 Cloudflare 接管。",
+        },
+        {
+          text: "02 DNS 与域名配置",
+          link: "/cloudflare/dns-domain",
+          description:
+            "理解 DNS 记录、代理状态、Custom Domain 与域名规划。",
+        },
+      ],
+    },
+    {
+      text: "第二部分 · Workers 自动部署",
+      items: [
+        {
+          text: "03 主站与知识库自动部署",
+          link: "/cloudflare/workers-auto-deploy",
+          description:
+            "在同一仓库中配置两套 Worker 构建与发布流程。",
+        },
+        {
+          text: "04 Travel 旅行站部署",
+          link: "/cloudflare/travel-worker-deployment",
+          description:
+            "创建第三个 Worker，连接 GitHub 并绑定 travel.sgao.cc。",
+        },
+      ],
+    },
+    {
+      text: "第三部分 · 存储与资源服务",
+      items: [
+        {
+          text: "05 Image Center 与 R2",
+          link: "/cloudflare/image-center",
+          description:
+            "使用 Worker、R2 和缓存搭建统一图片管理与访问服务。",
+        },
+      ],
+    },
+  ],
+};
+
 export const bookModules = {
   git: gitBook,
   systemArchitect: systemArchitectBook,
+  cloudflare: cloudflareBook,
 };
 
 export function createBookSidebar(book: BookModule) {

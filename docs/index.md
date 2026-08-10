@@ -76,6 +76,14 @@ hero:
         </div>
         <i>开始阅读 →</i>
       </a>
+      <a class="portal-book-card" href="/cloudflare/">
+        <span class="portal-book-index">BOOK 03</span>
+        <div>
+          <strong>Cloudflare 实战专题</strong>
+          <p>从域名接入、DNS、Workers 自动部署到 R2 图片中心与多站点实践</p>
+        </div>
+        <i>开始阅读 →</i>
+      </a>
     </div>
   </section>
 
@@ -91,6 +99,11 @@ hero:
       <a class="portal-card" href="/cloudflare/workers-auto-deploy">
         <strong>Workers 自动部署</strong>
         <span>主站与知识库双 Worker 部署流程</span>
+        <i>→</i>
+      </a>
+      <a class="portal-card" href="/cloudflare/travel-worker-deployment">
+        <strong>Travel 旅行站</strong>
+        <span>第三个 Worker、GitHub 自动构建与独立子域名</span>
         <i>→</i>
       </a>
       <a class="portal-card" href="/cloudflare/dns-domain">

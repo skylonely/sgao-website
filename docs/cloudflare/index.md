@@ -1,30 +1,8 @@
-# Cloudflare
+---
+layout: page
+title: Cloudflare 实战专题
+description: 从域名接入、DNS、Workers 自动部署到 R2 图片中心的 Cloudflare 实战专题。
+outline: false
+---
 
-本分类记录 SGAO Platform 已经实际使用的 Cloudflare 配置与维护经验。目前只展示有完整内容、能够直接执行和验证的文档。
-
-## 文档
-
-### [Workers 双站点自动部署](./workers-auto-deploy)
-
-说明 `sgao.cc` 主站和 `docs.sgao.cc` 知识库如何从同一个 GitHub 仓库分别构建、部署到两个 Worker。
-
-### [Travel 旅行站 Worker 创建与部署](./travel-worker-deployment)
-
-说明如何创建第三个 `sgao-travel` Worker、连接 GitHub 自动构建，并绑定 `travel.sgao.cc`。
-
-### [DNS 与域名配置](./dns-domain)
-
-说明 `sgao.cc` 域名体系、DNS 记录、代理状态、Worker Custom Domain 和常见故障处理。
-
-### [Spaceship 域名接入 Cloudflare Worker](./spaceship-worker-deployment)
-
-记录从 Spaceship 购买域名、修改 Nameserver、清理冲突记录，到绑定 Worker Custom Domain 的完整实际流程。
-
-### [Image Center（图片中心）](./image-center)
-
-说明 `img.sgao.cc` 如何通过 Cloudflare Worker、R2 和分层缓存提供图片上传、管理与访问服务。
-
-## 相关内容
-
-- [SGAO Platform 架构](/guide/platform-architecture)
-- [文档写作规范](/guide/writing-standard)
+<BookLanding book-id="cloudflare" />
