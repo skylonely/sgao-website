@@ -2068,6 +2068,136 @@ export const systemArchitectBook: BookModule = {
           link: "/ruankao/system-architect/case-analysis-2/125-ai-agent-architecture-governance-case",
           description: "学习架构治理智能体设计与案例分析。",
         },
+        {
+          text: "126 企业架构智能体案例",
+          link: "/ruankao/system-architect/case-analysis-2/126-ai-agent-enterprise-architecture-case",
+          description: "学习企业架构智能体设计与案例分析。",
+        },
+        {
+          text: "127 技术债治理智能体案例",
+          link: "/ruankao/system-architect/case-analysis-2/127-ai-agent-technical-debt-case",
+          description: "学习技术债治理智能体设计与案例分析。",
+        },
+        {
+          text: "128 代码质量智能体案例",
+          link: "/ruankao/system-architect/case-analysis-2/128-ai-agent-code-quality-case",
+          description: "学习代码质量智能体设计与案例分析。",
+        },
+        {
+          text: "129 需求分析智能体案例",
+          link: "/ruankao/system-architect/case-analysis-2/129-ai-agent-requirement-analysis-case",
+          description: "学习需求分析智能体设计与案例分析。",
+        },
+        {
+          text: "130 产品管理智能体案例",
+          link: "/ruankao/system-architect/case-analysis-2/130-ai-agent-product-management-case",
+          description: "学习产品管理智能体设计与案例分析。",
+        },
+        {
+          text: "131 项目管理智能体案例",
+          link: "/ruankao/system-architect/case-analysis-2/131-ai-agent-project-management-case",
+          description: "学习项目管理智能体设计与案例分析。",
+        },
+        {
+          text: "132 风险管理智能体案例",
+          link: "/ruankao/system-architect/case-analysis-2/132-ai-agent-risk-management-case",
+          description: "学习风险管理智能体设计与案例分析。",
+        },
+        {
+          text: "133 合规治理智能体案例",
+          link: "/ruankao/system-architect/case-analysis-2/133-ai-agent-compliance-case",
+          description: "学习合规治理智能体设计与案例分析。",
+        },
+        {
+          text: "134 数据治理智能体案例",
+          link: "/ruankao/system-architect/case-analysis-2/134-ai-agent-data-governance-case",
+          description: "学习数据治理智能体设计与案例分析。",
+        },
+        {
+          text: "135 数据质量智能体案例",
+          link: "/ruankao/system-architect/case-analysis-2/135-ai-agent-data-quality-case",
+          description: "学习数据质量智能体设计与案例分析。",
+        },
+        {
+          text: "136 主数据管理智能体案例",
+          link: "/ruankao/system-architect/case-analysis-2/136-ai-agent-master-data-case",
+          description: "学习主数据管理智能体设计与案例分析。",
+        },
+        {
+          text: "137 知识管理智能体案例",
+          link: "/ruankao/system-architect/case-analysis-2/137-ai-agent-knowledge-management-case",
+          description: "学习知识管理智能体设计与案例分析。",
+        },
+        {
+          text: "138 企业智能搜索智能体案例",
+          link: "/ruankao/system-architect/case-analysis-2/138-ai-agent-enterprise-search-case",
+          description: "学习企业智能搜索智能体设计与案例分析。",
+        },
+        {
+          text: "139 AI 助手智能体案例",
+          link: "/ruankao/system-architect/case-analysis-2/139-ai-agent-ai-assistant-case",
+          description: "学习 AI 助手智能体设计与案例分析。",
+        },
+        {
+          text: "140 自主智能体架构案例",
+          link: "/ruankao/system-architect/case-analysis-2/140-ai-agent-autonomous-agent-case",
+          description: "学习自主智能体架构设计与案例分析。",
+        },
+        {
+          text: "141 多智能体系统架构案例",
+          link: "/ruankao/system-architect/case-analysis-2/141-ai-agent-multi-agent-system-case",
+          description: "学习多智能体系统架构设计与案例分析。",
+        },
+        {
+          text: "142 智能体平台架构案例",
+          link: "/ruankao/system-architect/case-analysis-2/142-ai-agent-agent-platform-case",
+          description: "学习智能体平台架构设计与案例分析。",
+        },
+        {
+          text: "143 智能体治理架构案例",
+          link: "/ruankao/system-architect/case-analysis-2/143-ai-agent-agent-governance-case",
+          description: "学习智能体治理架构设计与案例分析。",
+        },
+        {
+          text: "144 AI 安全智能体架构案例",
+          link: "/ruankao/system-architect/case-analysis-2/144-ai-agent-ai-security-case",
+          description: "学习 AI 安全智能体架构设计与案例分析。",
+        },
+        {
+          text: "145 LLMOps 智能体运维案例",
+          link: "/ruankao/system-architect/case-analysis-2/145-ai-agent-llmops-case",
+          description: "学习 LLMOps 智能体运维架构与案例分析。",
+        },
+        {
+          text: "146 AgentOps 智能体运营案例",
+          link: "/ruankao/system-architect/case-analysis-2/146-ai-agent-agentops-case",
+          description: "学习 AgentOps 智能体运营架构与案例分析。",
+        },
+        {
+          text: "147 AI 原生应用智能体案例",
+          link: "/ruankao/system-architect/case-analysis-2/147-ai-agent-ai-native-application-case",
+          description: "学习 AI 原生应用智能体架构与案例分析。",
+        },
+        {
+          text: "148 AI 原生软件工程智能体案例",
+          link: "/ruankao/system-architect/case-analysis-2/148-ai-agent-ai-native-software-engineering-case",
+          description: "学习 AI 原生软件工程智能体架构与案例分析。",
+        },
+        {
+          text: "149 AI 原生企业架构案例",
+          link: "/ruankao/system-architect/case-analysis-2/149-ai-agent-ai-native-enterprise-case",
+          description: "学习 AI 原生企业架构与案例分析。",
+        },
+        {
+          text: "150 企业 AI 转型架构案例",
+          link: "/ruankao/system-architect/case-analysis-2/150-ai-agent-ai-transformation-case",
+          description: "学习企业 AI 转型架构设计与案例分析。",
+        },
+        {
+          text: "151 AI Agent 专题冲刺总结",
+          link: "/ruankao/system-architect/case-analysis-2/151-AI-Agent专题冲刺总结",
+          description: "总结 AI Agent 专题核心架构、答题方法与冲刺重点。",
+        },
       ],
     },
   ],
