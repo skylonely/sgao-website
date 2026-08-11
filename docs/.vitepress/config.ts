@@ -2,6 +2,7 @@ import { defineConfig } from "vitepress";
 import { withMermaid } from "vitepress-plugin-mermaid";
 import {
   cloudflareBook,
+  cloudNativeBook,
   createBookSidebar,
   gitBook,
   systemArchitectBook,
@@ -19,6 +20,7 @@ export default withMermaid(defineConfig({
       { text: "软考专题", link: "/ruankao/system-architect/" },
       { text: "平台架构", link: "/guide/platform-architecture" },
       { text: "Git 专栏", link: "/git/" },
+      { text: "云原生专题", link: "/cloud-native/" },
       {
         text: "AI 基础",
         items: [
@@ -37,6 +39,7 @@ export default withMermaid(defineConfig({
       "/git/": createBookSidebar(gitBook),
       "/ruankao/system-architect/": createBookSidebar(systemArchitectBook),
       "/cloudflare/": createBookSidebar(cloudflareBook),
+      "/cloud-native/": createBookSidebar(cloudNativeBook),
       "/": [
         {
           text: "📐 平台与规范",

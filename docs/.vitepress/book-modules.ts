@@ -2270,10 +2270,123 @@ export const cloudflareBook: BookModule = {
   ],
 };
 
+export const cloudNativeBook: BookModule = {
+  id: "cloud-native",
+  title: "Docker + Kubernetes 云原生专题",
+  icon: "🐳",
+  base: "/cloud-native/",
+  kicker: "BOOK MODULE · 04",
+  summary:
+    "从容器底层原理出发，系统掌握 Docker 架构、镜像、容器、网络、存储、编排、安全与生产实践，并为后续 Kubernetes 学习建立完整基础。",
+  audience: {
+    title: "准备系统学习云原生的开发者与架构师",
+    description:
+      "适合希望补齐容器基础、掌握 Docker 工程实践，或准备继续学习 Kubernetes、云原生架构与平台工程的人。",
+  },
+  outcome: {
+    title: "完成 Docker 从原理到生产实践的知识闭环",
+    description:
+      "能够理解容器隔离机制，独立构建、运行和编排多容器应用，并掌握镜像仓库、安全、监控和生产部署规范。",
+  },
+  sections: [
+    {
+      text: "第一部分 · 容器与 Docker 基础",
+      items: [
+        {
+          text: "01 Docker 容器技术概述",
+          link: "/cloud-native/chapters/01-docker-overview",
+          description: "认识 Docker、容器技术演进、核心概念与云原生关系。",
+        },
+        {
+          text: "02 容器基础原理",
+          link: "/cloud-native/chapters/02-container-basic",
+          description: "理解 Namespace、Cgroups 与 UnionFS 的隔离和存储机制。",
+        },
+        {
+          text: "03 Docker 整体架构与运行机制",
+          link: "/cloud-native/chapters/03-docker-architecture",
+          description: "掌握 Docker Engine、客户端、守护进程与运行时架构。",
+        },
+        {
+          text: "04 Docker 安装与环境配置",
+          link: "/cloud-native/chapters/04-docker-installation",
+          description: "完成 Docker 安装、基础配置与运行环境验证。",
+        },
+      ],
+    },
+    {
+      text: "第二部分 · Docker 核心能力",
+      items: [
+        {
+          text: "05 Docker 镜像原理与管理",
+          link: "/cloud-native/chapters/05-image",
+          description: "理解镜像分层、标签、构建、分发与日常管理。",
+        },
+        {
+          text: "06 Docker 容器与生命周期",
+          link: "/cloud-native/chapters/06-container",
+          description: "掌握容器创建、运行、停止、资源控制和生命周期管理。",
+        },
+        {
+          text: "07 Dockerfile 构建与优化",
+          link: "/cloud-native/chapters/07-dockerfile",
+          description: "使用 Dockerfile 自动构建并优化镜像体积与缓存。",
+        },
+        {
+          text: "08 Docker 数据持久化",
+          link: "/cloud-native/chapters/08-volume",
+          description: "掌握 Volume、Bind Mount 与容器数据管理。",
+        },
+        {
+          text: "09 Docker 网络与容器通信",
+          link: "/cloud-native/chapters/09-network",
+          description: "理解网络驱动、端口映射、DNS 与跨容器通信。",
+        },
+        {
+          text: "10 Docker Compose 多容器编排",
+          link: "/cloud-native/chapters/10-docker-compose",
+          description: "使用 Compose 定义、启动和维护多容器应用。",
+        },
+        {
+          text: "11 Docker Registry 镜像仓库",
+          link: "/cloud-native/chapters/11-registry",
+          description: "掌握镜像分发、私有仓库与企业镜像管理。",
+        },
+      ],
+    },
+    {
+      text: "第三部分 · 生产实践与集群",
+      items: [
+        {
+          text: "12 Docker 安全实践",
+          link: "/cloud-native/chapters/12-docker-security",
+          description: "理解容器安全边界、权限控制与镜像安全治理。",
+        },
+        {
+          text: "13 Docker 监控与可观测性",
+          link: "/cloud-native/chapters/13-docker-monitoring",
+          description: "建立日志、指标、监控和故障定位能力。",
+        },
+        {
+          text: "14 Docker Swarm 集群编排",
+          link: "/cloud-native/chapters/14-docker-swarm",
+          description: "学习 Swarm 集群、服务编排、扩缩容与高可用。",
+        },
+        {
+          text: "15 Docker 企业最佳实践",
+          link: "/cloud-native/chapters/15-docker-best-practice",
+          description: "总结生产部署规范、工程治理与企业落地经验。",
+        },
+      ],
+    },
+  ],
+};
+
 export const bookModules = {
   git: gitBook,
   systemArchitect: systemArchitectBook,
   cloudflare: cloudflareBook,
+  cloudNative: cloudNativeBook,
 };
 
 export function createBookSidebar(book: BookModule) {

@@ -84,6 +84,14 @@ hero:
         </div>
         <i>开始阅读 →</i>
       </a>
+      <a class="portal-book-card" href="/cloud-native/">
+        <span class="portal-book-index">BOOK 04</span>
+        <div>
+          <strong>Docker + Kubernetes 云原生专题</strong>
+          <p>已更新 Docker 01–15 章：容器原理、核心能力、集群编排与生产实践</p>
+        </div>
+        <i>开始阅读 →</i>
+      </a>
     </div>
   </section>
 
