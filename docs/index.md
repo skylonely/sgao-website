@@ -88,7 +88,7 @@ hero:
         <span class="portal-book-index">BOOK 04</span>
         <div>
           <strong>Docker + Kubernetes 云原生专题</strong>
-          <p>已更新 Docker 01–15 章：容器原理、核心能力、集群编排与生产实践</p>
+          <p>已更新 01–30 章：Docker 工程实践与 Kubernetes 核心工作负载、流量、存储和集群管理</p>
         </div>
         <i>开始阅读 →</i>
       </a>

@@ -2277,16 +2277,16 @@ export const cloudNativeBook: BookModule = {
   base: "/cloud-native/",
   kicker: "BOOK MODULE · 04",
   summary:
-    "从容器底层原理出发，系统掌握 Docker 架构、镜像、容器、网络、存储、编排、安全与生产实践，并为后续 Kubernetes 学习建立完整基础。",
+    "从容器底层原理出发，系统掌握 Docker 工程实践，并继续深入 Kubernetes 架构、资源模型、核心工作负载、服务访问、存储与集群管理。",
   audience: {
     title: "准备系统学习云原生的开发者与架构师",
     description:
-      "适合希望补齐容器基础、掌握 Docker 工程实践，或准备继续学习 Kubernetes、云原生架构与平台工程的人。",
+      "适合希望补齐容器基础、掌握 Docker 工程实践，并系统学习 Kubernetes、云原生架构与平台工程的人。",
   },
   outcome: {
-    title: "完成 Docker 从原理到生产实践的知识闭环",
+    title: "建立 Docker 与 Kubernetes 的完整知识主线",
     description:
-      "能够理解容器隔离机制，独立构建、运行和编排多容器应用，并掌握镜像仓库、安全、监控和生产部署规范。",
+      "能够理解容器隔离机制，构建和编排容器应用，并掌握 Kubernetes 集群架构、核心资源、工作负载部署和节点管理。",
   },
   sections: [
     {
@@ -2355,7 +2355,7 @@ export const cloudNativeBook: BookModule = {
       ],
     },
     {
-      text: "第三部分 · 生产实践与集群",
+      text: "第三部分 · Docker 生产实践与集群",
       items: [
         {
           text: "12 Docker 安全实践",
@@ -2376,6 +2376,96 @@ export const cloudNativeBook: BookModule = {
           text: "15 Docker 企业最佳实践",
           link: "/cloud-native/chapters/15-docker-best-practice",
           description: "总结生产部署规范、工程治理与企业落地经验。",
+        },
+      ],
+    },
+    {
+      text: "第四部分 · Kubernetes 基础与架构",
+      items: [
+        {
+          text: "16 Kubernetes 概述与云原生基础",
+          link: "/cloud-native/chapters/16-kubernetes-overview",
+          description: "理解 Kubernetes 的定位、核心能力与云原生生态关系。",
+        },
+        {
+          text: "17 Kubernetes 架构与核心组件",
+          link: "/cloud-native/chapters/17-kubernetes-architecture",
+          description: "掌握控制平面、工作节点及各核心组件的协作机制。",
+        },
+        {
+          text: "18 Kubernetes 安装与集群部署",
+          link: "/cloud-native/chapters/18-kubernetes-installation",
+          description: "了解集群安装方式、部署流程与基础环境验证。",
+        },
+        {
+          text: "19 Kubernetes 资源模型",
+          link: "/cloud-native/chapters/19-kubernetes-resource-model",
+          description: "理解声明式 API、资源对象、元数据和期望状态。",
+        },
+        {
+          text: "20 Pod 核心概念与生命周期",
+          link: "/cloud-native/chapters/20-kubernetes-pod",
+          description: "掌握 Pod 结构、生命周期、探针和容器协作模式。",
+        },
+      ],
+    },
+    {
+      text: "第五部分 · 应用部署、流量与存储",
+      items: [
+        {
+          text: "21 Deployment 与滚动更新",
+          link: "/cloud-native/chapters/21-kubernetes-deployment",
+          description: "使用 Deployment 管理应用副本、升级与回滚。",
+        },
+        {
+          text: "22 Service 与负载均衡",
+          link: "/cloud-native/chapters/22-kubernetes-service",
+          description: "理解服务发现、虚拟 IP、流量转发与暴露方式。",
+        },
+        {
+          text: "23 Ingress 与外部流量管理",
+          link: "/cloud-native/chapters/23-kubernetes-ingress",
+          description: "通过 Ingress 组织 HTTP 路由、域名和外部访问。",
+        },
+        {
+          text: "24 ConfigMap 与 Secret",
+          link: "/cloud-native/chapters/24-kubernetes-configmap-secret",
+          description: "将应用配置和敏感信息从镜像与代码中解耦。",
+        },
+        {
+          text: "25 Kubernetes 存储与持久化",
+          link: "/cloud-native/chapters/25-kubernetes-volume-storage",
+          description: "掌握 Volume、PV、PVC、StorageClass 与持久化流程。",
+        },
+      ],
+    },
+    {
+      text: "第六部分 · 工作负载与集群管理",
+      items: [
+        {
+          text: "26 StatefulSet 有状态应用",
+          link: "/cloud-native/chapters/26-kubernetes-statefulset",
+          description: "管理稳定身份、顺序部署和持久存储的有状态应用。",
+        },
+        {
+          text: "27 DaemonSet 节点级服务",
+          link: "/cloud-native/chapters/27-kubernetes-daemonset",
+          description: "在目标节点上运行日志、监控和网络等系统服务。",
+        },
+        {
+          text: "28 Job 与 CronJob 任务调度",
+          link: "/cloud-native/chapters/28-kubernetes-job-cronjob",
+          description: "运行一次性任务、批处理任务与周期性计划任务。",
+        },
+        {
+          text: "29 Kubernetes 调度机制",
+          link: "/cloud-native/chapters/29-kubernetes-scheduler",
+          description: "理解调度流程、节点选择、亲和性与污点容忍。",
+        },
+        {
+          text: "30 Node 节点管理",
+          link: "/cloud-native/chapters/30-kubernetes-node-management",
+          description: "掌握节点生命周期、维护、隔离和故障处理。",
         },
       ],
     },
