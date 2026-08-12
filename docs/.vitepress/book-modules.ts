@@ -2277,7 +2277,7 @@ export const cloudNativeBook: BookModule = {
   base: "/cloud-native/",
   kicker: "BOOK MODULE · 04",
   summary:
-    "从容器底层原理出发，系统掌握 Docker 工程实践，并继续深入 Kubernetes 架构、资源模型、核心工作负载、服务访问、存储与集群管理。",
+    "从容器底层原理出发，系统掌握 Docker 工程实践，并继续深入 Kubernetes 架构、工作负载、资源治理、安全、可观测性、持续交付、平台扩展与生产运维。",
   audience: {
     title: "准备系统学习云原生的开发者与架构师",
     description:
@@ -2286,7 +2286,7 @@ export const cloudNativeBook: BookModule = {
   outcome: {
     title: "建立 Docker 与 Kubernetes 的完整知识主线",
     description:
-      "能够理解容器隔离机制，构建和编排容器应用，并掌握 Kubernetes 集群架构、核心资源、工作负载部署和节点管理。",
+      "能够理解容器隔离机制，构建和编排容器应用，并掌握 Kubernetes 集群架构、工作负载、资源与安全治理、交付体系及生产运维。",
   },
   sections: [
     {
@@ -2466,6 +2466,131 @@ export const cloudNativeBook: BookModule = {
           text: "30 Node 节点管理",
           link: "/cloud-native/chapters/30-kubernetes-node-management",
           description: "掌握节点生命周期、维护、隔离和故障处理。",
+        },
+      ],
+    },
+    {
+      text: "第七部分 · 资源治理与弹性伸缩",
+      items: [
+        {
+          text: "31 资源管理与 QoS 模型",
+          link: "/cloud-native/chapters/31-kubernetes-resource-management",
+          description: "掌握 Requests、Limits、QoS 分级与资源治理策略。",
+        },
+        {
+          text: "32 HPA 水平自动扩缩容",
+          link: "/cloud-native/chapters/32-kubernetes-hpa",
+          description: "基于指标自动调整工作负载副本数量。",
+        },
+        {
+          text: "33 VPA 垂直自动扩缩容",
+          link: "/cloud-native/chapters/33-kubernetes-vpa",
+          description: "自动优化容器资源请求并提高集群资源利用率。",
+        },
+      ],
+    },
+    {
+      text: "第八部分 · 安全、可观测性与可靠性",
+      items: [
+        {
+          text: "34 RBAC 权限控制",
+          link: "/cloud-native/chapters/34-kubernetes-rbac",
+          description: "使用角色、绑定和最小权限原则管理集群访问。",
+        },
+        {
+          text: "35 Kubernetes 安全体系",
+          link: "/cloud-native/chapters/35-kubernetes-security",
+          description: "从镜像、运行时、工作负载和集群层面建立安全防线。",
+        },
+        {
+          text: "36 NetworkPolicy 网络安全",
+          link: "/cloud-native/chapters/36-kubernetes-network-policy",
+          description: "通过网络策略控制 Pod 间及外部访问流量。",
+        },
+        {
+          text: "37 日志、监控与可观测性",
+          link: "/cloud-native/chapters/37-kubernetes-observability",
+          description: "构建指标、日志、链路追踪和告警体系。",
+        },
+        {
+          text: "38 备份、恢复与灾难恢复",
+          link: "/cloud-native/chapters/38-kubernetes-backup-recovery",
+          description: "设计集群资源与持久数据的备份和恢复流程。",
+        },
+      ],
+    },
+    {
+      text: "第九部分 · GitOps 与持续交付",
+      items: [
+        {
+          text: "39 GitOps 持续交付",
+          link: "/cloud-native/chapters/39-kubernetes-gitops",
+          description: "以 Git 为事实来源实现声明式、可审计的自动部署。",
+        },
+        {
+          text: "40 Helm 包管理",
+          link: "/cloud-native/chapters/40-kubernetes-helm",
+          description: "使用 Chart 管理应用模板、版本和发布流程。",
+        },
+        {
+          text: "41 Kustomize 多环境管理",
+          link: "/cloud-native/chapters/41-kubernetes-kustomize",
+          description: "通过基础配置和 Overlay 管理环境差异。",
+        },
+        {
+          text: "42 Kubernetes CI/CD",
+          link: "/cloud-native/chapters/42-kubernetes-ci-cd",
+          description: "建立从代码提交到集群发布的持续交付流水线。",
+        },
+      ],
+    },
+    {
+      text: "第十部分 · 平台扩展与治理",
+      items: [
+        {
+          text: "43 Service Mesh 服务网格",
+          link: "/cloud-native/chapters/43-kubernetes-service-mesh",
+          description: "治理微服务通信、流量、安全和可观测性。",
+        },
+        {
+          text: "44 Operator 与自定义控制器",
+          link: "/cloud-native/chapters/44-kubernetes-operator",
+          description: "使用控制器模式自动化复杂应用运维知识。",
+        },
+        {
+          text: "45 CRD 与 API 扩展",
+          link: "/cloud-native/chapters/45-kubernetes-crd",
+          description: "通过自定义资源扩展 Kubernetes API 和领域模型。",
+        },
+        {
+          text: "46 Admission Controller 准入控制",
+          link: "/cloud-native/chapters/46-kubernetes-admission-controller",
+          description: "在资源写入前执行验证、变更和策略治理。",
+        },
+      ],
+    },
+    {
+      text: "第十一部分 · 多集群与生产运维",
+      items: [
+        {
+          text: "47 Kubernetes 多集群管理",
+          link: "/cloud-native/chapters/47-kubernetes-multi-cluster",
+          description: "理解多集群架构、统一治理与跨集群应用管理。",
+        },
+        {
+          text: "48 Cluster API 生命周期管理",
+          link: "/cloud-native/chapters/48-kubernetes-cluster-api",
+          description: "使用声明式 API 自动创建、升级和管理集群。",
+        },
+        {
+          text: "49 生产故障排查",
+          link: "/cloud-native/chapters/49-kubernetes-troubleshooting",
+          description: "建立从应用、网络、存储到节点的系统诊断方法。",
+        },
+        {
+          text: "50 Kubernetes 架构总结",
+          link: "/cloud-native/chapters/50-kubernetes-summary",
+          description: "串联 Kubernetes 核心知识体系与生产架构主线。",
         },
       ],
     },
