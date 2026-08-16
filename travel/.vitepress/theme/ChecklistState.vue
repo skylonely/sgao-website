@@ -5,8 +5,6 @@ import { useData } from "vitepress";
 const API_ORIGIN = "https://api.sgao.cc";
 const TRIP_ID = "shenyang-dandong-dalian";
 const VISITOR_KEY = "sgao.travel.checklist.visitor";
-const CHECKLIST_PATH = "/shenyang-dandong-dalian/checklist";
-
 const { route } = useData();
 let activeRequest: AbortController | undefined;
 
@@ -15,10 +13,6 @@ type ChecklistItem = {
   label: string;
   paragraph: HTMLParagraphElement;
 };
-
-function isChecklistPage() {
-  return route.path === CHECKLIST_PATH || route.path === `${CHECKLIST_PATH}.html`;
-}
 
 function visitorId() {
   const existing = localStorage.getItem(VISITOR_KEY);
@@ -115,8 +109,6 @@ async function saveItem(
 
 async function initialize() {
   activeRequest?.abort();
-  if (!isChecklistPage()) return;
-
   await nextTick();
   const items = checklistItems();
   if (!items.length) return;
