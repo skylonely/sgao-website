@@ -87,7 +87,7 @@ async function saveItem(
 
   try {
     const response = await fetch(
-      `${API_ORIGIN}/v1/checklists/${TRIP_ID}/items/${item.id}`,
+      `${API_ORIGIN}/api/v1/checklists/${TRIP_ID}/items/${item.id}`,
       {
         method: "PUT",
         headers: {
@@ -119,15 +119,19 @@ async function initialize() {
   let checkedItemIds = new Set<string>();
 
   try {
-    const response = await fetch(`${API_ORIGIN}/v1/checklists/${TRIP_ID}`, {
+    const response = await fetch(`${API_ORIGIN}/api/v1/checklists/${TRIP_ID}`, {
       headers: { "X-Checklist-Visitor": id },
       signal: activeRequest.signal,
     });
     if (!response.ok) throw new Error("The checklist API rejected the request");
 
-    const data = (await response.json()) as { checkedItemIds?: unknown };
-    if (Array.isArray(data.checkedItemIds)) {
-      checkedItemIds = new Set(data.checkedItemIds.filter((value): value is string => typeof value === "string"));
+    const responseBody = (await response.json()) as {
+      data?: { checkedItemIds?: unknown };
+    };
+    if (Array.isArray(responseBody.data?.checkedItemIds)) {
+      checkedItemIds = new Set(
+        responseBody.data.checkedItemIds.filter((value): value is string => typeof value === "string"),
+      );
     }
     status.textContent = "勾选会自动保存到此浏览器的个人清单。";
   } catch (error) {
