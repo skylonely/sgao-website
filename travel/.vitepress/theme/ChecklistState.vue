@@ -3,9 +3,8 @@ import { nextTick, onBeforeUnmount, onMounted, watch } from "vue";
 import { useData } from "vitepress";
 
 const API_ORIGIN = "https://api.sgao.cc";
-const TRIP_ID = "shenyang-dandong-dalian";
 const VISITOR_KEY = "sgao.travel.checklist.visitor";
-const { route } = useData();
+const { frontmatter, route } = useData();
 let activeRequest: AbortController | undefined;
 
 type ChecklistItem = {
@@ -54,7 +53,13 @@ function statusElement(items: ChecklistItem[]) {
   return status;
 }
 
-function renderItem(item: ChecklistItem, checked: boolean, status: HTMLElement, id: string) {
+function renderItem(
+  item: ChecklistItem,
+  checked: boolean,
+  status: HTMLElement,
+  id: string,
+  checklistId: string,
+) {
   const label = document.createElement("label");
   label.className = "travel-checklist-item";
 
@@ -67,7 +72,7 @@ function renderItem(item: ChecklistItem, checked: boolean, status: HTMLElement, 
   text.textContent = item.label;
 
   input.addEventListener("change", () => {
-    void saveItem(input, item, status, id);
+    void saveItem(input, item, status, id, checklistId);
   });
 
   label.append(input, text);
@@ -80,6 +85,7 @@ async function saveItem(
   item: ChecklistItem,
   status: HTMLElement,
   id: string,
+  checklistId: string,
 ) {
   const checked = input.checked;
   input.disabled = true;
@@ -87,7 +93,7 @@ async function saveItem(
 
   try {
     const response = await fetch(
-      `${API_ORIGIN}/api/v1/checklists/${TRIP_ID}/items/${item.id}`,
+      `${API_ORIGIN}/api/v1/checklists/${checklistId}/items/${item.id}`,
       {
         method: "PUT",
         headers: {
@@ -110,6 +116,9 @@ async function saveItem(
 async function initialize() {
   activeRequest?.abort();
   await nextTick();
+  const checklistId = frontmatter.value.checklistId;
+  if (typeof checklistId !== "string" || !checklistId) return;
+
   const items = checklistItems();
   if (!items.length) return;
 
@@ -119,7 +128,7 @@ async function initialize() {
   let checkedItemIds = new Set<string>();
 
   try {
-    const response = await fetch(`${API_ORIGIN}/api/v1/checklists/${TRIP_ID}`, {
+    const response = await fetch(`${API_ORIGIN}/api/v1/checklists/${checklistId}`, {
       headers: { "X-Checklist-Visitor": id },
       signal: activeRequest.signal,
     });
@@ -140,7 +149,7 @@ async function initialize() {
   }
 
   for (const item of items) {
-    renderItem(item, checkedItemIds.has(item.id), status, id);
+    renderItem(item, checkedItemIds.has(item.id), status, id, checklistId);
   }
 }
 

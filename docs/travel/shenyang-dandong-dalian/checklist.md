@@ -1,3 +1,7 @@
+---
+checklistId: shenyang-dandong-dalian
+---
+
 # 沈阳 + 丹东 + 大连旅行准备清单
 
 ## 出发信息
