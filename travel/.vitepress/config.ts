@@ -10,7 +10,6 @@ export default defineConfig({
     siteTitle: "SGAO Travel",
     nav: [
       { text: "旅行首页", link: "/" },
-      { text: "To Do List", link: "/todoList" },
       {
         text: "沈阳 · 丹东 · 大连",
         link: "/shenyang-dandong-dalian/",

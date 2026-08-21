@@ -2,7 +2,6 @@
 import { nextTick, onBeforeUnmount, onMounted, watch } from "vue";
 import { useData } from "vitepress";
 
-const API_ORIGIN = "https://api.sgao.cc";
 const VISITOR_KEY = "sgao.travel.checklist.visitor";
 const { frontmatter, route } = useData();
 let activeRequest: AbortController | undefined;
@@ -59,6 +58,7 @@ function renderItem(
   status: HTMLElement,
   id: string,
   checklistId: string,
+  apiOrigin: string,
 ) {
   const label = document.createElement("label");
   label.className = "travel-checklist-item";
@@ -72,7 +72,7 @@ function renderItem(
   text.textContent = item.label;
 
   input.addEventListener("change", () => {
-    void saveItem(input, item, status, id, checklistId);
+    void saveItem(input, item, status, id, checklistId, apiOrigin);
   });
 
   label.append(input, text);
@@ -86,6 +86,7 @@ async function saveItem(
   status: HTMLElement,
   id: string,
   checklistId: string,
+  apiOrigin: string,
 ) {
   const checked = input.checked;
   input.disabled = true;
@@ -93,7 +94,7 @@ async function saveItem(
 
   try {
     const response = await fetch(
-      `${API_ORIGIN}/api/v1/checklists/${checklistId}/items/${item.id}`,
+      `${apiOrigin}/api/v1/checklists/${checklistId}/items/${item.id}`,
       {
         method: "PUT",
         headers: {
@@ -118,6 +119,10 @@ async function initialize() {
   await nextTick();
   const checklistId = frontmatter.value.checklistId;
   if (typeof checklistId !== "string" || !checklistId) return;
+  const configuredApiOrigin = frontmatter.value.checklistApiOrigin;
+  const apiOrigin = typeof configuredApiOrigin === "string"
+    ? configuredApiOrigin.replace(/\/$/, "")
+    : "";
 
   const items = checklistItems();
   if (!items.length) return;
@@ -128,7 +133,7 @@ async function initialize() {
   let checkedItemIds = new Set<string>();
 
   try {
-    const response = await fetch(`${API_ORIGIN}/api/v1/checklists/${checklistId}`, {
+    const response = await fetch(`${apiOrigin}/api/v1/checklists/${checklistId}`, {
       headers: { "X-Checklist-Visitor": id },
       signal: activeRequest.signal,
     });
@@ -149,7 +154,7 @@ async function initialize() {
   }
 
   for (const item of items) {
-    renderItem(item, checkedItemIds.has(item.id), status, id, checklistId);
+    renderItem(item, checkedItemIds.has(item.id), status, id, checklistId, apiOrigin);
   }
 }
 

@@ -1,6 +1,6 @@
 # 🌐 sgao-website
 
-`sgao-website` 是 SGAO Platform 的主站与知识库项目，包含网址导航、VitePress 文档站和 Cloudflare Worker 部署配置。
+`sgao-website` 是 SGAO Platform 的主站与内容站点项目，包含网址导航、知识库、旅行站、Todo 站和 Cloudflare Worker 部署配置。
 
 ## 在线服务
 
@@ -9,6 +9,7 @@
 | [sgao.cc](https://sgao.cc) | 主站与网址导航 |
 | [docs.sgao.cc](https://docs.sgao.cc) | SGAO 知识库 |
 | [travel.sgao.cc](https://travel.sgao.cc) | 旅行计划、行程攻略与出发清单 |
+| [todo.sgao.cc](https://todo.sgao.cc) | 个人待办与分类清单 |
 | [img.sgao.cc](https://img.sgao.cc) | 图片中心与 CDN |
 
 完整说明参见 [SGAO Platform 架构](https://docs.sgao.cc/guide/platform-architecture)。
@@ -52,13 +53,16 @@ sgao-website/
 │   ├── guide/              # 平台架构与写作规范
 │   ├── ruankao/            # 系统架构设计师专题
 │   ├── travel/             # 旅行站内容源文件
+│   ├── todo/               # Todo 站内容源文件
 │   └── index.md            # 知识库首页
 ├── public/                 # 主站静态资源
 ├── travel/                 # 独立旅行站的 VitePress 配置
+├── todo/                   # 独立 Todo 站的 VitePress 配置与 Worker
 ├── worker/                 # 主站 Cloudflare Worker 入口
 ├── package.json            # 依赖与脚本
 ├── wrangler.jsonc          # 主站 Worker 配置
-└── wrangler.docs.jsonc     # 知识库 Worker 配置
+├── wrangler.docs.jsonc     # 知识库 Worker 配置
+└── wrangler.todo.jsonc     # Todo Worker 配置
 ```
 
 ## 本地开发

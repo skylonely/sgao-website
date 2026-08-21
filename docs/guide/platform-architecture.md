@@ -1,6 +1,6 @@
 # SGAO Platform 架构
 
-> 更新时间：2026-07-30
+> 更新时间：2026-08-21
 
 SGAO Platform 是以统一域名体系为入口、以 Cloudflare 为基础设施的一站式个人数字平台。平台目前整合主站、知识库和图片中心，并为博客、在线工具、开放 API 与统一后台预留扩展空间。
 
@@ -30,10 +30,12 @@ Cloudflare R2 / GitHub
 | --- | --- | --- |
 | `sgao.cc` | 主站、个人门户、导航与个人介绍 | 已上线 |
 | `docs.sgao.cc` | 知识库、教程与指南 | 已上线 |
+| `travel.sgao.cc` | 旅行计划、行程攻略与出发清单 | 已上线 |
+| `todo.sgao.cc` | 个人待办与分类清单 | 已上线 |
 | `img.sgao.cc` | 图片中心、图片托管与 CDN 加速 | 已上线 |
 | `blog.sgao.cc` | 文章、分类、标签与评论 | 规划中 |
 | `labs.sgao.cc` | 在线工具、小应用与实验功能 | 规划中 |
-| `api.sgao.cc` | 开放 API 与服务接口 | 规划中 |
+| `api.sgao.cc` | 开放 API 与服务接口 | 已上线 |
 | `admin.sgao.cc` | 平台统一管理后台 | 规划中 |
 
 ## 三、Cloudflare 基础设施

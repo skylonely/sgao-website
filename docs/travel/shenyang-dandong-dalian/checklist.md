@@ -1,5 +1,6 @@
 ---
 checklistId: shenyang-dandong-dalian
+checklistApiOrigin: https://api.sgao.cc
 ---
 
 # 沈阳 + 丹东 + 大连旅行准备清单

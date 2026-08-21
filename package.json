@@ -19,7 +19,10 @@
     "docs:preview": "vitepress preview docs",
     "travel:dev": "vitepress dev travel",
     "travel:build": "vitepress build travel",
-    "travel:preview": "vitepress preview travel"
+    "travel:preview": "vitepress preview travel",
+    "todo:dev": "vitepress dev todo",
+    "todo:build": "vitepress build todo",
+    "todo:preview": "vitepress preview todo"
   },
   "dependencies": {
     "drizzle-orm": "0.45.2",

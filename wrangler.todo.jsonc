@@ -1,0 +1,19 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "sgao-todo",
+  "main": "todo/worker.ts",
+  "compatibility_date": "2026-08-21",
+  "routes": [
+    {
+      "pattern": "todo.sgao.cc",
+      "custom_domain": true
+    }
+  ],
+  "assets": {
+    "directory": "./todo/.vitepress/dist",
+    "binding": "ASSETS",
+    "run_worker_first": ["/api/*"],
+    "html_handling": "auto-trailing-slash",
+    "not_found_handling": "404-page"
+  }
+}

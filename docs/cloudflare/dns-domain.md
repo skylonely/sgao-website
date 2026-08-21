@@ -1,6 +1,6 @@
 # Cloudflare DNS 与域名配置
 
-> 更新时间：2026-07-30
+> 更新时间：2026-08-21
 
 本文记录 SGAO Platform 的域名规划、Cloudflare DNS 管理方式，以及域名绑定到 Cloudflare Worker 的实际流程。
 
@@ -10,10 +10,12 @@
 | --- | --- | --- | --- |
 | `sgao.cc` | 主站与网址导航 | `noisy-math-2b8d` | 已上线 |
 | `docs.sgao.cc` | VitePress 知识库 | `sgao-docs` | 已上线 |
+| `travel.sgao.cc` | 旅行计划与攻略 | `sgao-travel` | 已上线 |
+| `todo.sgao.cc` | 个人待办与分类清单 | `sgao-todo` | 已上线 |
 | `img.sgao.cc` | 图片中心与 CDN | `sgao-image-center` | 已上线 |
 | `blog.sgao.cc` | 博客系统 | 待创建 | 规划中 |
 | `labs.sgao.cc` | 在线工具与实验功能 | 待创建 | 规划中 |
-| `api.sgao.cc` | 开放 API | 待创建 | 规划中 |
+| `api.sgao.cc` | 开放 API | `sgao-api` | 已上线 |
 | `admin.sgao.cc` | 统一管理后台 | 待创建 | 规划中 |
 
 ## 二、DNS 记录基础

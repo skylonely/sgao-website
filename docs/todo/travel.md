@@ -1,11 +1,11 @@
 ---
-title: To Do List
-description: 随手勾选并自动保存的个人待办清单
+title: 出行清单
+description: 出发前需要确认和携带的个人清单
 checklistId: todo-list
 aside: false
 ---
 
-# To Do List
+# 出行清单
 
 ☐ 猫砂 猫粮 猫水
 
