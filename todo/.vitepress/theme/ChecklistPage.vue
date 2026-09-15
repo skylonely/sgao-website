@@ -189,8 +189,13 @@ async function refreshFromStorage() {
   }
 }
 
+function refreshFromStorageEvent(event: StorageEvent) {
+  if (!event.key || event.key.startsWith("sgao.todo.")) void refreshFromStorage();
+}
+
 onMounted(async () => {
   window.addEventListener(TODO_DATA_CHANGED_EVENT, refreshFromStorage);
+  window.addEventListener("storage", refreshFromStorageEvent);
   await initializeAccountSync();
   const slug = currentSlug();
   checklist.value = readChecklists().find((candidate) => candidate.slug === slug) ?? null;
@@ -201,7 +206,10 @@ onMounted(async () => {
   await loadCheckedState();
 });
 
-onBeforeUnmount(() => window.removeEventListener(TODO_DATA_CHANGED_EVENT, refreshFromStorage));
+onBeforeUnmount(() => {
+  window.removeEventListener(TODO_DATA_CHANGED_EVENT, refreshFromStorage);
+  window.removeEventListener("storage", refreshFromStorageEvent);
+});
 </script>
 
 <template>

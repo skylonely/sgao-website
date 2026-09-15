@@ -11,6 +11,7 @@ import {
 
 const API_ORIGIN = "https://api.sgao.cc";
 const VISITOR_KEY = "sgao.travel.checklist.visitor";
+const ACCOUNT_REFRESH_INTERVAL_MS = 10_000;
 export const TODO_DATA_CHANGED_EVENT = "sgao:todo-data-changed";
 
 type Account = { id: string; email: string };
@@ -28,6 +29,10 @@ export const accountState = reactive({
 
 let initializePromise: Promise<void> | undefined;
 let saveTimer: ReturnType<typeof setTimeout> | undefined;
+let refreshPromise: Promise<void> | undefined;
+let refreshListenersInstalled = false;
+let pendingLocalChanges = false;
+let changeGeneration = 0;
 
 function visitorId() {
   const existing = localStorage.getItem(VISITOR_KEY);
@@ -82,6 +87,23 @@ function applySnapshot(lists: SyncedChecklist[]) {
   emitDataChanged();
 }
 
+function snapshotsMatch(lists: SyncedChecklist[]) {
+  return JSON.stringify(snapshotFromLocal()) === JSON.stringify(lists);
+}
+
+function startAutomaticRefresh() {
+  if (refreshListenersInstalled) return;
+  refreshListenersInstalled = true;
+
+  const refreshWhenActive = () => {
+    if (document.visibilityState === "visible") void refreshAccountSnapshot();
+  };
+
+  window.addEventListener("focus", refreshWhenActive);
+  document.addEventListener("visibilitychange", refreshWhenActive);
+  setInterval(refreshWhenActive, ACCOUNT_REFRESH_INTERVAL_MS);
+}
+
 async function uploadSnapshot() {
   const response = await fetch(`${API_ORIGIN}/api/v1/account/checklists`, {
     method: "POST",
@@ -90,6 +112,71 @@ async function uploadSnapshot() {
     body: JSON.stringify({ lists: snapshotFromLocal() }),
   });
   if (!response.ok) throw new Error("Account API rejected the snapshot");
+}
+
+async function flushAccountSnapshot() {
+  if (!accountState.signedIn) return;
+  const generation = changeGeneration;
+  accountState.syncing = true;
+  accountState.message = "正在同步…";
+
+  try {
+    await uploadSnapshot();
+    if (generation === changeGeneration) {
+      pendingLocalChanges = false;
+      accountState.message = "已同步到账号";
+    } else {
+      scheduleUpload(100);
+    }
+  } catch {
+    accountState.message = "同步失败，稍后自动重试";
+    scheduleUpload(5_000);
+  } finally {
+    if (!pendingLocalChanges) accountState.syncing = false;
+  }
+}
+
+function scheduleUpload(delay: number) {
+  if (saveTimer) clearTimeout(saveTimer);
+  saveTimer = setTimeout(() => {
+    saveTimer = undefined;
+    void flushAccountSnapshot();
+  }, delay);
+}
+
+export async function refreshAccountSnapshot() {
+  if (!accountState.signedIn || accountState.syncing || pendingLocalChanges) return;
+  if (refreshPromise) return refreshPromise;
+
+  refreshPromise = (async () => {
+    let refreshMarkedSyncing = false;
+    try {
+      const response = await fetch(`${API_ORIGIN}/api/v1/account/checklists`, {
+        credentials: "include",
+        cache: "no-store",
+      });
+      if (!response.ok) throw new Error("Account API rejected the refresh");
+      const body = await response.json() as {
+        data?: { lists?: SyncedChecklist[] };
+      };
+      const lists = body.data?.lists;
+      if (!Array.isArray(lists)) throw new Error("Invalid account refresh response");
+      if (pendingLocalChanges) return;
+      if (!snapshotsMatch(lists)) {
+        accountState.syncing = true;
+        refreshMarkedSyncing = true;
+        applySnapshot(lists);
+        accountState.message = "已自动刷新账号数据";
+      }
+    } catch {
+      accountState.message = "自动刷新失败，将继续重试";
+    } finally {
+      if (refreshMarkedSyncing && !pendingLocalChanges) accountState.syncing = false;
+      refreshPromise = undefined;
+    }
+  })();
+
+  return refreshPromise;
 }
 
 export async function initializeAccountSync() {
@@ -110,6 +197,7 @@ export async function initializeAccountSync() {
       accountState.signedIn = true;
       accountState.email = account.email;
       accountState.syncing = true;
+      startAutomaticRefresh();
       if (body.data?.initialized) {
         applySnapshot(lists);
         accountState.message = "账号数据已同步";
@@ -133,19 +221,11 @@ export async function initializeAccountSync() {
 export function scheduleAccountSync() {
   emitDataChanged();
   if (!accountState.signedIn) return;
-  if (saveTimer) clearTimeout(saveTimer);
+  pendingLocalChanges = true;
+  changeGeneration += 1;
   accountState.syncing = true;
   accountState.message = "正在同步…";
-  saveTimer = setTimeout(async () => {
-    try {
-      await uploadSnapshot();
-      accountState.message = "已同步到账号";
-    } catch {
-      accountState.message = "同步失败，本地修改仍已保留";
-    } finally {
-      accountState.syncing = false;
-    }
-  }, 300);
+  scheduleUpload(300);
 }
 
 export function startLogin() {
