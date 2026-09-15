@@ -1,0 +1,19 @@
+[
+  {
+    "id": "todo-list",
+    "slug": "travel",
+    "title": "出行清单",
+    "description": "出发前需要确认和携带的个人清单。",
+    "items": [
+      { "id": "item-1-tccmnh", "label": "猫砂 猫粮 猫水" },
+      { "id": "item-2-n04znw", "label": "数据线 手表" },
+      { "id": "item-3-4tf75y", "label": "监控" },
+      { "id": "item-4-74gkcd", "label": "充电宝" },
+      { "id": "item-5-7da2wv", "label": "身份证" },
+      { "id": "item-6-7egpa3", "label": "银行卡" },
+      { "id": "item-7-4tf34c", "label": "电脑" },
+      { "id": "item-8-74rqs8", "label": "剃须刀" },
+      { "id": "item-9-7fd9mh", "label": "驾驶证" }
+    ]
+  }
+]
