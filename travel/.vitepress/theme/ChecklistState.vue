@@ -34,9 +34,12 @@ function checklistItems(): ChecklistItem[] {
   return paragraphs.flatMap((paragraph, index) => {
     const label = paragraph.textContent?.trim();
     if (!label?.startsWith("☐ ")) return [];
+    const explicitId = paragraph
+      .querySelector<HTMLElement>("[data-checklist-id]")
+      ?.dataset.checklistId;
 
     return [{
-      id: itemId(index, label),
+      id: explicitId || itemId(index, label),
       label: label.slice(2),
       paragraph,
     }];

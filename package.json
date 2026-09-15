@@ -22,7 +22,8 @@
     "travel:preview": "vitepress preview travel",
     "todo:dev": "vitepress dev todo",
     "todo:build": "vitepress build todo",
-    "todo:preview": "vitepress preview todo"
+    "todo:preview": "vitepress preview todo",
+    "todo:test": "npm run todo:build && node --test tests/todo-checklist-ids.test.mjs"
   },
   "dependencies": {
     "drizzle-orm": "0.45.2",
