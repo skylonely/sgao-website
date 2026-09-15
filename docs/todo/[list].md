@@ -2,4 +2,4 @@
 aside: false
 ---
 
-<!-- @content -->
+<ChecklistPage />

@@ -4,6 +4,8 @@ import test from "node:test";
 
 const registryPath = new URL("../todo/checklists.json", import.meta.url);
 const buildDirectory = new URL("../todo/.vitepress/dist/", import.meta.url);
+const workerPath = new URL("../todo/worker.ts", import.meta.url);
+const wranglerPath = new URL("../wrangler.todo.jsonc", import.meta.url);
 
 async function checklists() {
   return JSON.parse(await readFile(registryPath, "utf8"));
@@ -36,7 +38,12 @@ test("todo checklist items have unique stable IDs", async () => {
 
 test("todo build generates the homepage and every registered list", async () => {
   const lists = await checklists();
-  await access(new URL("index.html", buildDirectory));
+  const homepage = await readFile(new URL("index.html", buildDirectory), "utf8");
+  await access(new URL("list.html", buildDirectory));
+
+  assert.match(homepage, />新建清单</);
+  assert.match(homepage, />编辑</);
+  assert.match(homepage, />\s*删除\s*</);
 
   for (const list of lists) {
     const outputPath = new URL(`${list.slug}.html`, buildDirectory);
@@ -48,5 +55,19 @@ test("todo build generates the homepage and every registered list", async () => 
       list.items.length,
       `${list.slug} output must include every registered item`,
     );
+    assert.match(html, />\s*编辑清单\s*</);
   }
+});
+
+test("todo worker serves browser-created checklist routes", async () => {
+  const [worker, wrangler] = await Promise.all([
+    readFile(workerPath, "utf8"),
+    readFile(wranglerPath, "utf8"),
+  ]);
+
+  assert.match(worker, /url\.pathname\.startsWith\("\/lists\/"\)/);
+  assert.match(worker, /new URL\("\/list", url\)/);
+  assert.match(worker, /new HTMLRewriter\(\)/);
+  assert.match(worker, /__SGAO_TODO_LIST_SLUG__/);
+  assert.match(wrangler, /"\/lists\/\*"/);
 });
