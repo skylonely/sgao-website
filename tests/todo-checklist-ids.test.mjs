@@ -6,6 +6,8 @@ const registryPath = new URL("../todo/checklists.json", import.meta.url);
 const buildDirectory = new URL("../todo/.vitepress/dist/", import.meta.url);
 const workerPath = new URL("../todo/worker.ts", import.meta.url);
 const wranglerPath = new URL("../wrangler.todo.jsonc", import.meta.url);
+const accountSyncPath = new URL("../todo/.vitepress/theme/account-sync.ts", import.meta.url);
+const accountStatusPath = new URL("../todo/.vitepress/theme/AccountStatus.vue", import.meta.url);
 
 async function checklists() {
   return JSON.parse(await readFile(registryPath, "utf8"));
@@ -70,4 +72,19 @@ test("todo worker serves browser-created checklist routes", async () => {
   assert.match(worker, /new HTMLRewriter\(\)/);
   assert.match(worker, /__SGAO_TODO_LIST_SLUG__/);
   assert.match(wrangler, /"\/lists\/\*"/);
+});
+
+test("account sync detects and presents revision conflicts", async () => {
+  const [accountSync, accountStatus] = await Promise.all([
+    readFile(accountSyncPath, "utf8"),
+    readFile(accountStatusPath, "utf8"),
+  ]);
+
+  assert.match(accountSync, /revision: currentRevision/);
+  assert.match(accountSync, /response\.status === 409/);
+  assert.match(accountSync, /useRemoteConflictVersion/);
+  assert.match(accountSync, /keepLocalConflictVersion/);
+  assert.match(accountStatus, />\s*使用云端\s*</);
+  assert.match(accountStatus, />保留本机</);
+  assert.match(accountStatus, /上次同步/);
 });

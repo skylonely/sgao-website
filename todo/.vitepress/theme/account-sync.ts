@@ -18,12 +18,23 @@ type Account = { id: string; email: string };
 type SyncedChecklist = Checklist & {
   items: Array<Checklist["items"][number] & { checked: boolean }>;
 };
+type AccountSnapshot = {
+  account?: Account;
+  initialized: boolean;
+  revision: number;
+  updatedAt: string | null;
+  lists: SyncedChecklist[];
+};
+
+class SyncConflictError extends Error {}
 
 export const accountState = reactive({
   ready: false,
   signedIn: false,
   syncing: false,
+  conflict: false,
   email: "",
+  lastSyncedAt: "",
   message: "正在检查账号…",
 });
 
@@ -33,6 +44,8 @@ let refreshPromise: Promise<void> | undefined;
 let refreshListenersInstalled = false;
 let pendingLocalChanges = false;
 let changeGeneration = 0;
+let currentRevision = 0;
+let conflictSnapshot: AccountSnapshot | undefined;
 
 function visitorId() {
   const existing = localStorage.getItem(VISITOR_KEY);
@@ -91,6 +104,11 @@ function snapshotsMatch(lists: SyncedChecklist[]) {
   return JSON.stringify(snapshotFromLocal()) === JSON.stringify(lists);
 }
 
+function setSyncMetadata(snapshot: Pick<AccountSnapshot, "revision" | "updatedAt">) {
+  currentRevision = snapshot.revision;
+  accountState.lastSyncedAt = snapshot.updatedAt ?? "";
+}
+
 function startAutomaticRefresh() {
   if (refreshListenersInstalled) return;
   refreshListenersInstalled = true;
@@ -104,14 +122,67 @@ function startAutomaticRefresh() {
   setInterval(refreshWhenActive, ACCOUNT_REFRESH_INTERVAL_MS);
 }
 
+async function requestAccountSnapshot(): Promise<AccountSnapshot> {
+  const response = await fetch(`${API_ORIGIN}/api/v1/account/checklists`, {
+    credentials: "include",
+    cache: "no-store",
+  });
+  if (!response.ok) throw new Error("Account API rejected the refresh");
+  const body = await response.json() as {
+    data?: {
+      account?: Account;
+      initialized?: boolean;
+      revision?: unknown;
+      updatedAt?: unknown;
+      lists?: SyncedChecklist[];
+    };
+  };
+  const revision = body.data?.revision;
+  const lists = body.data?.lists;
+  if (!Number.isSafeInteger(revision) || Number(revision) < 0 || !Array.isArray(lists)) {
+    throw new Error("Invalid account snapshot response");
+  }
+  return {
+    account: body.data?.account,
+    initialized: body.data?.initialized === true,
+    revision: Number(revision),
+    updatedAt: typeof body.data?.updatedAt === "string" ? body.data.updatedAt : null,
+    lists,
+  };
+}
+
 async function uploadSnapshot() {
   const response = await fetch(`${API_ORIGIN}/api/v1/account/checklists`, {
     method: "POST",
     credentials: "include",
     headers: { "Content-Type": "text/plain;charset=UTF-8" },
-    body: JSON.stringify({ lists: snapshotFromLocal() }),
+    body: JSON.stringify({ revision: currentRevision, lists: snapshotFromLocal() }),
   });
+  if (response.status === 409) throw new SyncConflictError("Account snapshot conflict");
   if (!response.ok) throw new Error("Account API rejected the snapshot");
+  const body = await response.json() as {
+    data?: { revision?: unknown; updatedAt?: unknown };
+  };
+  const revision = body.data?.revision;
+  if (!Number.isSafeInteger(revision) || Number(revision) < 0) {
+    throw new Error("Invalid account save response");
+  }
+  setSyncMetadata({
+    revision: Number(revision),
+    updatedAt: typeof body.data?.updatedAt === "string" ? body.data.updatedAt : null,
+  });
+}
+
+async function prepareSyncConflict() {
+  try {
+    conflictSnapshot = await requestAccountSnapshot();
+    setSyncMetadata(conflictSnapshot);
+    accountState.conflict = true;
+    accountState.message = "另一台设备已有更新，请选择保留版本";
+  } catch {
+    accountState.message = "检测到同步冲突，读取云端版本失败";
+    scheduleUpload(5_000);
+  }
 }
 
 async function flushAccountSnapshot() {
@@ -128,9 +199,13 @@ async function flushAccountSnapshot() {
     } else {
       scheduleUpload(100);
     }
-  } catch {
-    accountState.message = "同步失败，稍后自动重试";
-    scheduleUpload(5_000);
+  } catch (error) {
+    if (error instanceof SyncConflictError) {
+      await prepareSyncConflict();
+    } else {
+      accountState.message = "同步失败，稍后自动重试";
+      scheduleUpload(5_000);
+    }
   } finally {
     if (!pendingLocalChanges) accountState.syncing = false;
   }
@@ -145,27 +220,19 @@ function scheduleUpload(delay: number) {
 }
 
 export async function refreshAccountSnapshot() {
-  if (!accountState.signedIn || accountState.syncing || pendingLocalChanges) return;
+  if (!accountState.signedIn || accountState.syncing || accountState.conflict || pendingLocalChanges) return;
   if (refreshPromise) return refreshPromise;
 
   refreshPromise = (async () => {
     let refreshMarkedSyncing = false;
     try {
-      const response = await fetch(`${API_ORIGIN}/api/v1/account/checklists`, {
-        credentials: "include",
-        cache: "no-store",
-      });
-      if (!response.ok) throw new Error("Account API rejected the refresh");
-      const body = await response.json() as {
-        data?: { lists?: SyncedChecklist[] };
-      };
-      const lists = body.data?.lists;
-      if (!Array.isArray(lists)) throw new Error("Invalid account refresh response");
-      if (pendingLocalChanges) return;
-      if (!snapshotsMatch(lists)) {
+      const snapshot = await requestAccountSnapshot();
+      if (pendingLocalChanges || accountState.conflict) return;
+      setSyncMetadata(snapshot);
+      if (!snapshotsMatch(snapshot.lists)) {
         accountState.syncing = true;
         refreshMarkedSyncing = true;
-        applySnapshot(lists);
+        applySnapshot(snapshot.lists);
         accountState.message = "已自动刷新账号数据";
       }
     } catch {
@@ -183,29 +250,23 @@ export async function initializeAccountSync() {
   if (initializePromise) return initializePromise;
   initializePromise = (async () => {
     try {
-      const response = await fetch(`${API_ORIGIN}/api/v1/account/checklists`, {
-        credentials: "include",
-      });
-      if (!response.ok) throw new Error("No active account session");
-      const body = await response.json() as {
-        data?: { account?: Account; initialized?: boolean; lists?: SyncedChecklist[] };
-      };
-      const account = body.data?.account;
-      const lists = body.data?.lists;
-      if (!account || !Array.isArray(lists)) throw new Error("Invalid account response");
+      const snapshot = await requestAccountSnapshot();
+      const account = snapshot.account;
+      if (!account) throw new Error("Invalid account response");
 
       accountState.signedIn = true;
       accountState.email = account.email;
       accountState.syncing = true;
-      startAutomaticRefresh();
-      if (body.data?.initialized) {
-        applySnapshot(lists);
+      setSyncMetadata(snapshot);
+      if (snapshot.initialized) {
+        applySnapshot(snapshot.lists);
         accountState.message = "账号数据已同步";
       } else {
         await copyAnonymousChecksToLocal();
         await uploadSnapshot();
         accountState.message = "已把此设备的清单存入账号";
       }
+      startAutomaticRefresh();
     } catch {
       accountState.signedIn = false;
       accountState.email = "";
@@ -223,9 +284,33 @@ export function scheduleAccountSync() {
   if (!accountState.signedIn) return;
   pendingLocalChanges = true;
   changeGeneration += 1;
+  if (accountState.conflict) {
+    accountState.message = "存在同步冲突，请先选择保留版本";
+    return;
+  }
   accountState.syncing = true;
   accountState.message = "正在同步…";
   scheduleUpload(300);
+}
+
+export function useRemoteConflictVersion() {
+  if (!conflictSnapshot) return;
+  applySnapshot(conflictSnapshot.lists);
+  setSyncMetadata(conflictSnapshot);
+  conflictSnapshot = undefined;
+  pendingLocalChanges = false;
+  accountState.conflict = false;
+  accountState.syncing = false;
+  accountState.message = "已使用云端版本";
+}
+
+export function keepLocalConflictVersion() {
+  if (!conflictSnapshot) return;
+  conflictSnapshot = undefined;
+  accountState.conflict = false;
+  accountState.syncing = true;
+  accountState.message = "正在用本机版本更新云端…";
+  scheduleUpload(0);
 }
 
 export function startLogin() {
@@ -236,6 +321,8 @@ export function startLogin() {
 export function openLogout() {
   window.open(`${API_ORIGIN}/cdn-cgi/access/logout`, "_blank", "noopener,noreferrer");
   accountState.signedIn = false;
+  accountState.conflict = false;
   accountState.email = "";
+  accountState.lastSyncedAt = "";
   accountState.message = "退出页面已打开；本地清单仍保留在此设备";
 }

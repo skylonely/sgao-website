@@ -1,6 +1,25 @@
 <script setup lang="ts">
-import { onMounted } from "vue";
-import { accountState, initializeAccountSync, openLogout, startLogin } from "./account-sync";
+import { computed, onMounted } from "vue";
+import {
+  accountState,
+  initializeAccountSync,
+  keepLocalConflictVersion,
+  openLogout,
+  startLogin,
+  useRemoteConflictVersion,
+} from "./account-sync";
+
+const statusText = computed(() => {
+  if (!accountState.lastSyncedAt) return accountState.message;
+  const timestamp = Date.parse(accountState.lastSyncedAt);
+  if (Number.isNaN(timestamp)) return accountState.message;
+  const time = new Intl.DateTimeFormat("zh-CN", {
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+  }).format(timestamp);
+  return `${accountState.message} · 上次同步 ${time}`;
+});
 
 onMounted(initializeAccountSync);
 </script>
@@ -9,9 +28,15 @@ onMounted(initializeAccountSync);
   <aside class="todo-account" :class="{ 'todo-account--signed-in': accountState.signedIn }">
     <div>
       <strong>{{ accountState.signedIn ? accountState.email : "跨设备同步" }}</strong>
-      <span>{{ accountState.message }}</span>
+      <span>{{ statusText }}</span>
     </div>
     <button v-if="!accountState.ready" class="todo-account__button" type="button" disabled>检查中…</button>
+    <div v-else-if="accountState.conflict" class="todo-account__actions">
+      <button class="todo-account__button todo-account__button--secondary" type="button" @click="useRemoteConflictVersion">
+        使用云端
+      </button>
+      <button class="todo-account__button" type="button" @click="keepLocalConflictVersion">保留本机</button>
+    </div>
     <button v-else-if="!accountState.signedIn" class="todo-account__button" type="button" @click="startLogin">登录</button>
     <button v-else class="todo-account__button todo-account__button--secondary" type="button" @click="openLogout">退出</button>
   </aside>
@@ -35,6 +60,7 @@ onMounted(initializeAccountSync);
 }
 
 .todo-account div { display: grid; min-width: 0; gap: 3px; }
+.todo-account .todo-account__actions { display: flex; flex: none; gap: 8px; }
 .todo-account strong,
 .todo-account span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .todo-account span { color: var(--vp-c-text-2); font-size: 13px; }
