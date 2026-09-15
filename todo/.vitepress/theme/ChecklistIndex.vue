@@ -11,6 +11,8 @@ import {
   writeChecklists,
   type Checklist,
 } from "./checklist-store";
+import AccountStatus from "./AccountStatus.vue";
+import { scheduleAccountSync, TODO_DATA_CHANGED_EVENT } from "./account-sync";
 
 const checklists = ref<Checklist[]>(defaultLists());
 const creating = ref(false);
@@ -35,33 +37,42 @@ function createChecklist() {
   const checklist = newChecklist(title.value, description.value, checklists.value);
   const next = [...checklists.value, checklist];
   writeChecklists(next);
+  scheduleAccountSync();
   checklists.value = next;
   window.location.assign(`${href(checklist)}?edit=1`);
 }
 
 function deleteChecklist(checklist: Checklist) {
-  if (!window.confirm(`确定删除“${checklist.title}”吗？此操作只影响当前浏览器。`)) return;
+  if (!window.confirm(`确定删除“${checklist.title}”吗？登录后也会从账号中删除。`)) return;
   const next = checklists.value.filter(({ id }) => id !== checklist.id);
   writeChecklists(next);
   removeLocalCheckedIds(checklist.id);
   checklists.value = next;
+  scheduleAccountSync();
 }
 
 function restoreDefaults() {
   const next = [...checklists.value, ...missingDefaults.value];
   writeChecklists(next);
   checklists.value = next;
+  scheduleAccountSync();
 }
 
 onMounted(() => {
   refresh();
   window.addEventListener("storage", refresh);
+  window.addEventListener(TODO_DATA_CHANGED_EVENT, refresh);
 });
 
-onBeforeUnmount(() => window.removeEventListener("storage", refresh));
+onBeforeUnmount(() => {
+  window.removeEventListener("storage", refresh);
+  window.removeEventListener(TODO_DATA_CHANGED_EVENT, refresh);
+});
 </script>
 
 <template>
+  <AccountStatus />
+
   <div class="todo-index-toolbar">
     <p>{{ checklists.length }} 张清单</p>
     <div class="todo-index-toolbar__actions">

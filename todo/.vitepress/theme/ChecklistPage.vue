@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from "vue";
+import { computed, onBeforeUnmount, onMounted, ref } from "vue";
 import { useData, withBase } from "vitepress";
 import {
   checklistHref,
@@ -13,6 +13,13 @@ import {
   writeLocalCheckedIds,
   type Checklist,
 } from "./checklist-store";
+import AccountStatus from "./AccountStatus.vue";
+import {
+  accountState,
+  initializeAccountSync,
+  scheduleAccountSync,
+  TODO_DATA_CHANGED_EVENT,
+} from "./account-sync";
 
 const VISITOR_KEY = "sgao.travel.checklist.visitor";
 const { params } = useData();
@@ -51,6 +58,11 @@ function setCheckedIds(ids: Set<string>) {
 
 async function loadCheckedState() {
   if (!checklist.value) return;
+  if (accountState.signedIn) {
+    setCheckedIds(readLocalCheckedIds(checklist.value.id));
+    status.value = "勾选和编辑内容会自动同步到账号。";
+    return;
+  }
   if (!isDefault.value) {
     setCheckedIds(readLocalCheckedIds(checklist.value.id));
     status.value = "勾选和编辑内容会自动保存在此浏览器。";
@@ -79,6 +91,13 @@ async function toggleItem(itemId: string, checked: boolean) {
   const next = new Set(previous);
   checked ? next.add(itemId) : next.delete(itemId);
   setCheckedIds(next);
+
+  if (accountState.signedIn) {
+    writeLocalCheckedIds(checklist.value.id, next);
+    scheduleAccountSync();
+    status.value = "正在同步到账号…";
+    return;
+  }
 
   if (!isDefault.value) {
     writeLocalCheckedIds(checklist.value.id, next);
@@ -141,6 +160,7 @@ function saveChanges() {
   if (index === -1) return;
   lists[index] = cleaned;
   writeChecklists(lists);
+  scheduleAccountSync();
   checklist.value = cleaned;
   draft.value = null;
   editing.value = false;
@@ -152,14 +172,26 @@ function saveChanges() {
 
 function deleteChecklist() {
   if (!checklist.value) return;
-  if (!window.confirm(`确定删除“${checklist.value.title}”吗？此操作只影响当前浏览器。`)) return;
+  if (!window.confirm(`确定删除“${checklist.value.title}”吗？登录后也会从账号中删除。`)) return;
   const remaining = readChecklists().filter(({ id }) => id !== checklist.value?.id);
   writeChecklists(remaining);
   removeLocalCheckedIds(checklist.value.id);
+  scheduleAccountSync();
   window.location.assign(withBase("/"));
 }
 
+async function refreshFromStorage() {
+  const slug = currentSlug();
+  checklist.value = readChecklists().find((candidate) => candidate.slug === slug) ?? null;
+  if (checklist.value) {
+    document.title = `${checklist.value.title} | SGAO Todo`;
+    await loadCheckedState();
+  }
+}
+
 onMounted(async () => {
+  window.addEventListener(TODO_DATA_CHANGED_EVENT, refreshFromStorage);
+  await initializeAccountSync();
   const slug = currentSlug();
   checklist.value = readChecklists().find((candidate) => candidate.slug === slug) ?? null;
   loading.value = false;
@@ -168,9 +200,13 @@ onMounted(async () => {
   if (editing.value) beginEditing();
   await loadCheckedState();
 });
+
+onBeforeUnmount(() => window.removeEventListener(TODO_DATA_CHANGED_EVENT, refreshFromStorage));
 </script>
 
 <template>
+  <AccountStatus />
+
   <p v-if="loading" class="checklist-empty">正在加载清单…</p>
 
   <section v-else-if="!checklist" class="checklist-empty">
