@@ -101,6 +101,16 @@ npm run docs:build
 
 ## 部署
 
+### 主站账号与导航同步
+
+主站复用 `api.sgao.cc/api/v1/account/*` 的 Cloudflare Access 登录，仅同步收藏、自定义网站和分类。首次登录须明确选择合并本机数据或使用云端；访问足迹、搜索和显示偏好不会上传，也不与 Todo 清单混用。
+
+修改先保存在本机，联网后自动提交；页面可见时每 10 秒检查云端更新，重新聚焦和联网时也会检查。版本冲突会暂停自动覆盖，等待用户选择合并或使用云端。替换本机导航前保存一份可下载的备份；导入这种导航备份不影响本机访问足迹。清空本机数据会暂停同步，不删除云端导航。
+
+本地验证：`npm run navigation:test`、`npm test`、`npm run build:static`。登录与真实跨设备同步仍需发布后验证。
+
+首次发布须先在独立 API 项目应用新增的 `migrations/0005_account_navigation.sql`，再发布 API，最后构建并发布主站。新增表 `account_navigation_profiles` 使用现有 D1 绑定，不修改 Todo 表；生产迁移和发布须单独确认。
+
 主站和知识库使用不同的 Worker，可以独立部署。
 
 部署主站：

@@ -241,6 +241,48 @@ button { color: inherit; }
 .breadcrumb i { color: var(--line-strong); font-style: normal; }
 .breadcrumb strong { color: var(--ink); font-weight: 650; }
 .top-actions { display: flex; align-items: center; gap: 10px; }
+.account-button {
+  min-height: 38px;
+  padding: 0 12px;
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+  font-size: 11px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.navigation-account-callout { padding: 20px 42px 0; }
+.navigation-account-panel {
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface);
+  overflow-wrap: anywhere;
+}
+.navigation-account-panel__heading { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+.navigation-account-panel__heading > div { display: grid; gap: 5px; min-width: 0; }
+.navigation-account-panel strong { color: var(--ink); font-size: 13px; }
+.navigation-account-email { color: var(--muted); font-size: 11px; }
+.navigation-account-panel p { margin: 10px 0; color: var(--ink); font-size: 12px; line-height: 1.7; }
+.navigation-account-panel small { color: var(--muted); font-size: 10px; }
+.navigation-account-panel p.navigation-account-note { color: var(--muted); font-size: 11px; }
+.navigation-account-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.navigation-account-panel button {
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface-2);
+  color: var(--ink);
+  font: inherit;
+  font-size: 11px;
+  cursor: pointer;
+}
+.navigation-account-panel button.navigation-account-primary { border-color: var(--accent); background: var(--accent); color: #fff; }
+.navigation-account-panel button:disabled { opacity: .5; cursor: not-allowed; }
+.navigation-account-panel button:focus-visible, .account-button:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.navigation-account-panel button.navigation-account-backup { padding: 0; border: 0; background: transparent; color: var(--muted); }
 .round-button, .mobile-menu {
   display: grid;
   width: 38px;
@@ -869,6 +911,8 @@ footer { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center
   .hero-content { width: 82%; }
 }
 @media (max-width: 680px) {
+  .navigation-account-callout { padding: 16px 16px 0; }
+  .account-button { min-height: 35px; padding: 0 9px; font-size: 10px; }
   .topbar { height: 62px; padding: 0 16px; }
   .breadcrumb span, .breadcrumb i { display: none; }
   .round-button, .mobile-menu { width: 35px; height: 35px; }

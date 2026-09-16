@@ -7,20 +7,20 @@ import {
   useMemo,
   useRef,
   useState,
+  useSyncExternalStore,
 } from "react";
 import { categories, defaultSites, type NavSite } from "./data";
+import NavigationAccountPanel from "./NavigationAccountPanel";
+import {
+  NAVIGATION_DATA_CHANGED_EVENT, NAVIGATION_LOCAL_CHANGED_EVENT, NAVIGATION_STORAGE_KEYS,
+  parseNavigationData, readNavigationData, type NavigationItem,
+} from "./navigation-data";
+import { navigationAccount } from "./navigation-sync";
 
 type SearchEngine = "local" | "baidu" | "bing" | "google";
 type ViewMode = "all" | "favorites" | "history";
 type CardMode = "grid" | "compact";
 type Theme = "light" | "dark";
-type NavigationItem = {
-  id: string;
-  name: string;
-  icon: string;
-  eyebrow: string;
-  isCustom?: boolean;
-};
 
 const engineMap: Record<
   SearchEngine,
@@ -53,13 +53,6 @@ const colors = [
   "blue",
 ] as const;
 
-const legacyCategoryMap: Record<string, string> = {
-  anime: "tools",
-  game: "tools",
-  movie: "tools",
-  music: "tools",
-};
-
 function readStorage<T>(key: string, fallback: T): T {
   if (typeof window === "undefined") return fallback;
   try {
@@ -72,6 +65,9 @@ function readStorage<T>(key: string, fallback: T): T {
 
 function writeStorage(key: string, value: unknown) {
   window.localStorage.setItem(key, JSON.stringify(value));
+  if ((NAVIGATION_STORAGE_KEYS as readonly string[]).includes(key)) {
+    window.dispatchEvent(new CustomEvent(NAVIGATION_LOCAL_CHANGED_EVENT));
+  }
 }
 
 function normalizeUrl(url: string) {
@@ -91,6 +87,9 @@ function SiteMark({ site, index = 0 }: { site: NavSite; index?: number }) {
 
 export default function Navigator() {
   const [mounted, setMounted] = useState(false);
+  const accountState = useSyncExternalStore(
+    navigationAccount.subscribe, navigationAccount.getSnapshot, navigationAccount.getServerSnapshot,
+  );
   const [theme, setTheme] = useState<Theme>("light");
   const [cardMode, setCardMode] = useState<CardMode>("grid");
   const [engine, setEngine] = useState<SearchEngine>("local");
@@ -130,34 +129,46 @@ export default function Navigator() {
   const importRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    const savedTheme = readStorage<Theme>(
-      "qifei-theme",
-      window.matchMedia("(prefers-color-scheme: dark)").matches
-        ? "dark"
-        : "light",
-    );
-    setTheme(savedTheme);
-    setCardMode(readStorage<CardMode>("qifei-card-mode", "grid"));
-    setFavorites(readStorage<string[]>("qifei-favorites", []));
-    setHistory(readStorage<string[]>("qifei-history", []));
-    const savedCustomSites = readStorage<NavSite[]>("qifei-custom-sites", []);
-    const migratedCustomSites = savedCustomSites.map((site) => {
-      const category = legacyCategoryMap[site.category];
-      return category ? { ...site, category } : site;
+    let cancelled = false;
+    queueMicrotask(() => {
+      if (cancelled) return;
+      const savedTheme = readStorage<Theme>(
+        "qifei-theme",
+        window.matchMedia("(prefers-color-scheme: dark)").matches
+          ? "dark"
+          : "light",
+      );
+      setTheme(savedTheme);
+      setCardMode(readStorage<CardMode>("qifei-card-mode", "grid"));
+      setHistory(readStorage<string[]>("qifei-history", []));
+      try {
+        const data = readNavigationData(window.localStorage);
+        setFavorites(data.favorites);
+        setCustomSites(data.customSites);
+        setCustomNavigations(data.customNavigations);
+      } catch { setToast("本机导航数据格式有误，原数据未修改，请先导出备份检查。"); }
+      setMounted(true);
     });
-    setCustomSites(migratedCustomSites);
-    if (
-      migratedCustomSites.some(
-        (site, index) => site !== savedCustomSites[index],
-      )
-    ) {
-      writeStorage("qifei-custom-sites", migratedCustomSites);
-    }
-    setCustomNavigations(
-      readStorage<NavigationItem[]>("qifei-custom-navigations", []),
-    );
-    setMounted(true);
+    return () => { cancelled = true; };
   }, []);
+
+  useEffect(() => {
+    if (!mounted) return;
+    const refreshNavigation = () => {
+      try {
+        const data = readNavigationData(window.localStorage);
+        setFavorites(data.favorites);
+        setCustomSites(data.customSites);
+        setCustomNavigations(data.customNavigations);
+      } catch { setToast("无法读取导航数据，原数据仍保留在本机。"); }
+    };
+    window.addEventListener(NAVIGATION_DATA_CHANGED_EVENT, refreshNavigation);
+    navigationAccount.start();
+    return () => {
+      window.removeEventListener(NAVIGATION_DATA_CHANGED_EVENT, refreshNavigation);
+      navigationAccount.stop();
+    };
+  }, [mounted]);
 
   useEffect(() => {
     if (!mounted) return;
@@ -374,7 +385,7 @@ export default function Navigator() {
     event.preventDefault();
     if (!newSite.name.trim() || !newSite.url.trim()) return;
     const site: NavSite = {
-      id: `custom-${Date.now()}`,
+      id: `custom-${crypto.randomUUID()}`,
       name: newSite.name.trim(),
       url: normalizeUrl(newSite.url.trim()),
       desc: newSite.desc.trim() || "我的自定义网站",
@@ -384,6 +395,8 @@ export default function Navigator() {
       isCustom: true,
     };
     const next = [...customSites, site];
+    try { parseNavigationData({ favorites, customSites: next, customNavigations }); }
+    catch { showToast("请检查网站信息：仅支持不含账号密码的 HTTP/HTTPS 地址，并有数量和长度限制。"); return; }
     setCustomSites(next);
     writeStorage("qifei-custom-sites", next);
     setNewSite({ name: "", url: "", desc: "", category: "tools" });
@@ -404,13 +417,15 @@ export default function Navigator() {
       return;
     }
     const navigation: NavigationItem = {
-      id: `custom-nav-${Date.now()}`,
+      id: `custom-nav-${crypto.randomUUID()}`,
       name,
       icon: newNavigation.icon.trim().slice(0, 2) || "◇",
       eyebrow: "MY NAVIGATION",
       isCustom: true,
     };
     const next = [...customNavigations, navigation];
+    try { parseNavigationData({ favorites, customSites, customNavigations: next }); }
+    catch { showToast("分类名称过长或数量已达到上限。"); return; }
     setCustomNavigations(next);
     writeStorage("qifei-custom-navigations", next);
     setNewNavigation({ name: "", icon: "◇" });
@@ -484,22 +499,19 @@ export default function Navigator() {
   async function importData(file?: File) {
     if (!file) return;
     try {
+      if (file.size > 512 * 1024) throw new Error("Backup is too large");
       const data = JSON.parse(await file.text()) as {
         favorites?: string[];
         history?: string[];
         customSites?: NavSite[];
         customNavigations?: NavigationItem[];
       };
-      const nextFavorites = Array.isArray(data.favorites)
-        ? data.favorites
-        : [];
-      const nextHistory = Array.isArray(data.history) ? data.history : [];
-      const nextCustom = Array.isArray(data.customSites)
-        ? data.customSites
-        : [];
-      const nextNavigations = Array.isArray(data.customNavigations)
-        ? data.customNavigations
-        : [];
+      const valid = parseNavigationData({ favorites: data.favorites ?? [], customSites: data.customSites ?? [], customNavigations: data.customNavigations ?? [] });
+      const nextFavorites = valid.favorites;
+      const nextCustom = valid.customSites;
+      const nextNavigations = valid.customNavigations;
+      const nextHistory = data.history === undefined ? history : data.history;
+      if (!Array.isArray(nextHistory) || !nextHistory.every((id) => typeof id === "string")) throw new Error("Invalid history");
       setFavorites(nextFavorites);
       setHistory(nextHistory);
       setCustomSites(nextCustom);
@@ -515,6 +527,7 @@ export default function Navigator() {
   }
 
   function resetData() {
+    navigationAccount.pauseForLocalReset();
     setFavorites([]);
     setHistory([]);
     setCustomSites([]);
@@ -524,7 +537,7 @@ export default function Navigator() {
     writeStorage("qifei-custom-sites", []);
     writeStorage("qifei-custom-navigations", []);
     setResetConfirmOpen(false);
-    showToast("本机数据已清空");
+    showToast("本机数据已清空，账号同步已暂停；云端数据未删除。");
   }
 
   const currentCategory =
@@ -645,6 +658,9 @@ export default function Navigator() {
             </strong>
           </div>
           <div className="top-actions">
+            <button className="account-button" onClick={() => setSettingsOpen(true)} title={accountState.message}>
+              {accountState.signedIn ? "账号 · 已登录" : "账号登录"}
+            </button>
             <button
               className="round-button"
               onClick={() => {
@@ -660,6 +676,10 @@ export default function Navigator() {
             </button>
           </div>
         </header>
+
+        {(accountState.phase === "choice" || accountState.phase === "conflict") && (
+          <div className="navigation-account-callout"><NavigationAccountPanel state={accountState} /></div>
+        )}
 
         <section className="hero">
           <div className="hero-orbit orbit-one" />
@@ -1005,6 +1025,10 @@ export default function Navigator() {
             </div>
 
             <div className="setting-group">
+              <NavigationAccountPanel state={accountState} />
+            </div>
+
+            <div className="setting-group">
               <h3>显示设置</h3>
               <label>
                 <span>
@@ -1137,7 +1161,7 @@ export default function Navigator() {
                 清空本机数据
               </button>
               <p className="privacy-note">
-                所有收藏、足迹、自定义网站和导航仅保存在当前浏览器，不会上传。
+                未登录或未启用同步时，所有数据只保存在本机。启用后仅同步收藏、自定义网站和分类；访问足迹、搜索及显示偏好不会上传。
               </p>
             </div>
           </aside>
@@ -1160,7 +1184,7 @@ export default function Navigator() {
               <div>
                 <span>ADD A NEW STOP</span>
                 <h2>添加一个网站</h2>
-                <p>把你常用的入口加入导航，仅保存在这台设备。</p>
+                <p>把常用入口加入导航；启用账号同步后可跨设备使用。</p>
               </div>
               <button type="button" onClick={() => setAddOpen(false)}>
                 ×
@@ -1334,7 +1358,7 @@ export default function Navigator() {
             <span className="confirm-kicker">PLEASE CONFIRM</span>
             <h2 id="reset-confirm-title">确定清空本机数据？</h2>
             <p id="reset-confirm-description">
-              这将永久删除当前浏览器中的收藏、访问足迹、自定义网站和导航，且无法撤销。
+              这将永久删除当前浏览器中的收藏、访问足迹、自定义网站和导航，并暂停账号同步；不会删除云端数据。本机清空操作无法撤销。
             </p>
             <div className="confirm-summary">
               <div>
