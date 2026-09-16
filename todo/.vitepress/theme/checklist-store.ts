@@ -168,6 +168,19 @@ export function newChecklistItem(label = ""): ChecklistItem {
   };
 }
 
+export function reorderEntries<T>(entries: T[], fromIndex: number, toIndex: number): T[] {
+  if (fromIndex === toIndex
+    || fromIndex < 0
+    || toIndex < 0
+    || fromIndex >= entries.length
+    || toIndex >= entries.length) return [...entries];
+
+  const next = [...entries];
+  const [moved] = next.splice(fromIndex, 1);
+  next.splice(toIndex, 0, moved);
+  return next;
+}
+
 export function readLocalCheckedIds(checklistId: string) {
   try {
     const parsed = JSON.parse(localStorage.getItem(`${CHECKED_STORAGE_PREFIX}${checklistId}`) || "[]");

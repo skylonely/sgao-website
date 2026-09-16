@@ -128,6 +128,24 @@ test("todo backups validate and restore lists, checks, and trash", async () => {
   assert.match(index, />覆盖导入</);
 });
 
+test("checklists and checklist items support persistent reordering", async () => {
+  const [store, index, checklistPage] = await Promise.all([
+    readFile(checklistStorePath, "utf8"),
+    readFile(checklistIndexPath, "utf8"),
+    readFile(new URL("../todo/.vitepress/theme/ChecklistPage.vue", import.meta.url), "utf8"),
+  ]);
+
+  assert.match(store, /export function reorderEntries/);
+  assert.match(index, /startChecklistDrag/);
+  assert.match(index, /moveChecklist\(index, -1\)/);
+  assert.match(index, /moveChecklist\(index, 1\)/);
+  assert.match(index, /saveChecklistOrder/);
+  assert.match(checklistPage, /startItemDrag/);
+  assert.match(checklistPage, /moveDraftItem\(index, -1\)/);
+  assert.match(checklistPage, /moveDraftItem\(index, 1\)/);
+  assert.match(checklistPage, /保存后生效/);
+});
+
 test("todo is installable and caches the app for offline use", async () => {
   await Promise.all([
     access(new URL("manifest.webmanifest", buildDirectory)),

@@ -9,6 +9,7 @@ import {
   newChecklistItem,
   readChecklists,
   readLocalCheckedIds,
+  reorderEntries,
   writeChecklists,
   writeLocalCheckedIds,
   type Checklist,
@@ -35,6 +36,8 @@ const draft = ref<Checklist | null>(null);
 const checkedIds = ref(new Set<string>());
 const savingIds = ref(new Set<string>());
 const status = ref("正在加载清单状态…");
+const draggedItemId = ref("");
+const itemSortMessage = ref("");
 const isDefault = computed(() => checklist.value ? isDefaultChecklist(checklist.value) : false);
 
 function visitorId() {
@@ -147,6 +150,41 @@ function addItem() {
 
 function removeItem(index: number) {
   draft.value?.items.splice(index, 1);
+}
+
+function moveDraftItem(index: number, offset: number) {
+  if (!draft.value) return;
+  const targetIndex = index + offset;
+  if (targetIndex < 0 || targetIndex >= draft.value.items.length) return;
+  const moved = draft.value.items[index];
+  draft.value.items = reorderEntries(draft.value.items, index, targetIndex);
+  itemSortMessage.value = `“${moved.label || `第 ${index + 1} 项`}”已移到第 ${targetIndex + 1} 位，保存后生效。`;
+}
+
+function startItemDrag(event: DragEvent, itemId: string) {
+  draggedItemId.value = itemId;
+  if (!event.dataTransfer) return;
+  event.dataTransfer.effectAllowed = "move";
+  event.dataTransfer.setData("text/plain", itemId);
+}
+
+function allowItemDrop(event: DragEvent) {
+  event.preventDefault();
+  if (event.dataTransfer) event.dataTransfer.dropEffect = "move";
+}
+
+function dropItem(event: DragEvent, targetId: string) {
+  event.preventDefault();
+  if (!draft.value) return;
+  const sourceId = draggedItemId.value || event.dataTransfer?.getData("text/plain") || "";
+  draggedItemId.value = "";
+  if (!sourceId || sourceId === targetId) return;
+  const sourceIndex = draft.value.items.findIndex(({ id }) => id === sourceId);
+  const targetIndex = draft.value.items.findIndex(({ id }) => id === targetId);
+  if (sourceIndex === -1 || targetIndex === -1) return;
+  const moved = draft.value.items[sourceIndex];
+  draft.value.items = reorderEntries(draft.value.items, sourceIndex, targetIndex);
+  itemSortMessage.value = `“${moved.label || `第 ${sourceIndex + 1} 项`}”已移到第 ${targetIndex + 1} 位，保存后生效。`;
 }
 
 function saveChanges() {
@@ -280,10 +318,43 @@ onBeforeUnmount(() => {
             <strong>项目</strong>
             <button class="todo-button todo-button--secondary" type="button" @click="addItem">添加一项</button>
           </div>
-          <div v-for="(item, index) in draft.items" :key="item.id" class="todo-editor-item">
+          <div
+            v-for="(item, index) in draft.items"
+            :key="item.id"
+            class="todo-editor-item"
+            :class="{ 'todo-editor-item--dragging': draggedItemId === item.id }"
+            @dragover="allowItemDrop"
+            @drop="dropItem($event, item.id)"
+          >
+            <button
+              class="todo-sort-handle"
+              type="button"
+              draggable="true"
+              :aria-label="`拖动第 ${index + 1} 项调整顺序`"
+              title="拖动调整顺序"
+              @dragstart="startItemDrag($event, item.id)"
+              @dragend="draggedItemId = ''"
+            >⠿</button>
             <input v-model="item.label" :aria-label="`第 ${index + 1} 项`" maxlength="100" placeholder="输入项目内容">
-            <button class="todo-icon-button" type="button" :aria-label="`删除第 ${index + 1} 项`" @click="removeItem(index)">×</button>
+            <div class="todo-editor-item__actions">
+              <button
+                class="todo-sort-button"
+                type="button"
+                :disabled="index === 0"
+                :aria-label="`将第 ${index + 1} 项上移`"
+                @click="moveDraftItem(index, -1)"
+              >↑</button>
+              <button
+                class="todo-sort-button"
+                type="button"
+                :disabled="index === draft.items.length - 1"
+                :aria-label="`将第 ${index + 1} 项下移`"
+                @click="moveDraftItem(index, 1)"
+              >↓</button>
+              <button class="todo-icon-button" type="button" :aria-label="`删除第 ${index + 1} 项`" @click="removeItem(index)">×</button>
+            </div>
           </div>
+          <p class="todo-visually-hidden" aria-live="polite">{{ itemSortMessage }}</p>
         </div>
 
         <div class="todo-dialog__actions">
@@ -352,8 +423,7 @@ onBeforeUnmount(() => {
 
 .todo-dialog__heading,
 .todo-editor-items__heading,
-.todo-dialog__actions,
-.todo-editor-item {
+.todo-dialog__actions {
   display: flex;
   align-items: center;
   gap: 10px;
@@ -399,6 +469,82 @@ onBeforeUnmount(() => {
   display: grid;
   gap: 10px;
   margin-top: 22px;
+}
+
+.todo-editor-item {
+  display: grid;
+  grid-template-columns: 32px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  padding: 6px;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  transition: opacity 0.2s, border-color 0.2s, background 0.2s;
+}
+
+.todo-editor-item--dragging {
+  opacity: 0.55;
+  background: var(--vp-c-brand-soft);
+  border-color: var(--vp-c-brand-1);
+}
+
+.todo-editor-item__actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.todo-sort-handle,
+.todo-sort-button {
+  display: inline-grid;
+  width: 32px;
+  height: 32px;
+  place-items: center;
+  padding: 0;
+  color: var(--vp-c-text-2);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 7px;
+  font: inherit;
+}
+
+.todo-sort-handle {
+  cursor: grab;
+  font-size: 19px;
+}
+
+.todo-sort-handle:active {
+  cursor: grabbing;
+}
+
+.todo-sort-button {
+  cursor: pointer;
+  font-size: 17px;
+}
+
+.todo-sort-handle:hover,
+.todo-sort-handle:focus-visible,
+.todo-sort-button:hover:not(:disabled),
+.todo-sort-button:focus-visible {
+  color: var(--vp-c-brand-1);
+  background: var(--vp-c-brand-soft);
+  border-color: var(--vp-c-brand-1);
+  outline: none;
+}
+
+.todo-sort-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.3;
+}
+
+.todo-visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
 }
 
 .todo-dialog__actions {
@@ -464,6 +610,15 @@ onBeforeUnmount(() => {
 
   .todo-dialog__actions-spacer {
     display: none;
+  }
+
+  .todo-editor-item {
+    grid-template-columns: 32px minmax(0, 1fr);
+  }
+
+  .todo-editor-item__actions {
+    grid-column: 2;
+    justify-content: flex-end;
   }
 }
 </style>

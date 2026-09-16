@@ -12,6 +12,7 @@ import {
   readAllChecklists,
   readChecklists,
   readTrashedChecklists,
+  reorderEntries,
   restoreTrashedChecklist,
   writeChecklists,
   type Checklist,
@@ -40,6 +41,8 @@ const backupError = ref("");
 const creating = ref(false);
 const title = ref("");
 const description = ref("");
+const draggedChecklistId = ref("");
+const sortMessage = ref("");
 const missingDefaults = computed(() =>
   defaultLists().filter((defaultList) =>
     !checklists.value.some(({ id }) => id === defaultList.id)
@@ -64,6 +67,52 @@ function createChecklist() {
   scheduleAccountSync();
   checklists.value = next;
   window.location.assign(`${href(checklist)}?edit=1`);
+}
+
+function saveChecklistOrder(next: Checklist[], movedTitle: string, position: number) {
+  writeChecklists(next);
+  checklists.value = next;
+  sortMessage.value = `“${movedTitle}”已移到第 ${position + 1} 位。`;
+  scheduleAccountSync();
+}
+
+function moveChecklist(index: number, offset: number) {
+  const targetIndex = index + offset;
+  if (targetIndex < 0 || targetIndex >= checklists.value.length) return;
+  const moved = checklists.value[index];
+  saveChecklistOrder(
+    reorderEntries(checklists.value, index, targetIndex),
+    moved.title,
+    targetIndex,
+  );
+}
+
+function startChecklistDrag(event: DragEvent, checklistId: string) {
+  draggedChecklistId.value = checklistId;
+  if (!event.dataTransfer) return;
+  event.dataTransfer.effectAllowed = "move";
+  event.dataTransfer.setData("text/plain", checklistId);
+}
+
+function allowChecklistDrop(event: DragEvent) {
+  event.preventDefault();
+  if (event.dataTransfer) event.dataTransfer.dropEffect = "move";
+}
+
+function dropChecklist(event: DragEvent, targetId: string) {
+  event.preventDefault();
+  const sourceId = draggedChecklistId.value || event.dataTransfer?.getData("text/plain") || "";
+  draggedChecklistId.value = "";
+  if (!sourceId || sourceId === targetId) return;
+  const sourceIndex = checklists.value.findIndex(({ id }) => id === sourceId);
+  const targetIndex = checklists.value.findIndex(({ id }) => id === targetId);
+  if (sourceIndex === -1 || targetIndex === -1) return;
+  const moved = checklists.value[sourceIndex];
+  saveChecklistOrder(
+    reorderEntries(checklists.value, sourceIndex, targetIndex),
+    moved.title,
+    targetIndex,
+  );
 }
 
 function deleteChecklist(checklist: Checklist) {
@@ -198,7 +247,14 @@ onBeforeUnmount(() => {
   </div>
 
   <div v-if="checklists.length" class="todo-checklist-grid">
-    <article v-for="checklist in checklists" :key="checklist.id" class="todo-checklist-card">
+    <article
+      v-for="(checklist, index) in checklists"
+      :key="checklist.id"
+      class="todo-checklist-card"
+      :class="{ 'todo-checklist-card--dragging': draggedChecklistId === checklist.id }"
+      @dragover="allowChecklistDrop"
+      @drop="dropChecklist($event, checklist.id)"
+    >
       <a
         class="todo-checklist-card__link"
         :href="href(checklist)"
@@ -209,6 +265,30 @@ onBeforeUnmount(() => {
         <span class="todo-checklist-card__count">{{ checklist.items.length }} 项</span>
       </a>
       <div class="todo-checklist-card__actions">
+        <button
+          class="todo-sort-handle"
+          type="button"
+          draggable="true"
+          :aria-label="`拖动“${checklist.title}”调整顺序`"
+          title="拖动调整顺序"
+          @dragstart="startChecklistDrag($event, checklist.id)"
+          @dragend="draggedChecklistId = ''"
+        >⠿</button>
+        <button
+          class="todo-sort-button"
+          type="button"
+          :disabled="index === 0"
+          :aria-label="`将“${checklist.title}”上移`"
+          @click="moveChecklist(index, -1)"
+        >↑</button>
+        <button
+          class="todo-sort-button"
+          type="button"
+          :disabled="index === checklists.length - 1"
+          :aria-label="`将“${checklist.title}”下移`"
+          @click="moveChecklist(index, 1)"
+        >↓</button>
+        <span class="todo-checklist-card__actions-spacer"></span>
         <a
           class="todo-text-action"
           :href="`${href(checklist)}?edit=1`"
@@ -221,6 +301,7 @@ onBeforeUnmount(() => {
     </article>
   </div>
   <p v-else class="todo-index-empty">还没有清单，先新建一张吧。</p>
+  <p class="todo-visually-hidden" aria-live="polite">{{ sortMessage }}</p>
 
   <div v-if="backupOpen" class="todo-dialog-backdrop" @click.self="backupOpen = false">
     <section class="todo-dialog" role="dialog" aria-modal="true" aria-labelledby="backup-title">
@@ -353,6 +434,12 @@ onBeforeUnmount(() => {
   transform: translateY(-2px);
 }
 
+.todo-checklist-card--dragging {
+  opacity: 0.55;
+  border-color: var(--vp-c-brand-1);
+  box-shadow: var(--vp-shadow-2);
+}
+
 .todo-checklist-card__link {
   display: flex;
   min-height: 150px;
@@ -386,9 +473,55 @@ onBeforeUnmount(() => {
 }
 
 .todo-checklist-card__actions {
-  justify-content: flex-end;
   padding: 10px 16px;
   border-top: 1px solid var(--vp-c-divider);
+}
+
+.todo-checklist-card__actions-spacer {
+  flex: 1;
+}
+
+.todo-sort-handle,
+.todo-sort-button {
+  display: inline-grid;
+  width: 32px;
+  height: 32px;
+  place-items: center;
+  padding: 0;
+  color: var(--vp-c-text-2);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 7px;
+  font: inherit;
+}
+
+.todo-sort-handle {
+  cursor: grab;
+  font-size: 19px;
+}
+
+.todo-sort-handle:active {
+  cursor: grabbing;
+}
+
+.todo-sort-button {
+  cursor: pointer;
+  font-size: 17px;
+}
+
+.todo-sort-handle:hover,
+.todo-sort-handle:focus-visible,
+.todo-sort-button:hover:not(:disabled),
+.todo-sort-button:focus-visible {
+  color: var(--vp-c-brand-1);
+  background: var(--vp-c-brand-soft);
+  border-color: var(--vp-c-brand-1);
+  outline: none;
+}
+
+.todo-sort-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.3;
 }
 
 .todo-text-action {
