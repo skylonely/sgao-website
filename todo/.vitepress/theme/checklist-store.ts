@@ -2,6 +2,7 @@ import defaultChecklists from "../../checklists.json";
 
 const CHECKLISTS_STORAGE_KEY = "sgao.todo.checklists.v1";
 const CHECKED_STORAGE_PREFIX = "sgao.todo.checked.v1.";
+const TRASH_RETENTION_MS = 30 * 24 * 60 * 60 * 1000;
 
 export type ChecklistItem = {
   id: string;
@@ -14,6 +15,7 @@ export type Checklist = {
   title: string;
   description: string;
   items: ChecklistItem[];
+  deletedAt?: string;
 };
 
 function cloneChecklist(checklist: Checklist): Checklist {
@@ -30,6 +32,8 @@ function validChecklist(value: unknown): value is Checklist {
     && typeof checklist.slug === "string"
     && typeof checklist.title === "string"
     && typeof checklist.description === "string"
+    && (checklist.deletedAt === undefined
+      || (typeof checklist.deletedAt === "string" && !Number.isNaN(Date.parse(checklist.deletedAt))))
     && Array.isArray(checklist.items)
     && checklist.items.every((item) =>
       item
@@ -42,7 +46,7 @@ export function defaultLists(): Checklist[] {
   return (defaultChecklists as Checklist[]).map(cloneChecklist);
 }
 
-export function readChecklists(): Checklist[] {
+export function readAllChecklists(): Checklist[] {
   if (typeof window === "undefined") return defaultLists();
 
   try {
@@ -58,7 +62,62 @@ export function readChecklists(): Checklist[] {
 }
 
 export function writeChecklists(checklists: Checklist[]) {
+  const trashed = readAllChecklists().filter(({ deletedAt }) => deletedAt);
+  writeAllChecklists([...checklists, ...trashed]);
+}
+
+export function writeAllChecklists(checklists: Checklist[]) {
   localStorage.setItem(CHECKLISTS_STORAGE_KEY, JSON.stringify(checklists));
+}
+
+export function readChecklists(): Checklist[] {
+  return readAllChecklists().filter(({ deletedAt }) => !deletedAt);
+}
+
+export function readTrashedChecklists(): Checklist[] {
+  return readAllChecklists()
+    .filter((checklist): checklist is Checklist & { deletedAt: string } => Boolean(checklist.deletedAt))
+    .sort((a, b) => Date.parse(b.deletedAt) - Date.parse(a.deletedAt));
+}
+
+export function moveChecklistToTrash(checklistId: string) {
+  const deletedAt = new Date().toISOString();
+  const lists = readAllChecklists().map((checklist) =>
+    checklist.id === checklistId ? { ...checklist, deletedAt } : checklist,
+  );
+  writeAllChecklists(lists);
+}
+
+export function restoreTrashedChecklist(checklistId: string) {
+  const all = readAllChecklists();
+  const active = all.filter(({ deletedAt }) => !deletedAt);
+  const lists = all.map((checklist) => {
+    if (checklist.id !== checklistId) return checklist;
+    const slugIsTaken = active.some(({ slug }) => slug === checklist.slug);
+    const restored = cloneChecklist(checklist);
+    delete restored.deletedAt;
+    return slugIsTaken
+      ? { ...restored, slug: uniqueSlug(restored.title, active) }
+      : restored;
+  });
+  writeAllChecklists(lists);
+}
+
+export function permanentlyDeleteChecklist(checklistId: string) {
+  writeAllChecklists(readAllChecklists().filter(({ id }) => id !== checklistId));
+  removeLocalCheckedIds(checklistId);
+}
+
+export function cleanupExpiredTrash(now = Date.now()) {
+  const all = readAllChecklists();
+  const expired = all.filter(({ deletedAt }) =>
+    deletedAt && now - Date.parse(deletedAt) >= TRASH_RETENTION_MS,
+  );
+  if (!expired.length) return 0;
+  const expiredIds = new Set(expired.map(({ id }) => id));
+  writeAllChecklists(all.filter(({ id }) => !expiredIds.has(id)));
+  expired.forEach(({ id }) => removeLocalCheckedIds(id));
+  return expired.length;
 }
 
 export function isDefaultChecklist(checklist: Checklist) {

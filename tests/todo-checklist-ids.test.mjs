@@ -8,6 +8,8 @@ const workerPath = new URL("../todo/worker.ts", import.meta.url);
 const wranglerPath = new URL("../wrangler.todo.jsonc", import.meta.url);
 const accountSyncPath = new URL("../todo/.vitepress/theme/account-sync.ts", import.meta.url);
 const accountStatusPath = new URL("../todo/.vitepress/theme/AccountStatus.vue", import.meta.url);
+const checklistStorePath = new URL("../todo/.vitepress/theme/checklist-store.ts", import.meta.url);
+const checklistIndexPath = new URL("../todo/.vitepress/theme/ChecklistIndex.vue", import.meta.url);
 
 async function checklists() {
   return JSON.parse(await readFile(registryPath, "utf8"));
@@ -87,4 +89,20 @@ test("account sync detects and presents revision conflicts", async () => {
   assert.match(accountStatus, />\s*使用云端\s*</);
   assert.match(accountStatus, />保留本机</);
   assert.match(accountStatus, /上次同步/);
+});
+
+test("deleted checklists use a synchronized 30-day recycle bin", async () => {
+  const [store, index, accountSync] = await Promise.all([
+    readFile(checklistStorePath, "utf8"),
+    readFile(checklistIndexPath, "utf8"),
+    readFile(accountSyncPath, "utf8"),
+  ]);
+
+  assert.match(store, /TRASH_RETENTION_MS = 30 \* 24 \* 60 \* 60 \* 1000/);
+  assert.match(store, /moveChecklistToTrash/);
+  assert.match(store, /restoreTrashedChecklist/);
+  assert.match(store, /permanentlyDeleteChecklist/);
+  assert.match(index, />恢复</);
+  assert.match(index, />永久删除</);
+  assert.match(accountSync, /deletedAt: list\.deletedAt \?\? null/);
 });

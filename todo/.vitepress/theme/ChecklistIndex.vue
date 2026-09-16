@@ -3,29 +3,38 @@ import { computed, onBeforeUnmount, onMounted, ref } from "vue";
 import { withBase } from "vitepress";
 import {
   checklistHref,
+  cleanupExpiredTrash,
   defaultLists,
   isDefaultChecklist,
+  moveChecklistToTrash,
   newChecklist,
+  permanentlyDeleteChecklist,
+  readAllChecklists,
   readChecklists,
-  removeLocalCheckedIds,
+  readTrashedChecklists,
+  restoreTrashedChecklist,
   writeChecklists,
   type Checklist,
 } from "./checklist-store";
 import AccountStatus from "./AccountStatus.vue";
-import { scheduleAccountSync, TODO_DATA_CHANGED_EVENT } from "./account-sync";
+import { initializeAccountSync, scheduleAccountSync, TODO_DATA_CHANGED_EVENT } from "./account-sync";
 
 const checklists = ref<Checklist[]>(defaultLists());
+const trashedChecklists = ref<Checklist[]>([]);
+const trashOpen = ref(false);
 const creating = ref(false);
 const title = ref("");
 const description = ref("");
 const missingDefaults = computed(() =>
   defaultLists().filter((defaultList) =>
-    !checklists.value.some(({ id }) => id === defaultList.id),
+    !checklists.value.some(({ id }) => id === defaultList.id)
+      && !trashedChecklists.value.some(({ id }) => id === defaultList.id),
   ),
 );
 
 function refresh() {
   checklists.value = readChecklists();
+  trashedChecklists.value = readTrashedChecklists();
 }
 
 function href(checklist: Checklist) {
@@ -34,7 +43,7 @@ function href(checklist: Checklist) {
 
 function createChecklist() {
   if (!title.value.trim()) return;
-  const checklist = newChecklist(title.value, description.value, checklists.value);
+  const checklist = newChecklist(title.value, description.value, readAllChecklists());
   const next = [...checklists.value, checklist];
   writeChecklists(next);
   scheduleAccountSync();
@@ -43,12 +52,33 @@ function createChecklist() {
 }
 
 function deleteChecklist(checklist: Checklist) {
-  if (!window.confirm(`确定删除“${checklist.title}”吗？登录后也会从账号中删除。`)) return;
-  const next = checklists.value.filter(({ id }) => id !== checklist.id);
-  writeChecklists(next);
-  removeLocalCheckedIds(checklist.id);
-  checklists.value = next;
+  if (!window.confirm(`把“${checklist.title}”移入回收站吗？30 天内可以恢复。`)) return;
+  moveChecklistToTrash(checklist.id);
+  refresh();
   scheduleAccountSync();
+}
+
+function restoreChecklist(checklist: Checklist) {
+  restoreTrashedChecklist(checklist.id);
+  refresh();
+  scheduleAccountSync();
+}
+
+function permanentlyDelete(checklist: Checklist) {
+  if (!window.confirm(`确定永久删除“${checklist.title}”吗？此操作无法撤销。`)) return;
+  permanentlyDeleteChecklist(checklist.id);
+  refresh();
+  scheduleAccountSync();
+}
+
+function deletedTime(checklist: Checklist) {
+  if (!checklist.deletedAt) return "";
+  return new Intl.DateTimeFormat("zh-CN", {
+    month: "numeric",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(Date.parse(checklist.deletedAt));
 }
 
 function restoreDefaults() {
@@ -58,10 +88,13 @@ function restoreDefaults() {
   scheduleAccountSync();
 }
 
-onMounted(() => {
+onMounted(async () => {
   refresh();
   window.addEventListener("storage", refresh);
   window.addEventListener(TODO_DATA_CHANGED_EVENT, refresh);
+  await initializeAccountSync();
+  if (cleanupExpiredTrash() > 0) scheduleAccountSync();
+  refresh();
 });
 
 onBeforeUnmount(() => {
@@ -78,6 +111,9 @@ onBeforeUnmount(() => {
     <div class="todo-index-toolbar__actions">
       <button v-if="missingDefaults.length" class="todo-button todo-button--secondary" type="button" @click="restoreDefaults">
         恢复默认清单
+      </button>
+      <button class="todo-button todo-button--secondary" type="button" @click="trashOpen = true">
+        回收站<span v-if="trashedChecklists.length">（{{ trashedChecklists.length }}）</span>
       </button>
       <button class="todo-button" type="button" @click="creating = true">新建清单</button>
     </div>
@@ -107,6 +143,31 @@ onBeforeUnmount(() => {
     </article>
   </div>
   <p v-else class="todo-index-empty">还没有清单，先新建一张吧。</p>
+
+  <div v-if="trashOpen" class="todo-dialog-backdrop" @click.self="trashOpen = false">
+    <section class="todo-dialog" role="dialog" aria-modal="true" aria-labelledby="trash-title">
+      <div class="todo-dialog__heading">
+        <div>
+          <h2 id="trash-title">回收站</h2>
+          <p class="todo-dialog__subtitle">删除的清单会保留 30 天。</p>
+        </div>
+        <button class="todo-icon-button" type="button" aria-label="关闭" @click="trashOpen = false">×</button>
+      </div>
+      <div v-if="trashedChecklists.length" class="todo-trash-list">
+        <article v-for="checklist in trashedChecklists" :key="checklist.id" class="todo-trash-item">
+          <div>
+            <strong>{{ checklist.title }}</strong>
+            <span>{{ checklist.items.length }} 项 · 删除于 {{ deletedTime(checklist) }}</span>
+          </div>
+          <div class="todo-trash-item__actions">
+            <button class="todo-text-action" type="button" @click="restoreChecklist(checklist)">恢复</button>
+            <button class="todo-text-action todo-text-action--danger" type="button" @click="permanentlyDelete(checklist)">永久删除</button>
+          </div>
+        </article>
+      </div>
+      <p v-else class="todo-index-empty">回收站是空的。</p>
+    </section>
+  </div>
 
   <div v-if="creating" class="todo-dialog-backdrop" @click.self="creating = false">
     <form class="todo-dialog" @submit.prevent="createChecklist">
@@ -262,6 +323,52 @@ onBeforeUnmount(() => {
   border: 0;
 }
 
+.todo-dialog__subtitle {
+  margin: 4px 0 0;
+  color: var(--vp-c-text-2);
+  font-size: 14px;
+}
+
+.todo-trash-list {
+  display: grid;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.todo-trash-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px;
+  background: var(--vp-c-bg-soft);
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 10px;
+}
+
+.todo-trash-item > div:first-child {
+  display: grid;
+  min-width: 0;
+  gap: 4px;
+}
+
+.todo-trash-item strong,
+.todo-trash-item span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.todo-trash-item span {
+  color: var(--vp-c-text-2);
+  font-size: 13px;
+}
+
+.todo-trash-item__actions {
+  display: flex;
+  flex: none;
+}
+
 .todo-field {
   display: grid;
   gap: 6px;
@@ -333,6 +440,11 @@ onBeforeUnmount(() => {
 
   .todo-dialog {
     padding: 18px;
+  }
+
+  .todo-trash-item {
+    align-items: flex-start;
+    flex-direction: column;
   }
 }
 </style>

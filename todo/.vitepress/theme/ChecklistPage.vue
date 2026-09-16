@@ -5,10 +5,10 @@ import {
   checklistHref,
   defaultLists,
   isDefaultChecklist,
+  moveChecklistToTrash,
   newChecklistItem,
   readChecklists,
   readLocalCheckedIds,
-  removeLocalCheckedIds,
   writeChecklists,
   writeLocalCheckedIds,
   type Checklist,
@@ -172,10 +172,8 @@ function saveChanges() {
 
 function deleteChecklist() {
   if (!checklist.value) return;
-  if (!window.confirm(`确定删除“${checklist.value.title}”吗？登录后也会从账号中删除。`)) return;
-  const remaining = readChecklists().filter(({ id }) => id !== checklist.value?.id);
-  writeChecklists(remaining);
-  removeLocalCheckedIds(checklist.value.id);
+  if (!window.confirm(`把“${checklist.value.title}”移入回收站吗？30 天内可以恢复。`)) return;
+  moveChecklistToTrash(checklist.value.id);
   scheduleAccountSync();
   window.location.assign(withBase("/"));
 }

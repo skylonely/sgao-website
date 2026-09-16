@@ -1,10 +1,10 @@
 import { reactive } from "vue";
 import {
   defaultLists,
-  readChecklists,
+  readAllChecklists,
   readLocalCheckedIds,
   removeLocalCheckedIds,
-  writeChecklists,
+  writeAllChecklists,
   writeLocalCheckedIds,
   type Checklist,
 } from "./checklist-store";
@@ -16,6 +16,7 @@ export const TODO_DATA_CHANGED_EVENT = "sgao:todo-data-changed";
 
 type Account = { id: string; email: string };
 type SyncedChecklist = Checklist & {
+  deletedAt?: string | null;
   items: Array<Checklist["items"][number] & { checked: boolean }>;
 };
 type AccountSnapshot = {
@@ -60,10 +61,11 @@ function emitDataChanged() {
 }
 
 function snapshotFromLocal(): SyncedChecklist[] {
-  return readChecklists().map((list) => {
+  return readAllChecklists().map((list) => {
     const checkedIds = readLocalCheckedIds(list.id);
     return {
       ...list,
+      deletedAt: list.deletedAt ?? null,
       items: list.items.map((item) => ({ ...item, checked: checkedIds.has(item.id) })),
     };
   });
@@ -88,11 +90,15 @@ async function copyAnonymousChecksToLocal() {
 }
 
 function applySnapshot(lists: SyncedChecklist[]) {
-  readChecklists().forEach(({ id }) => removeLocalCheckedIds(id));
-  writeChecklists(lists.map((list) => ({
-    ...list,
-    items: list.items.map(({ id, label }) => ({ id, label })),
-  })));
+  readAllChecklists().forEach(({ id }) => removeLocalCheckedIds(id));
+  writeAllChecklists(lists.map((list) => {
+    const { deletedAt, ...rest } = list;
+    return {
+      ...rest,
+      ...(typeof deletedAt === "string" ? { deletedAt } : {}),
+      items: list.items.map(({ id, label }) => ({ id, label })),
+    };
+  }));
   lists.forEach((list) => writeLocalCheckedIds(
     list.id,
     new Set(list.items.filter(({ checked }) => checked).map(({ id }) => id)),
