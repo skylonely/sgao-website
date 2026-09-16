@@ -16,6 +16,7 @@ import {
 } from "./checklist-store";
 import AccountStatus from "./AccountStatus.vue";
 import PwaStatus from "./PwaStatus.vue";
+import { checklistProgress, filterChecklistItems } from "./checklist-view.mjs";
 import { flushAnonymousChecks, queueAnonymousCheck } from "./anonymous-sync";
 import {
   accountState,
@@ -39,6 +40,11 @@ const status = ref("正在加载清单状态…");
 const draggedItemId = ref("");
 const itemSortMessage = ref("");
 const isDefault = computed(() => checklist.value ? isDefaultChecklist(checklist.value) : false);
+const itemFilter = ref<"all" | "unchecked" | "checked">("all");
+const progress = computed(() => checklistProgress(checklist.value?.items ?? [], checkedIds.value));
+const visibleItems = computed(() => filterChecklistItems(
+  checklist.value?.items ?? [], checkedIds.value, itemFilter.value,
+));
 
 function visitorId() {
   const existing = localStorage.getItem(VISITOR_KEY);
@@ -279,9 +285,21 @@ onBeforeUnmount(() => {
 
     <p class="checklist-sync-status" aria-live="polite">{{ status }}</p>
 
-    <div v-if="checklist.items.length" class="editable-checklist__items">
+    <div class="checklist-view-toolbar">
+      <div class="checklist-filters" role="group" aria-label="筛选项目">
+        <button type="button" :aria-pressed="itemFilter === 'all'" @click="itemFilter = 'all'">全部（{{ progress.total }}）</button>
+        <button type="button" :aria-pressed="itemFilter === 'unchecked'" @click="itemFilter = 'unchecked'">未完成（{{ progress.remaining }}）</button>
+        <button type="button" :aria-pressed="itemFilter === 'checked'" @click="itemFilter = 'checked'">已完成（{{ progress.completed }}）</button>
+      </div>
+      <div class="checklist-progress">
+        <span aria-live="polite">已完成 {{ progress.completed }} / {{ progress.total }} 项</span>
+        <progress :value="progress.completed" :max="progress.total || 1" aria-label="清单完成进度"></progress>
+      </div>
+    </div>
+
+    <div v-if="visibleItems.length" class="editable-checklist__items">
       <label
-        v-for="item in checklist.items"
+        v-for="item in visibleItems"
         :key="item.id"
         class="travel-checklist-item"
         :data-checklist-id="item.id"
@@ -294,6 +312,10 @@ onBeforeUnmount(() => {
         >
         <span>{{ item.label }}</span>
       </label>
+    </div>
+    <div v-else-if="checklist.items.length" class="checklist-empty" role="status">
+      <p>{{ itemFilter === 'unchecked' ? '没有未完成项目，全部完成了！' : '还没有已完成项目。' }}</p>
+      <button class="todo-button todo-button--secondary" type="button" @click="itemFilter = 'all'">查看全部项目</button>
     </div>
     <p v-else class="checklist-empty">这张清单还没有项目，点击“编辑清单”添加第一项。</p>
 
@@ -369,6 +391,77 @@ onBeforeUnmount(() => {
 </template>
 
 <style scoped>
+.checklist-view-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin: 20px 0;
+}
+
+.checklist-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.checklist-filters button {
+  padding: 8px 12px;
+  color: var(--vp-c-text-2);
+  background: var(--vp-c-bg-soft);
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 8px;
+  cursor: pointer;
+  font: inherit;
+  font-size: 14px;
+}
+
+.checklist-filters button[aria-pressed="true"] {
+  color: var(--vp-c-brand-1);
+  background: var(--vp-c-brand-soft);
+  border-color: var(--vp-c-brand-1);
+  font-weight: 600;
+}
+
+.checklist-filters button:focus-visible {
+  outline: 2px solid var(--vp-c-brand-1);
+  outline-offset: 2px;
+}
+
+.checklist-progress {
+  display: grid;
+  gap: 6px;
+  min-width: 150px;
+  color: var(--vp-c-text-2);
+  font-size: 13px;
+}
+
+.checklist-progress progress {
+  width: 100%;
+  height: 7px;
+  overflow: hidden;
+  appearance: none;
+  border: 0;
+  border-radius: 4px;
+  background: var(--vp-c-bg-soft);
+}
+
+.checklist-progress progress::-webkit-progress-bar {
+  background: var(--vp-c-bg-soft);
+  border-radius: 4px;
+}
+
+.checklist-progress progress::-webkit-progress-value {
+  background: var(--vp-c-brand-1);
+  border-radius: 4px;
+}
+
+.checklist-progress progress::-moz-progress-bar {
+  background: var(--vp-c-brand-1);
+  border-radius: 4px;
+}
+
 .editable-checklist__header {
   display: flex;
   align-items: flex-start;

@@ -1,6 +1,12 @@
 import assert from "node:assert/strict";
 import { access, readFile } from "node:fs/promises";
 import test from "node:test";
+import {
+  checklistProgress,
+  filterChecklistItems,
+  matchingChecklistItems,
+  searchChecklists,
+} from "../todo/.vitepress/theme/checklist-view.mjs";
 
 const registryPath = new URL("../todo/checklists.json", import.meta.url);
 const buildDirectory = new URL("../todo/.vitepress/dist/", import.meta.url);
@@ -19,6 +25,61 @@ const manifestPath = new URL("../todo/public/manifest.webmanifest", import.meta.
 async function checklists() {
   return JSON.parse(await readFile(registryPath, "utf8"));
 }
+
+const searchFixtures = [
+  { id: "travel", title: "出行清单", description: "出发前确认", items: [{ id: "passport", label: "身份证" }, { id: "cable", label: "USB 数据线" }] },
+  { id: "home", title: "家中准备", description: "照顾猫咪", items: [{ id: "food", label: "猫粮" }, { id: "water", label: "猫水" }] },
+  { id: "work", title: "工作清单", description: "整理文件", items: [] },
+];
+
+test("checklist search matches titles, descriptions, and items without reordering", () => {
+  const original = JSON.stringify(searchFixtures);
+  assert.deepEqual(searchChecklists(searchFixtures, "清单").map(({ id }) => id), ["travel", "work"]);
+  assert.deepEqual(searchChecklists(searchFixtures, "猫咪").map(({ id }) => id), ["home"]);
+  assert.deepEqual(searchChecklists(searchFixtures, "身份证").map(({ id }) => id), ["travel"]);
+  assert.deepEqual(searchChecklists(searchFixtures, " 出行   身份证 ").map(({ id }) => id), ["travel"]);
+  assert.deepEqual(searchChecklists(searchFixtures, "ｕｓｂ").map(({ id }) => id), ["travel"]);
+  assert.deepEqual(searchChecklists(searchFixtures, "   "), searchFixtures);
+  assert.deepEqual(searchChecklists(searchFixtures, "不存在"), []);
+  assert.deepEqual(searchChecklists(searchFixtures, "[.*]"), []);
+  assert.equal(JSON.stringify(searchFixtures), original);
+});
+
+test("search previews include matching items only", () => {
+  assert.deepEqual(matchingChecklistItems(searchFixtures[0].items, "usb"), [searchFixtures[0].items[1]]);
+  assert.deepEqual(matchingChecklistItems(searchFixtures[0].items, "出行"), []);
+  assert.deepEqual(matchingChecklistItems(searchFixtures[0].items, ""), []);
+});
+
+test("completion filters preserve item order and react to check changes", () => {
+  const items = searchFixtures[0].items;
+  const checkedIds = new Set(["passport", "deleted-item"]);
+  assert.deepEqual(filterChecklistItems(items, checkedIds, "all"), items);
+  assert.deepEqual(filterChecklistItems(items, checkedIds, "checked"), [items[0]]);
+  assert.deepEqual(filterChecklistItems(items, checkedIds, "unchecked"), [items[1]]);
+  assert.deepEqual(checklistProgress(items, checkedIds), { total: 2, completed: 1, remaining: 1 });
+  checkedIds.add("cable");
+  assert.deepEqual(filterChecklistItems(items, checkedIds, "unchecked"), []);
+  assert.deepEqual(checklistProgress(items, checkedIds), { total: 2, completed: 2, remaining: 0 });
+  checkedIds.delete("passport");
+  assert.deepEqual(filterChecklistItems(items, checkedIds, "unchecked"), [items[0]]);
+  assert.deepEqual(checklistProgress([], checkedIds), { total: 0, completed: 0, remaining: 0 });
+});
+
+test("search and completion controls are integrated into the todo pages", async () => {
+  const [index, page] = await Promise.all([
+    readFile(checklistIndexPath, "utf8"),
+    readFile(new URL("../todo/.vitepress/theme/ChecklistPage.vue", import.meta.url), "utf8"),
+  ]);
+  assert.match(index, /v-model="searchQuery"/);
+  assert.match(index, /in filteredChecklists/);
+  assert.match(index, /if \(searching\.value\) return;/);
+  assert.match(index, /没有找到匹配的清单/);
+  assert.match(page, /in visibleItems/);
+  assert.match(page, /aria-pressed="itemFilter/);
+  assert.match(page, /checklistProgress/);
+  assert.match(page, /查看全部项目/);
+});
 
 test("todo registry has unique list routes and API IDs", async () => {
   const lists = await checklists();

@@ -27,6 +27,7 @@ import {
 } from "./checklist-backup";
 import AccountStatus from "./AccountStatus.vue";
 import PwaStatus from "./PwaStatus.vue";
+import { matchingChecklistItems, searchChecklists } from "./checklist-view.mjs";
 import { initializeAccountSync, scheduleAccountSync, TODO_DATA_CHANGED_EVENT } from "./account-sync";
 
 const checklists = ref<Checklist[]>(defaultLists());
@@ -43,6 +44,14 @@ const title = ref("");
 const description = ref("");
 const draggedChecklistId = ref("");
 const sortMessage = ref("");
+const searchQuery = ref("");
+const searching = computed(() => searchQuery.value.trim().length > 0);
+const filteredChecklists = computed(() => searchChecklists(checklists.value, searchQuery.value));
+
+function matchedItems(checklist: Checklist) {
+  return matchingChecklistItems(checklist.items, searchQuery.value)
+    .slice(0, 3).map(({ label }) => label).join("、");
+}
 const missingDefaults = computed(() =>
   defaultLists().filter((defaultList) =>
     !checklists.value.some(({ id }) => id === defaultList.id)
@@ -77,6 +86,7 @@ function saveChecklistOrder(next: Checklist[], movedTitle: string, position: num
 }
 
 function moveChecklist(index: number, offset: number) {
+  if (searching.value) return;
   const targetIndex = index + offset;
   if (targetIndex < 0 || targetIndex >= checklists.value.length) return;
   const moved = checklists.value[index];
@@ -88,6 +98,10 @@ function moveChecklist(index: number, offset: number) {
 }
 
 function startChecklistDrag(event: DragEvent, checklistId: string) {
+  if (searching.value) {
+    event.preventDefault();
+    return;
+  }
   draggedChecklistId.value = checklistId;
   if (!event.dataTransfer) return;
   event.dataTransfer.effectAllowed = "move";
@@ -101,6 +115,7 @@ function allowChecklistDrop(event: DragEvent) {
 
 function dropChecklist(event: DragEvent, targetId: string) {
   event.preventDefault();
+  if (searching.value) return;
   const sourceId = draggedChecklistId.value || event.dataTransfer?.getData("text/plain") || "";
   draggedChecklistId.value = "";
   if (!sourceId || sourceId === targetId) return;
@@ -232,8 +247,22 @@ onBeforeUnmount(() => {
   <AccountStatus />
   <PwaStatus />
 
+  <div class="todo-search">
+    <label class="todo-visually-hidden" for="todo-search-input">搜索清单名称、说明或项目</label>
+    <input
+      id="todo-search-input"
+      v-model="searchQuery"
+      type="search"
+      placeholder="搜索清单名称、说明或项目…"
+      autocomplete="off"
+      @keydown.esc="searchQuery = ''"
+    >
+    <button v-if="searching" class="todo-text-action" type="button" @click="searchQuery = ''">清空搜索</button>
+  </div>
+  <p v-if="searching" class="todo-search-tip">搜索时暂停排序，清空搜索后可调整顺序。</p>
+
   <div class="todo-index-toolbar">
-    <p>{{ checklists.length }} 张清单</p>
+    <p aria-live="polite">{{ searching ? `找到 ${filteredChecklists.length} / ${checklists.length}` : checklists.length }} 张清单</p>
     <div class="todo-index-toolbar__actions">
       <button v-if="missingDefaults.length" class="todo-button todo-button--secondary" type="button" @click="restoreDefaults">
         恢复默认清单
@@ -246,9 +275,9 @@ onBeforeUnmount(() => {
     </div>
   </div>
 
-  <div v-if="checklists.length" class="todo-checklist-grid">
+  <div v-if="filteredChecklists.length" class="todo-checklist-grid">
     <article
-      v-for="(checklist, index) in checklists"
+      v-for="(checklist, index) in filteredChecklists"
       :key="checklist.id"
       class="todo-checklist-card"
       :class="{ 'todo-checklist-card--dragging': draggedChecklistId === checklist.id }"
@@ -262,13 +291,15 @@ onBeforeUnmount(() => {
       >
         <span class="todo-checklist-card__title">{{ checklist.title }}</span>
         <span class="todo-checklist-card__description">{{ checklist.description || "暂无说明" }}</span>
+        <span v-if="searching && matchedItems(checklist)" class="todo-checklist-card__matches">匹配项目：{{ matchedItems(checklist) }}</span>
         <span class="todo-checklist-card__count">{{ checklist.items.length }} 项</span>
       </a>
       <div class="todo-checklist-card__actions">
         <button
           class="todo-sort-handle"
           type="button"
-          draggable="true"
+          :draggable="!searching"
+          :disabled="searching"
           :aria-label="`拖动“${checklist.title}”调整顺序`"
           title="拖动调整顺序"
           @dragstart="startChecklistDrag($event, checklist.id)"
@@ -277,14 +308,14 @@ onBeforeUnmount(() => {
         <button
           class="todo-sort-button"
           type="button"
-          :disabled="index === 0"
+          :disabled="searching || index === 0"
           :aria-label="`将“${checklist.title}”上移`"
           @click="moveChecklist(index, -1)"
         >↑</button>
         <button
           class="todo-sort-button"
           type="button"
-          :disabled="index === checklists.length - 1"
+          :disabled="searching || index === checklists.length - 1"
           :aria-label="`将“${checklist.title}”下移`"
           @click="moveChecklist(index, 1)"
         >↓</button>
@@ -300,6 +331,7 @@ onBeforeUnmount(() => {
       </div>
     </article>
   </div>
+  <p v-else-if="searching" class="todo-index-empty" role="status">没有找到匹配的清单，换个关键词试试。</p>
   <p v-else class="todo-index-empty">还没有清单，先新建一张吧。</p>
   <p class="todo-visually-hidden" aria-live="polite">{{ sortMessage }}</p>
 
@@ -393,6 +425,46 @@ onBeforeUnmount(() => {
 </template>
 
 <style scoped>
+.todo-search {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.todo-search input {
+  flex: 1;
+  min-width: 0;
+  padding: 11px 14px;
+  color: var(--vp-c-text-1);
+  background: var(--vp-c-bg);
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 10px;
+  font: inherit;
+}
+
+.todo-search input:focus {
+  border-color: var(--vp-c-brand-1);
+  outline: 2px solid var(--vp-c-brand-soft);
+}
+
+.todo-search .todo-text-action {
+  flex: none;
+}
+
+.todo-search-tip {
+  margin: 8px 0 0;
+  color: var(--vp-c-text-2);
+  font-size: 13px;
+}
+
+.todo-checklist-card__matches {
+  margin-top: 10px;
+  color: var(--vp-c-brand-1);
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+
 .todo-index-toolbar,
 .todo-index-toolbar__actions,
 .todo-checklist-card__actions,
@@ -509,7 +581,7 @@ onBeforeUnmount(() => {
   font-size: 17px;
 }
 
-.todo-sort-handle:hover,
+.todo-sort-handle:hover:not(:disabled),
 .todo-sort-handle:focus-visible,
 .todo-sort-button:hover:not(:disabled),
 .todo-sort-button:focus-visible {
@@ -519,7 +591,8 @@ onBeforeUnmount(() => {
   outline: none;
 }
 
-.todo-sort-button:disabled {
+.todo-sort-button:disabled,
+.todo-sort-handle:disabled {
   cursor: not-allowed;
   opacity: 0.3;
 }
