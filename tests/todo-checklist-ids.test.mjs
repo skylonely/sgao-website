@@ -11,6 +11,10 @@ const accountStatusPath = new URL("../todo/.vitepress/theme/AccountStatus.vue", 
 const checklistStorePath = new URL("../todo/.vitepress/theme/checklist-store.ts", import.meta.url);
 const checklistIndexPath = new URL("../todo/.vitepress/theme/ChecklistIndex.vue", import.meta.url);
 const checklistBackupPath = new URL("../todo/.vitepress/theme/checklist-backup.ts", import.meta.url);
+const pwaPath = new URL("../todo/.vitepress/theme/pwa.ts", import.meta.url);
+const pwaStatusPath = new URL("../todo/.vitepress/theme/PwaStatus.vue", import.meta.url);
+const anonymousSyncPath = new URL("../todo/.vitepress/theme/anonymous-sync.ts", import.meta.url);
+const manifestPath = new URL("../todo/public/manifest.webmanifest", import.meta.url);
 
 async function checklists() {
   return JSON.parse(await readFile(registryPath, "utf8"));
@@ -122,4 +126,47 @@ test("todo backups validate and restore lists, checks, and trash", async () => {
   assert.match(index, />下载备份</);
   assert.match(index, />合并导入</);
   assert.match(index, />覆盖导入</);
+});
+
+test("todo is installable and caches the app for offline use", async () => {
+  await Promise.all([
+    access(new URL("manifest.webmanifest", buildDirectory)),
+    access(new URL("icons/todo-192.png", buildDirectory)),
+    access(new URL("icons/todo-512.png", buildDirectory)),
+  ]);
+
+  const [manifestText, pwa, pwaStatus, serviceWorker] = await Promise.all([
+    readFile(manifestPath, "utf8"),
+    readFile(pwaPath, "utf8"),
+    readFile(pwaStatusPath, "utf8"),
+    readFile(new URL("sw.js", buildDirectory), "utf8"),
+  ]);
+  const manifest = JSON.parse(manifestText);
+
+  assert.equal(manifest.display, "standalone");
+  assert.equal(manifest.start_url, "/");
+  assert.ok(manifest.icons.some(({ sizes }) => sizes === "192x192"));
+  assert.ok(manifest.icons.some(({ sizes }) => sizes === "512x512"));
+  assert.match(pwa, /navigator\.serviceWorker\.register\("\/sw\.js"/);
+  assert.match(pwa, /beforeinstallprompt/);
+  assert.match(pwaStatus, />\s*安装应用\s*</);
+  assert.match(pwaStatus, />\s*立即更新\s*</);
+  assert.match(serviceWorker, /PRECACHE_URLS/);
+  assert.match(serviceWorker, /SKIP_WAITING/);
+  assert.match(serviceWorker, /pathname\.startsWith\("\/api\/"\)/);
+});
+
+test("offline checklist edits are queued and resume when online", async () => {
+  const [accountSync, anonymousSync] = await Promise.all([
+    readFile(accountSyncPath, "utf8"),
+    readFile(anonymousSyncPath, "utf8"),
+  ]);
+
+  assert.match(accountSync, /ACCOUNT_SYNC_CACHE_KEY/);
+  assert.match(accountSync, /pending: pendingLocalChanges/);
+  assert.match(accountSync, /addEventListener\("online"/);
+  assert.match(accountSync, /联网后自动同步/);
+  assert.match(anonymousSync, /ANONYMOUS_QUEUE_KEY/);
+  assert.match(anonymousSync, /queueAnonymousCheck/);
+  assert.match(anonymousSync, /flushAnonymousChecks/);
 });

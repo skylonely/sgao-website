@@ -21,7 +21,7 @@
     "travel:build": "vitepress build travel",
     "travel:preview": "vitepress preview travel",
     "todo:dev": "vitepress dev todo",
-    "todo:build": "vitepress build todo",
+    "todo:build": "vitepress build todo && node scripts/generate-todo-sw.mjs",
     "todo:preview": "vitepress preview todo",
     "todo:test": "npm run todo:build && node --test tests/todo-checklist-ids.test.mjs"
   },

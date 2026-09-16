@@ -14,6 +14,8 @@ import {
   type Checklist,
 } from "./checklist-store";
 import AccountStatus from "./AccountStatus.vue";
+import PwaStatus from "./PwaStatus.vue";
+import { flushAnonymousChecks, queueAnonymousCheck } from "./anonymous-sync";
 import {
   accountState,
   initializeAccountSync,
@@ -69,7 +71,15 @@ async function loadCheckedState() {
     return;
   }
 
+  if (!navigator.onLine) {
+    setCheckedIds(readLocalCheckedIds(checklist.value.id));
+    status.value = "当前离线，勾选会保存在本机并在联网后同步。";
+    return;
+  }
+
   try {
+    const flushed = await flushAnonymousChecks(visitorId());
+    if (!flushed) throw new Error("Pending anonymous checks are still queued");
     const response = await fetch(`/api/v1/checklists/${checklist.value.id}`, {
       headers: { "X-Checklist-Visitor": visitorId() },
     });
@@ -79,6 +89,7 @@ async function loadCheckedState() {
       ? body.data.checkedItemIds.filter((id): id is string => typeof id === "string")
       : [];
     setCheckedIds(new Set(ids));
+    writeLocalCheckedIds(checklist.value.id, new Set(ids));
     status.value = "勾选会自动保存到此浏览器的个人清单。";
   } catch {
     status.value = "暂时无法读取已保存的清单状态。";
@@ -105,27 +116,20 @@ async function toggleItem(itemId: string, checked: boolean) {
     return;
   }
 
+  writeLocalCheckedIds(checklist.value.id, next);
+  queueAnonymousCheck(checklist.value.id, itemId, checked);
+  if (!navigator.onLine) {
+    status.value = "离线修改已保存，联网后自动同步。";
+    return;
+  }
+
   savingIds.value = new Set(savingIds.value).add(itemId);
   status.value = "正在保存…";
-  try {
-    const response = await fetch(`/api/v1/checklists/${checklist.value.id}/items/${itemId}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        "X-Checklist-Visitor": visitorId(),
-      },
-      body: JSON.stringify({ checked }),
-    });
-    if (!response.ok) throw new Error("Checklist API rejected the update");
-    status.value = "已保存";
-  } catch {
-    setCheckedIds(previous);
-    status.value = "保存失败，请检查网络后重试。";
-  } finally {
-    const saving = new Set(savingIds.value);
-    saving.delete(itemId);
-    savingIds.value = saving;
-  }
+  const flushed = await flushAnonymousChecks(visitorId());
+  status.value = flushed ? "已保存" : "暂时无法同步，联网后会自动重试。";
+  const saving = new Set(savingIds.value);
+  saving.delete(itemId);
+  savingIds.value = saving;
 }
 
 function beginEditing() {
@@ -194,6 +198,7 @@ function refreshFromStorageEvent(event: StorageEvent) {
 onMounted(async () => {
   window.addEventListener(TODO_DATA_CHANGED_EVENT, refreshFromStorage);
   window.addEventListener("storage", refreshFromStorageEvent);
+  window.addEventListener("online", loadCheckedState);
   await initializeAccountSync();
   const slug = currentSlug();
   checklist.value = readChecklists().find((candidate) => candidate.slug === slug) ?? null;
@@ -207,11 +212,13 @@ onMounted(async () => {
 onBeforeUnmount(() => {
   window.removeEventListener(TODO_DATA_CHANGED_EVENT, refreshFromStorage);
   window.removeEventListener("storage", refreshFromStorageEvent);
+  window.removeEventListener("online", loadCheckedState);
 });
 </script>
 
 <template>
   <AccountStatus />
+  <PwaStatus />
 
   <p v-if="loading" class="checklist-empty">正在加载清单…</p>
 

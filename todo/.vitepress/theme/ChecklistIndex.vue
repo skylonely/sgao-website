@@ -25,6 +25,7 @@ import {
   type ImportMode,
 } from "./checklist-backup";
 import AccountStatus from "./AccountStatus.vue";
+import PwaStatus from "./PwaStatus.vue";
 import { initializeAccountSync, scheduleAccountSync, TODO_DATA_CHANGED_EVENT } from "./account-sync";
 
 const checklists = ref<Checklist[]>(defaultLists());
@@ -180,6 +181,7 @@ onBeforeUnmount(() => {
 
 <template>
   <AccountStatus />
+  <PwaStatus />
 
   <div class="todo-index-toolbar">
     <p>{{ checklists.length }} 张清单</p>

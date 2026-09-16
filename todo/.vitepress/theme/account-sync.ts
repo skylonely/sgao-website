@@ -11,6 +11,7 @@ import {
 
 const API_ORIGIN = "https://api.sgao.cc";
 const VISITOR_KEY = "sgao.travel.checklist.visitor";
+const ACCOUNT_SYNC_CACHE_KEY = "sgao.todo.account-sync.v1";
 const ACCOUNT_REFRESH_INTERVAL_MS = 10_000;
 export const TODO_DATA_CHANGED_EVENT = "sgao:todo-data-changed";
 
@@ -26,6 +27,12 @@ type AccountSnapshot = {
   updatedAt: string | null;
   lists: SyncedChecklist[];
 };
+type CachedAccountSync = {
+  email: string;
+  revision: number;
+  lastSyncedAt: string;
+  pending: boolean;
+};
 
 class SyncConflictError extends Error {}
 
@@ -34,6 +41,7 @@ export const accountState = reactive({
   signedIn: false,
   syncing: false,
   conflict: false,
+  online: typeof navigator === "undefined" ? true : navigator.onLine,
   email: "",
   lastSyncedAt: "",
   message: "正在检查账号…",
@@ -43,10 +51,46 @@ let initializePromise: Promise<void> | undefined;
 let saveTimer: ReturnType<typeof setTimeout> | undefined;
 let refreshPromise: Promise<void> | undefined;
 let refreshListenersInstalled = false;
+let networkListenersInstalled = false;
 let pendingLocalChanges = false;
 let changeGeneration = 0;
 let currentRevision = 0;
 let conflictSnapshot: AccountSnapshot | undefined;
+
+function readCachedAccountSync(): CachedAccountSync | undefined {
+  try {
+    const parsed = JSON.parse(localStorage.getItem(ACCOUNT_SYNC_CACHE_KEY) || "null") as Partial<CachedAccountSync> | null;
+    if (!parsed
+      || typeof parsed.email !== "string"
+      || !Number.isSafeInteger(parsed.revision)
+      || Number(parsed.revision) < 0
+      || typeof parsed.lastSyncedAt !== "string"
+      || typeof parsed.pending !== "boolean") return undefined;
+    return {
+      email: parsed.email,
+      revision: Number(parsed.revision),
+      lastSyncedAt: parsed.lastSyncedAt,
+      pending: parsed.pending,
+    };
+  } catch {
+    return undefined;
+  }
+}
+
+function persistAccountSync() {
+  if (!accountState.email) return;
+  localStorage.setItem(ACCOUNT_SYNC_CACHE_KEY, JSON.stringify({
+    email: accountState.email,
+    revision: currentRevision,
+    lastSyncedAt: accountState.lastSyncedAt,
+    pending: pendingLocalChanges,
+  } satisfies CachedAccountSync));
+}
+
+function setPendingLocalChanges(pending: boolean) {
+  pendingLocalChanges = pending;
+  persistAccountSync();
+}
 
 function visitorId() {
   const existing = localStorage.getItem(VISITOR_KEY);
@@ -113,6 +157,30 @@ function snapshotsMatch(lists: SyncedChecklist[]) {
 function setSyncMetadata(snapshot: Pick<AccountSnapshot, "revision" | "updatedAt">) {
   currentRevision = snapshot.revision;
   accountState.lastSyncedAt = snapshot.updatedAt ?? "";
+  persistAccountSync();
+}
+
+function startNetworkListeners() {
+  if (networkListenersInstalled) return;
+  networkListenersInstalled = true;
+  window.addEventListener("offline", () => {
+    accountState.online = false;
+    accountState.syncing = false;
+    accountState.message = pendingLocalChanges
+      ? "离线修改已保存，联网后自动同步"
+      : "当前离线，数据仍可在本机使用";
+  });
+  window.addEventListener("online", () => {
+    accountState.online = true;
+    if (!accountState.signedIn) return;
+    if (pendingLocalChanges) {
+      accountState.syncing = true;
+      accountState.message = "网络已恢复，正在同步…";
+      scheduleUpload(0);
+    } else {
+      void refreshAccountSnapshot();
+    }
+  });
 }
 
 function startAutomaticRefresh() {
@@ -193,6 +261,11 @@ async function prepareSyncConflict() {
 
 async function flushAccountSnapshot() {
   if (!accountState.signedIn) return;
+  if (!accountState.online) {
+    accountState.syncing = false;
+    accountState.message = "离线修改已保存，联网后自动同步";
+    return;
+  }
   const generation = changeGeneration;
   accountState.syncing = true;
   accountState.message = "正在同步…";
@@ -200,7 +273,7 @@ async function flushAccountSnapshot() {
   try {
     await uploadSnapshot();
     if (generation === changeGeneration) {
-      pendingLocalChanges = false;
+      setPendingLocalChanges(false);
       accountState.message = "已同步到账号";
     } else {
       scheduleUpload(100);
@@ -209,8 +282,11 @@ async function flushAccountSnapshot() {
     if (error instanceof SyncConflictError) {
       await prepareSyncConflict();
     } else {
-      accountState.message = "同步失败，稍后自动重试";
-      scheduleUpload(5_000);
+      accountState.online = navigator.onLine;
+      accountState.message = accountState.online
+        ? "同步失败，稍后自动重试"
+        : "离线修改已保存，联网后自动同步";
+      if (accountState.online) scheduleUpload(5_000);
     }
   } finally {
     if (!pendingLocalChanges) accountState.syncing = false;
@@ -226,7 +302,11 @@ function scheduleUpload(delay: number) {
 }
 
 export async function refreshAccountSnapshot() {
-  if (!accountState.signedIn || accountState.syncing || accountState.conflict || pendingLocalChanges) return;
+  if (!accountState.online
+    || !accountState.signedIn
+    || accountState.syncing
+    || accountState.conflict
+    || pendingLocalChanges) return;
   if (refreshPromise) return refreshPromise;
 
   refreshPromise = (async () => {
@@ -255,6 +335,9 @@ export async function refreshAccountSnapshot() {
 export async function initializeAccountSync() {
   if (initializePromise) return initializePromise;
   initializePromise = (async () => {
+    startNetworkListeners();
+    const cached = readCachedAccountSync();
+    pendingLocalChanges = cached?.pending === true;
     try {
       const snapshot = await requestAccountSnapshot();
       const account = snapshot.account;
@@ -263,20 +346,49 @@ export async function initializeAccountSync() {
       accountState.signedIn = true;
       accountState.email = account.email;
       accountState.syncing = true;
-      setSyncMetadata(snapshot);
-      if (snapshot.initialized) {
+      if (cached?.pending && cached.email === account.email) {
+        currentRevision = cached.revision;
+        accountState.lastSyncedAt = cached.lastSyncedAt;
+        if (snapshot.revision === cached.revision) {
+          await flushAccountSnapshot();
+        } else {
+          conflictSnapshot = snapshot;
+          setSyncMetadata(snapshot);
+          accountState.conflict = true;
+          accountState.message = "离线期间云端也有更新，请选择保留版本";
+        }
+      } else if (snapshot.initialized) {
+        setPendingLocalChanges(false);
+        setSyncMetadata(snapshot);
         applySnapshot(snapshot.lists);
         accountState.message = "账号数据已同步";
       } else {
+        setSyncMetadata(snapshot);
         await copyAnonymousChecksToLocal();
         await uploadSnapshot();
+        setPendingLocalChanges(false);
         accountState.message = "已把此设备的清单存入账号";
       }
       startAutomaticRefresh();
     } catch {
-      accountState.signedIn = false;
-      accountState.email = "";
-      accountState.message = "未登录，数据仅保存在此设备";
+      accountState.online = navigator.onLine;
+      if (cached) {
+        accountState.signedIn = true;
+        accountState.email = cached.email;
+        currentRevision = cached.revision;
+        accountState.lastSyncedAt = cached.lastSyncedAt;
+        pendingLocalChanges = cached.pending;
+        accountState.message = accountState.online
+          ? "暂时无法连接账号，修改会保存在本机"
+          : "当前离线，修改会在联网后同步";
+        startAutomaticRefresh();
+      } else {
+        accountState.signedIn = false;
+        accountState.email = "";
+        accountState.message = accountState.online
+          ? "未登录，数据仅保存在此设备"
+          : "当前离线，数据仅保存在此设备";
+      }
     } finally {
       accountState.ready = true;
       accountState.syncing = false;
@@ -288,10 +400,15 @@ export async function initializeAccountSync() {
 export function scheduleAccountSync() {
   emitDataChanged();
   if (!accountState.signedIn) return;
-  pendingLocalChanges = true;
+  setPendingLocalChanges(true);
   changeGeneration += 1;
   if (accountState.conflict) {
     accountState.message = "存在同步冲突，请先选择保留版本";
+    return;
+  }
+  if (!accountState.online) {
+    accountState.syncing = false;
+    accountState.message = "离线修改已保存，联网后自动同步";
     return;
   }
   accountState.syncing = true;
@@ -304,7 +421,7 @@ export function useRemoteConflictVersion() {
   applySnapshot(conflictSnapshot.lists);
   setSyncMetadata(conflictSnapshot);
   conflictSnapshot = undefined;
-  pendingLocalChanges = false;
+  setPendingLocalChanges(false);
   accountState.conflict = false;
   accountState.syncing = false;
   accountState.message = "已使用云端版本";
@@ -330,5 +447,7 @@ export function openLogout() {
   accountState.conflict = false;
   accountState.email = "";
   accountState.lastSyncedAt = "";
+  pendingLocalChanges = false;
+  localStorage.removeItem(ACCOUNT_SYNC_CACHE_KEY);
   accountState.message = "退出页面已打开；本地清单仍保留在此设备";
 }
