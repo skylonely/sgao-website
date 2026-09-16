@@ -10,6 +10,7 @@ const accountSyncPath = new URL("../todo/.vitepress/theme/account-sync.ts", impo
 const accountStatusPath = new URL("../todo/.vitepress/theme/AccountStatus.vue", import.meta.url);
 const checklistStorePath = new URL("../todo/.vitepress/theme/checklist-store.ts", import.meta.url);
 const checklistIndexPath = new URL("../todo/.vitepress/theme/ChecklistIndex.vue", import.meta.url);
+const checklistBackupPath = new URL("../todo/.vitepress/theme/checklist-backup.ts", import.meta.url);
 
 async function checklists() {
   return JSON.parse(await readFile(registryPath, "utf8"));
@@ -105,4 +106,20 @@ test("deleted checklists use a synchronized 30-day recycle bin", async () => {
   assert.match(index, />恢复</);
   assert.match(index, />永久删除</);
   assert.match(accountSync, /deletedAt: list\.deletedAt \?\? null/);
+});
+
+test("todo backups validate and restore lists, checks, and trash", async () => {
+  const [backup, index] = await Promise.all([
+    readFile(checklistBackupPath, "utf8"),
+    readFile(checklistIndexPath, "utf8"),
+  ]);
+
+  assert.match(backup, /BACKUP_FORMAT = "sgao-todo-backup"/);
+  assert.match(backup, /BACKUP_VERSION = 1/);
+  assert.match(backup, /checkedItemIds/);
+  assert.match(backup, /ImportMode = "merge" \| "replace"/);
+  assert.match(backup, /MAX_BACKUP_BYTES/);
+  assert.match(index, />下载备份</);
+  assert.match(index, />合并导入</);
+  assert.match(index, />覆盖导入</);
 });

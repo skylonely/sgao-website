@@ -16,12 +16,26 @@ import {
   writeChecklists,
   type Checklist,
 } from "./checklist-store";
+import {
+  applyChecklistBackup,
+  BackupValidationError,
+  downloadChecklistBackup,
+  parseChecklistBackup,
+  type ChecklistBackup,
+  type ImportMode,
+} from "./checklist-backup";
 import AccountStatus from "./AccountStatus.vue";
 import { initializeAccountSync, scheduleAccountSync, TODO_DATA_CHANGED_EVENT } from "./account-sync";
 
 const checklists = ref<Checklist[]>(defaultLists());
 const trashedChecklists = ref<Checklist[]>([]);
 const trashOpen = ref(false);
+const backupOpen = ref(false);
+const importInput = ref<HTMLInputElement | null>(null);
+const selectedBackup = ref<ChecklistBackup | null>(null);
+const selectedBackupName = ref("");
+const backupMessage = ref("");
+const backupError = ref("");
 const creating = ref(false);
 const title = ref("");
 const description = ref("");
@@ -81,6 +95,67 @@ function deletedTime(checklist: Checklist) {
   }).format(Date.parse(checklist.deletedAt));
 }
 
+function openBackup() {
+  selectedBackup.value = null;
+  selectedBackupName.value = "";
+  backupError.value = "";
+  backupMessage.value = "";
+  backupOpen.value = true;
+}
+
+function exportBackup() {
+  downloadChecklistBackup();
+  backupMessage.value = "备份文件已下载。";
+}
+
+async function selectBackupFile(event: Event) {
+  const input = event.target as HTMLInputElement;
+  const file = input.files?.[0];
+  input.value = "";
+  if (!file) return;
+  backupError.value = "";
+  backupMessage.value = "";
+  selectedBackup.value = null;
+  try {
+    selectedBackup.value = parseChecklistBackup(await file.text(), file.size);
+    selectedBackupName.value = file.name;
+  } catch (error) {
+    backupError.value = error instanceof BackupValidationError
+      ? error.message
+      : "无法读取这个备份文件。";
+  }
+}
+
+function importBackup(mode: ImportMode) {
+  if (!selectedBackup.value) return;
+  if (mode === "replace" && !window.confirm("覆盖导入会替换当前全部清单和勾选状态，确定继续吗？")) return;
+  backupError.value = "";
+  try {
+    const result = applyChecklistBackup(selectedBackup.value, mode);
+    refresh();
+    scheduleAccountSync();
+    const notes = [
+      `已导入 ${result.imported} 张清单`,
+      result.skipped ? `跳过 ${result.skipped} 张已有清单` : "",
+      result.expired ? `忽略 ${result.expired} 张已过期的回收站清单` : "",
+    ].filter(Boolean);
+    backupMessage.value = `${notes.join("，")}。`;
+    selectedBackup.value = null;
+    selectedBackupName.value = "";
+  } catch (error) {
+    backupError.value = error instanceof BackupValidationError
+      ? error.message
+      : "导入失败，现有数据未更改。";
+  }
+}
+
+function backupTime(backup: ChecklistBackup) {
+  return new Intl.DateTimeFormat("zh-CN", {
+    dateStyle: "medium",
+    timeStyle: "short",
+  }).format(Date.parse(backup.exportedAt));
+}
+
 function restoreDefaults() {
   const next = [...checklists.value, ...missingDefaults.value];
   writeChecklists(next);
@@ -112,6 +187,7 @@ onBeforeUnmount(() => {
       <button v-if="missingDefaults.length" class="todo-button todo-button--secondary" type="button" @click="restoreDefaults">
         恢复默认清单
       </button>
+      <button class="todo-button todo-button--secondary" type="button" @click="openBackup">备份与恢复</button>
       <button class="todo-button todo-button--secondary" type="button" @click="trashOpen = true">
         回收站<span v-if="trashedChecklists.length">（{{ trashedChecklists.length }}）</span>
       </button>
@@ -143,6 +219,47 @@ onBeforeUnmount(() => {
     </article>
   </div>
   <p v-else class="todo-index-empty">还没有清单，先新建一张吧。</p>
+
+  <div v-if="backupOpen" class="todo-dialog-backdrop" @click.self="backupOpen = false">
+    <section class="todo-dialog" role="dialog" aria-modal="true" aria-labelledby="backup-title">
+      <div class="todo-dialog__heading">
+        <div>
+          <h2 id="backup-title">备份与恢复</h2>
+          <p class="todo-dialog__subtitle">备份包含全部清单、勾选状态和回收站内容。</p>
+        </div>
+        <button class="todo-icon-button" type="button" aria-label="关闭" @click="backupOpen = false">×</button>
+      </div>
+
+      <div class="todo-backup-section">
+        <div>
+          <strong>导出数据</strong>
+          <p>下载一个 JSON 文件，建议定期保存在安全的位置。</p>
+        </div>
+        <button class="todo-button" type="button" @click="exportBackup">下载备份</button>
+      </div>
+
+      <div class="todo-backup-section todo-backup-section--import">
+        <div>
+          <strong>导入数据</strong>
+          <p>选择由 SGAO Todo 导出的 JSON 备份文件。</p>
+        </div>
+        <button class="todo-button todo-button--secondary" type="button" @click="importInput?.click()">选择文件</button>
+        <input ref="importInput" class="todo-visually-hidden" type="file" accept=".json,application/json" @change="selectBackupFile">
+      </div>
+
+      <div v-if="selectedBackup" class="todo-backup-preview">
+        <strong>{{ selectedBackupName }}</strong>
+        <span>{{ selectedBackup.lists.length }} 张清单 · 导出于 {{ backupTime(selectedBackup) }}</span>
+        <p>“合并”会保留当前清单并跳过相同 ID；“覆盖”会完整替换当前数据。</p>
+        <div class="todo-dialog__actions">
+          <button class="todo-button todo-button--secondary" type="button" @click="importBackup('merge')">合并导入</button>
+          <button class="todo-button todo-button--danger" type="button" @click="importBackup('replace')">覆盖导入</button>
+        </div>
+      </div>
+      <p v-if="backupMessage" class="todo-backup-message" aria-live="polite">{{ backupMessage }}</p>
+      <p v-if="backupError" class="todo-backup-error" role="alert">{{ backupError }}</p>
+    </section>
+  </div>
 
   <div v-if="trashOpen" class="todo-dialog-backdrop" @click.self="trashOpen = false">
     <section class="todo-dialog" role="dialog" aria-modal="true" aria-labelledby="trash-title">
@@ -369,6 +486,60 @@ onBeforeUnmount(() => {
   flex: none;
 }
 
+.todo-backup-section {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 18px 0;
+  border-bottom: 1px solid var(--vp-c-divider);
+}
+
+.todo-backup-section p,
+.todo-backup-preview p {
+  margin: 5px 0 0;
+  color: var(--vp-c-text-2);
+  font-size: 14px;
+}
+
+.todo-backup-preview {
+  display: grid;
+  gap: 5px;
+  margin-top: 18px;
+  padding: 16px;
+  background: var(--vp-c-bg-soft);
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 10px;
+}
+
+.todo-backup-preview > span {
+  color: var(--vp-c-text-2);
+  font-size: 13px;
+}
+
+.todo-backup-preview .todo-dialog__actions {
+  margin-top: 12px;
+}
+
+.todo-backup-message,
+.todo-backup-error {
+  margin: 16px 0 0;
+  font-size: 14px;
+}
+
+.todo-backup-message { color: var(--vp-c-brand-1); }
+.todo-backup-error { color: var(--vp-c-danger-1); }
+
+.todo-visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
 .todo-field {
   display: grid;
   gap: 6px;
@@ -445,6 +616,12 @@ onBeforeUnmount(() => {
   .todo-trash-item {
     align-items: flex-start;
     flex-direction: column;
+  }
+
+  .todo-backup-section {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 12px;
   }
 }
 </style>
