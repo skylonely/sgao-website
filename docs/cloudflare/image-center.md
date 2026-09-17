@@ -1,6 +1,6 @@
 # Cloudflare 图片中心（Image Center）
 
-> 更新时间：2026-09-17（账号鉴权改造待配置发布）
+> 更新时间：2026-09-17（账号鉴权改造已配置发布）
 
 Image Center 是 SGAO Platform 的统一图片存储与访问服务。当前方案以 Cloudflare R2 作为主要存储，通过 Cloudflare Worker 提供上传、管理、访问和缓存能力，并统一使用 `img.sgao.cc` 对外提供图片地址。
 
@@ -139,11 +139,11 @@ https://img.sgao.cc/admin/
 
 ## 六、上传鉴权
 
-账号鉴权改造完成后，上传与文件管理只允许 `gsios602@gmail.com` 的 Cloudflare Access 登录身份，网页不再要求上传密钥。登录检查通过后自动读取目录和文件；未登录或登录过期时显示登录入口。旧 Bearer 密钥不再授权管理操作，线上旧密钥暂不删除，以便必要时回滚。
+上传与文件管理只允许 `gsios602@gmail.com` 的 Cloudflare Access 登录身份，网页不再要求上传密钥。登录检查通过后自动读取目录和文件；未登录或登录过期时显示登录入口。旧 Bearer 密钥不再授权管理操作，线上旧密钥暂不删除，以便必要时回滚。
 
 上线前须在现有 Zero Trust 团队配置路径级图片应用，保护 `img.sgao.cc/admin`、`img.sgao.cc/admin/*` 和 `img.sgao.cc/api/*`，Allow 策略仅包含该邮箱。不能保护整个图片域名或整个 Worker，公开图片访问必须保持不变。
 
-Worker 配置 `ACCESS_TEAM_DOMAIN` 和该图片应用的 `ACCESS_AUD`，通过 `jose` 验证 JWT 签名、issuer、audience、有效期和邮箱，而不是信任网页传入的邮箱。配置为空时管理请求会被拒绝；当前改造尚未配置或发布，线上暂仍使用旧版。登录入口为 `/api/login`，会返回固定上传页或文件管理页，不允许任意外部跳转。所有写入还必须通过同源校验。
+Worker 配置 `ACCESS_TEAM_DOMAIN` 和该图片应用的 `ACCESS_AUD`，通过 `jose` 验证 JWT 签名、issuer、audience、有效期和邮箱，而不是信任网页传入的邮箱。配置为空时管理请求会被拒绝。当前使用 `https://gsios602.cloudflareaccess.com` 团队的 `img` 应用，版本 `bdf89cdb-4d08-4616-8055-c6b85629ea3c` 已发布。登录入口为 `/api/login`，会返回固定上传页或文件管理页，不允许任意外部跳转。所有写入还必须通过同源校验。29 项本地自动化测试通过；真实账号登录和上传仍需用户在浏览器验收。
 
 本地验证：图片中心项目执行 `npx vitest run`、`npm run test:auth-ui` 和 TypeScript 检查。真实账号登录及公开图片访问须在配置和发布后再次验证；没有数据库迁移，不修改 Todo 或主站 API。
 
