@@ -682,10 +682,12 @@ export default function Navigator() {
         )}
 
         <section className="hero">
-          <div className="hero-orbit orbit-one" />
-          <div className="hero-orbit orbit-two" />
-          <div className="hero-plane" aria-hidden="true">
-            <span>↗</span>
+          <div className="hero-decoration" aria-hidden="true">
+            <div className="hero-orbit orbit-one" />
+            <div className="hero-orbit orbit-two" />
+            <div className="hero-plane">
+              <span>↗</span>
+            </div>
           </div>
           <div className="hero-content">
             <div className="eyebrow">

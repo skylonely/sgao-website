@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import { readFileSync } from "node:fs";
 
 async function render() {
   const workerUrl = new URL("../dist/server/index.js", import.meta.url);
@@ -41,4 +42,16 @@ test("server-renders the navigation product and metadata", async () => {
   assert.match(html, /添加网站/);
   assert.match(html, /https:\/\/qifei\.example\/og\.png/);
   assert.doesNotMatch(html, /codex-preview|react-loading-skeleton/i);
+  assert.match(html, /class="hero-decoration" aria-hidden="true"/);
+  assert.match(html, /<\/span><\/div><\/div><div class="hero-content">/);
+});
+
+test("hero clips only background decoration, not the search engine popup", () => {
+  const css = readFileSync(new URL("../app/globals.css", import.meta.url), "utf8");
+  const hero = css.match(/\.hero\s*\{([^}]+)\}/)?.[1] ?? "";
+  const decoration = css.match(/\.hero-decoration\s*\{([^}]+)\}/)?.[1] ?? "";
+  assert.match(hero, /overflow:\s*visible;/);
+  assert.doesNotMatch(hero, /overflow-[xy]:|overflow:\s*(hidden|clip|auto|scroll)/);
+  assert.match(decoration, /overflow:\s*hidden;/);
+  assert.match(decoration, /pointer-events:\s*none;/);
 });
