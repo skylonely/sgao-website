@@ -10,6 +10,7 @@ const data = await loadModule("../app/navigation-data.ts");
 const { NavigationSyncController, NAVIGATION_SYNC_KEY } = await loadModule("../app/navigation-sync.ts");
 const backup = await loadModule("../app/navigation-backup.ts");
 const edit = await loadModule("../app/navigation-edit.ts");
+const order = await loadModule("../app/navigation-order.ts");
 const ACCOUNT = { id: "owner-account", email: "owner@sgao.cc" };
 const clone = (value) => JSON.parse(JSON.stringify(value));
 const EMPTY = data.emptyNavigationData();
@@ -19,6 +20,12 @@ const LOCAL = data.parseNavigationData({ favorites: ["github", "custom-local"], 
 const CLOUD = data.parseNavigationData({ favorites: ["bilibili", "custom-cloud"], customNavigations: [], customSites: [
   { id: "custom-cloud", name: "云端工具", url: "https://cloud.example/", desc: "云端", category: "tools", tags: ["自定义"], isCustom: true },
 ] });
+const ORDERED = data.parseNavigationData({ ...LOCAL,
+  customNavigations: ["work", "home"].map((name) => ({ id: `custom-nav-${name}`, name, icon: "◇", eyebrow: "MY NAVIGATION", isCustom: true })),
+  customSites: [{ ...LOCAL.customSites[0], category: "custom-nav-work" },
+    { ...LOCAL.customSites[0], id: "custom-middle", name: "中间其他分类", category: "dev" },
+    { ...LOCAL.customSites[0], id: "custom-second", name: "同分类第二个", category: "custom-nav-work" }],
+});
 
 class MemoryStorage {
   map = new Map();
@@ -113,6 +120,43 @@ test("first login does not upload or replace local navigation without a choice",
   assert.deepEqual(data.readNavigationData(storage), LOCAL);
   assert.equal(posts(api).length, 0);
   assert.equal(storage.getItem(NAVIGATION_SYNC_KEY), null);
+});
+
+test("site and category ordering persists offline and syncs after reload without uploading history", async () => {
+  const api = server(ORDERED, true), storage = new MemoryStorage(); data.writeNavigationData(storage, ORDERED);
+  storage.setItem("qifei-history", '["custom-local"]');
+  const sync = controller(api, storage, () => !api.offline); await sync.initialize(); await sync.choose("cloud");
+  api.offline = true;
+  let next = order.moveNavigationSite(data.readNavigationData(storage), "custom-local", "custom-nav-work", "down");
+  next = order.moveNavigationCategory(next, "custom-nav-work", "down");
+  data.writeNavigationData(storage, next); sync.localChanged(); await sync.flush();
+  assert.equal(sync.getSnapshot().phase, "offline"); assert.deepEqual(api.navigation, ORDERED);
+  assert.equal(JSON.parse(storage.getItem(NAVIGATION_SYNC_KEY)).pending, true); sync.stop();
+  const restarted = controller(api, storage, () => !api.offline); await restarted.initialize();
+  api.offline = false; await restarted.flush();
+  assert.deepEqual(api.navigation, next); assert.deepEqual(api.navigation.favorites, ORDERED.favorites);
+  assert.equal(storage.getItem("qifei-history"), '["custom-local"]');
+  assert.doesNotMatch(JSON.stringify(posts(api)), /history|sortOrder/);
+});
+
+test("remote array reordering is adopted on refresh even when every entry retains the same contents", async () => {
+  const api = server(ORDERED, true), storage = new MemoryStorage(); data.writeNavigationData(storage, ORDERED);
+  const sync = controller(api, storage); await sync.initialize(); await sync.choose("cloud");
+  api.navigation = order.moveNavigationSite(api.navigation, "custom-local", "custom-nav-work", "down");
+  api.navigation = order.moveNavigationCategory(api.navigation, "custom-nav-work", "down"); api.revision += 1;
+  await sync.refresh(); assert.deepEqual(data.readNavigationData(storage), api.navigation);
+  assert.equal(posts(api).length, 0);
+});
+
+test("simultaneous different ordering changes require a conflict choice instead of silently overwriting", async () => {
+  const api = server(ORDERED, true), storage = new MemoryStorage(); data.writeNavigationData(storage, ORDERED);
+  const sync = controller(api, storage); await sync.initialize(); await sync.choose("cloud");
+  const local = order.moveNavigationSite(ORDERED, "custom-local", "custom-nav-work", "down");
+  data.writeNavigationData(storage, local); sync.localChanged();
+  api.navigation = order.moveNavigationCategory(ORDERED, "custom-nav-work", "down"); api.revision += 1;
+  await sync.flush(); assert.equal(sync.getSnapshot().phase, "conflict");
+  assert.deepEqual(data.readNavigationData(storage), local);
+  assert.deepEqual(api.navigation.customSites, ORDERED.customSites);
 });
 
 test("site editing remains pending offline, preserves favorites/history and syncs the same ID after reconnect", async () => {

@@ -19,6 +19,7 @@ import { navigationAccount } from "./navigation-sync";
 import NavigationPwaPanel from "./NavigationPwaPanel";
 import { navigationPwa } from "./navigation-pwa";
 import { editNavigationCategory, editNavigationSite, normalizeNavigationUrl } from "./navigation-edit";
+import { canMoveNavigationSite, moveNavigationCategory, moveNavigationSite, type NavigationMoveDirection } from "./navigation-order";
 import NavigationImportDialog from "./NavigationImportDialog";
 import {
   applyNavigationImport, createNavigationImportPreview, NAVIGATION_IMPORT_BACKUP_KEY,
@@ -532,6 +533,30 @@ export default function Navigator() {
     setDeleteSiteConfirm(site);
   }
 
+  function reorderSite(event: MouseEvent, site: NavSite, direction: NavigationMoveDirection) {
+    event.preventDefault(); event.stopPropagation();
+    if (!site.isCustom) return;
+    try {
+      const next = moveNavigationSite(readNavigationData(window.localStorage), site.id, site.category, direction);
+      if (!next) return;
+      writeStorage("qifei-custom-sites", next.customSites);
+      setCustomSites(next.customSites);
+      window.dispatchEvent(new CustomEvent(NAVIGATION_DATA_CHANGED_EVENT));
+      showToast("同分类网站顺序已保存");
+    } catch (error) { showToast(error instanceof DOMException ? "无法保存顺序，请检查浏览器存储空间或权限。" : error instanceof Error ? error.message : "排序未完成，原数据未修改。"); }
+  }
+
+  function reorderNavigation(id: string, direction: NavigationMoveDirection) {
+    try {
+      const next = moveNavigationCategory(readNavigationData(window.localStorage), id, direction);
+      if (!next) return;
+      writeStorage("qifei-custom-navigations", next.customNavigations);
+      setCustomNavigations(next.customNavigations);
+      window.dispatchEvent(new CustomEvent(NAVIGATION_DATA_CHANGED_EVENT));
+      showToast("自定义导航顺序已保存");
+    } catch (error) { showToast(error instanceof DOMException ? "无法保存顺序，请检查浏览器存储空间或权限。" : error instanceof Error ? error.message : "排序未完成，原数据未修改。"); }
+  }
+
   function deleteSite(id: string) {
     const next = customSites.filter((item) => item.id !== id);
     setCustomSites(next);
@@ -1026,6 +1051,10 @@ export default function Navigator() {
                           ⧉
                         </button>
                         {site.isCustom && <button onClick={(event) => requestEditSite(event, site)} aria-label={`编辑${site.name}`} title="编辑网站">✎</button>}
+                        {site.isCustom && viewMode === "all" && !query.trim() && <>
+                          <button disabled={!canMoveNavigationSite(customSites, site.id, "up")} onClick={(event) => reorderSite(event, site, "up")} aria-label={`上移${site.name}`} title="在同分类自定义网站中上移">↑</button>
+                          <button disabled={!canMoveNavigationSite(customSites, site.id, "down")} onClick={(event) => reorderSite(event, site, "down")} aria-label={`下移${site.name}`} title="在同分类自定义网站中下移">↓</button>
+                        </>}
                         {site.isCustom && (
                           <button
                             className="danger"
@@ -1192,7 +1221,7 @@ export default function Navigator() {
               </div>
               {customNavigations.length > 0 ? (
                 <div className="custom-navigation-list">
-                  {customNavigations.map((item) => (
+                  {customNavigations.map((item, index) => (
                     <div key={item.id}>
                       <span className="custom-navigation-icon">
                         {item.icon}
@@ -1214,14 +1243,18 @@ export default function Navigator() {
                           个网站
                         </small>
                       </button>
-                      <button className="custom-navigation-edit" onClick={() => requestEditNavigation(item)} aria-label={`编辑${item.name}导航`} title="编辑分类">✎</button>
-                      <button
-                        className="custom-navigation-delete"
-                        onClick={() => setDeleteNavigationConfirm(item)}
-                        aria-label={`删除${item.name}导航`}
-                      >
-                        ×
-                      </button>
+                      <div className="custom-navigation-actions">
+                        <button className="custom-navigation-move" disabled={index === 0} onClick={() => reorderNavigation(item.id, "up")} aria-label={`上移${item.name}导航`} title="上移自定义分类">↑</button>
+                        <button className="custom-navigation-move" disabled={index === customNavigations.length - 1} onClick={() => reorderNavigation(item.id, "down")} aria-label={`下移${item.name}导航`} title="下移自定义分类">↓</button>
+                        <button className="custom-navigation-edit" onClick={() => requestEditNavigation(item)} aria-label={`编辑${item.name}导航`} title="编辑分类">✎</button>
+                        <button
+                          className="custom-navigation-delete"
+                          onClick={() => setDeleteNavigationConfirm(item)}
+                          aria-label={`删除${item.name}导航`}
+                        >
+                          ×
+                        </button>
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -1235,6 +1268,7 @@ export default function Navigator() {
                   <small>新导航会显示在左侧与顶部分类栏</small>
                 </button>
               )}
+              <p className="privacy-note">↑ ↓ 调整自定义分类顺序，内置分类固定在前。网站卡片的箭头只调整同分类自定义网站；搜索、收藏和足迹页不提供排序。启用账号同步时顺序也会同步。</p>
             </div>
 
             <div className="setting-group">
