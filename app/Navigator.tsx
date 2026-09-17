@@ -18,6 +18,12 @@ import {
 import { navigationAccount } from "./navigation-sync";
 import NavigationPwaPanel from "./NavigationPwaPanel";
 import { navigationPwa } from "./navigation-pwa";
+import NavigationImportDialog from "./NavigationImportDialog";
+import {
+  applyNavigationImport, createNavigationImportPreview, NAVIGATION_IMPORT_BACKUP_KEY,
+  NavigationImportStorageError, NavigationPreviewChangedError, parseNavigationBackup, readNavigationRecovery, readNavigationSnapshot,
+  type NavigationImportMode, type NavigationImportPreview, type NavigationRecoveryBackup,
+} from "./navigation-backup";
 
 type SearchEngine = "local" | "baidu" | "bing" | "google";
 type ViewMode = "all" | "favorites" | "history";
@@ -110,6 +116,11 @@ export default function Navigator() {
   const [addOpen, setAddOpen] = useState(false);
   const [addNavigationOpen, setAddNavigationOpen] = useState(false);
   const [resetConfirmOpen, setResetConfirmOpen] = useState(false);
+  const [importPreview, setImportPreview] = useState<NavigationImportPreview | null>(null);
+  const [importMode, setImportMode] = useState<NavigationImportMode>("merge");
+  const [importError, setImportError] = useState("");
+  const [recoveryBackup, setRecoveryBackup] = useState<NavigationRecoveryBackup | null>(null);
+  const [recoveryError, setRecoveryError] = useState("");
   const [deleteNavigationConfirm, setDeleteNavigationConfirm] =
     useState<NavigationItem | null>(null);
   const [deleteSiteConfirm, setDeleteSiteConfirm] = useState<NavSite | null>(
@@ -130,6 +141,7 @@ export default function Navigator() {
   });
   const searchRef = useRef<HTMLInputElement>(null);
   const importRef = useRef<HTMLInputElement>(null);
+  const importRequest = useRef(0);
 
   useEffect(() => {
     let cancelled = false;
@@ -151,8 +163,9 @@ export default function Navigator() {
         setCustomNavigations(data.customNavigations);
       } catch { setToast("本机导航数据格式有误，原数据未修改，请先导出备份检查。"); }
       setMounted(true);
+      refreshRecoveryBackup();
     });
-    return () => { cancelled = true; };
+    return () => { cancelled = true; importRequest.current += 1; };
   }, []);
 
   useEffect(() => {
@@ -174,6 +187,14 @@ export default function Navigator() {
       navigationPwa.stop();
     };
   }, [mounted]);
+
+  useEffect(() => {
+    const onStorage = (event: StorageEvent) => {
+      if (event.key === NAVIGATION_IMPORT_BACKUP_KEY || event.key === null) refreshRecoveryBackup();
+    };
+    window.addEventListener("storage", onStorage);
+    return () => window.removeEventListener("storage", onStorage);
+  }, []);
 
   useEffect(() => {
     if (!mounted) return;
@@ -203,6 +224,8 @@ export default function Navigator() {
         setDeleteSiteConfirm(null);
         setEngineOpen(false);
         setMobileNav(false);
+        setImportPreview(null);
+        importRequest.current += 1;
       }
     };
     const onScroll = () => setShowTop(window.scrollY > 480);
@@ -480,54 +503,92 @@ export default function Navigator() {
     showToast("自定义网站已移除");
   }
 
+  function downloadBackup(value: unknown, filename: string) {
+    const blob = new Blob([JSON.stringify(value, null, 2)], { type: "application/json" });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = filename;
+    link.click();
+    URL.revokeObjectURL(link.href);
+  }
+
   function exportData() {
-    const data = JSON.stringify(
+    downloadBackup(
       {
+        format: "sgao-navigation", version: 1,
         favorites,
         history,
         customSites,
         customNavigations,
         exportedAt: new Date().toISOString(),
       },
-      null,
-      2,
+      "sgao-website-backup.json",
     );
-    const blob = new Blob([data], { type: "application/json" });
-    const link = document.createElement("a");
-    link.href = URL.createObjectURL(blob);
-    link.download = "sgao-website-backup.json";
-    link.click();
-    URL.revokeObjectURL(link.href);
     showToast("导航数据已导出");
+  }
+
+  function refreshRecoveryBackup() {
+    try { setRecoveryBackup(readNavigationRecovery(window.localStorage)); setRecoveryError(""); }
+    catch { setRecoveryBackup(null); setRecoveryError("自动备份无法读取，请先下载检查，暂不能恢复。"); }
   }
 
   async function importData(file?: File) {
     if (!file) return;
+    const request = ++importRequest.current;
     try {
-      if (file.size > 512 * 1024) throw new Error("Backup is too large");
-      const data = JSON.parse(await file.text()) as {
-        favorites?: string[];
-        history?: string[];
-        customSites?: NavSite[];
-        customNavigations?: NavigationItem[];
-      };
-      const valid = parseNavigationData({ favorites: data.favorites ?? [], customSites: data.customSites ?? [], customNavigations: data.customNavigations ?? [] });
-      const nextFavorites = valid.favorites;
-      const nextCustom = valid.customSites;
-      const nextNavigations = valid.customNavigations;
-      const nextHistory = data.history === undefined ? history : data.history;
-      if (!Array.isArray(nextHistory) || !nextHistory.every((id) => typeof id === "string")) throw new Error("Invalid history");
-      setFavorites(nextFavorites);
-      setHistory(nextHistory);
-      setCustomSites(nextCustom);
-      setCustomNavigations(nextNavigations);
-      writeStorage("qifei-favorites", nextFavorites);
-      writeStorage("qifei-history", nextHistory);
-      writeStorage("qifei-custom-sites", nextCustom);
-      writeStorage("qifei-custom-navigations", nextNavigations);
-      showToast("数据导入成功");
+      if (file.size > 512 * 1024) throw new Error("备份文件不能超过 512 KB。");
+      const incoming = parseNavigationBackup(JSON.parse(await file.text()));
+      if (request !== importRequest.current) return;
+      setImportPreview(createNavigationImportPreview(readNavigationSnapshot(window.localStorage), incoming, file.name));
+      setImportMode("merge"); setImportError("");
+    } catch (error) {
+      if (request === importRequest.current) showToast(error instanceof SyntaxError ? "文件不是有效的 JSON 备份。" : error instanceof Error ? error.message : "备份文件无法读取。");
+    }
+  }
+
+  function openRecovery() {
+    try {
+      const backup = readNavigationRecovery(window.localStorage);
+      if (!backup) { refreshRecoveryBackup(); showToast("当前没有可恢复的自动备份。"); return; }
+      setImportPreview(createNavigationImportPreview(readNavigationSnapshot(window.localStorage), backup.data, `自动备份 · ${new Date(backup.savedAt).toLocaleString()}`, "recovery"));
+      setImportMode("replace"); setImportError("");
+    } catch { refreshRecoveryBackup(); showToast("自动备份暂不能恢复，请先下载检查。"); }
+  }
+
+  function confirmImport() {
+    if (!importPreview) return;
+    try {
+      const { data, backup } = applyNavigationImport(window.localStorage, importPreview, importMode);
+      setFavorites(data.favorites); setHistory(data.history);
+      setCustomSites(data.customSites); setCustomNavigations(data.customNavigations);
+      setRecoveryBackup(backup); setRecoveryError("");
+      setImportPreview(null); setImportError("");
+      // Notify only after all four keys have been saved; never sync an intermediate snapshot.
+      window.dispatchEvent(new CustomEvent(NAVIGATION_LOCAL_CHANGED_EVENT));
+      window.dispatchEvent(new CustomEvent(NAVIGATION_DATA_CHANGED_EVENT));
+      showToast(importPreview.source === "recovery" ? "已恢复备份，恢复前数据也已备份。" : "导航已导入，导入前数据已自动备份。");
+    } catch (error) {
+      if (error instanceof NavigationImportStorageError && error.recoveryRequired) navigationAccount.pauseForLocalReset();
+      if (error instanceof NavigationPreviewChangedError) {
+        setImportPreview(createNavigationImportPreview(readNavigationSnapshot(window.localStorage), importPreview.incoming, importPreview.name, importPreview.source));
+      }
+      setImportError(error instanceof Error ? error.message : "操作未完成，请检查存储后重试。");
+      refreshRecoveryBackup();
+    }
+  }
+
+  function downloadRecovery() {
+    try {
+      const backup = readNavigationRecovery(window.localStorage);
+      if (backup) downloadBackup({ format: "sgao-navigation", version: 1, ...backup.data, exportedAt: backup.savedAt }, "sgao-navigation-before-import.json");
+      else {
+        const raw = window.localStorage.getItem(NAVIGATION_IMPORT_BACKUP_KEY);
+        if (raw) downloadBackup({ recoveryRaw: raw }, "sgao-navigation-recovery-raw.json");
+      }
     } catch {
-      showToast("文件格式不正确");
+      const raw = window.localStorage.getItem(NAVIGATION_IMPORT_BACKUP_KEY);
+      if (raw) downloadBackup({ recoveryRaw: raw }, "sgao-navigation-recovery-raw.json");
+      else showToast("自动备份无法下载。");
     }
   }
 
@@ -1162,9 +1223,15 @@ export default function Navigator() {
                   type="file"
                   accept="application/json"
                   hidden
-                  onChange={(event) => importData(event.target.files?.[0])}
+                  onChange={(event) => { const file = event.target.files?.[0]; event.target.value = ""; void importData(file); }}
                 />
               </div>
+              {(recoveryBackup || recoveryError) && <div className="navigation-recovery-panel">
+                <h4>最近一次操作前备份</h4>
+                <p>{recoveryBackup ? `${new Date(recoveryBackup.savedAt).toLocaleString()} · ${recoveryBackup.data.customSites.length} 个网站、${recoveryBackup.data.customNavigations.length} 个分类、${recoveryBackup.data.favorites.length} 个收藏` : recoveryError}</p>
+                <div className="data-actions"><button disabled={!recoveryBackup} onClick={openRecovery}>恢复操作前数据</button><button onClick={downloadRecovery}>下载自动备份</button></div>
+                <p>仅保留最近一份，恢复前也会备份当前数据。自动备份只存于此浏览器，包含本机访问足迹。</p>
+              </div>}
               <button
                 className="reset-button"
                 onClick={() => setResetConfirmOpen(true)}
@@ -1178,6 +1245,8 @@ export default function Navigator() {
           </aside>
         </div>
       )}
+
+      {importPreview && <NavigationImportDialog preview={importPreview} mode={importMode} error={importError} onMode={(mode) => { setImportMode(mode); setImportError(""); }} onCancel={() => { setImportPreview(null); importRequest.current += 1; }} onConfirm={confirmImport} />}
 
       {addOpen && (
         <div className="modal-layer">

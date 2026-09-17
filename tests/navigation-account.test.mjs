@@ -8,6 +8,7 @@ async function loadModule(path) {
 }
 const data = await loadModule("../app/navigation-data.ts");
 const { NavigationSyncController, NAVIGATION_SYNC_KEY } = await loadModule("../app/navigation-sync.ts");
+const backup = await loadModule("../app/navigation-backup.ts");
 const ACCOUNT = { id: "owner-account", email: "owner@sgao.cc" };
 const clone = (value) => JSON.parse(JSON.stringify(value));
 const EMPTY = data.emptyNavigationData();
@@ -111,6 +112,46 @@ test("first login does not upload or replace local navigation without a choice",
   assert.deepEqual(data.readNavigationData(storage), LOCAL);
   assert.equal(posts(api).length, 0);
   assert.equal(storage.getItem(NAVIGATION_SYNC_KEY), null);
+});
+
+test("confirmed import syncs only the final navigation snapshot; recovery data and history never upload", async () => {
+  const api = server(LOCAL, true), storage = new MemoryStorage();
+  data.writeNavigationData(storage, LOCAL);
+  storage.setItem("qifei-history", '["github"]');
+  const sync = controller(api, storage);
+  await sync.initialize(); await sync.choose("cloud");
+  const preview = backup.createNavigationImportPreview(backup.readNavigationSnapshot(storage), { ...CLOUD, history: ["bilibili"] }, "navigation.json");
+  assert.equal(posts(api).length, 0);
+  backup.applyNavigationImport(storage, preview, "replace");
+  assert.equal(posts(api).length, 0);
+  sync.localChanged(); await sync.flush();
+  assert.equal(posts(api).length, 1);
+  assert.deepEqual(api.navigation, CLOUD);
+  assert.deepEqual(backup.readNavigationRecovery(storage).data, { ...LOCAL, history: ["github"] });
+  assert.doesNotMatch(JSON.stringify(posts(api)[0]), /history|savedAt|before-import|sgao-navigation/);
+});
+
+test("offline import remains pending across reload and restore respects the existing sync conflict protection", async () => {
+  const api = server(LOCAL, true), storage = new MemoryStorage();
+  data.writeNavigationData(storage, LOCAL);
+  const sync = controller(api, storage, () => !api.offline);
+  await sync.initialize(); await sync.choose("cloud");
+  api.offline = true;
+  backup.applyNavigationImport(storage, backup.createNavigationImportPreview(backup.readNavigationSnapshot(storage), CLOUD, "navigation.json"), "replace");
+  sync.localChanged(); await sync.flush();
+  assert.equal(JSON.parse(storage.getItem(NAVIGATION_SYNC_KEY)).pending, true);
+  assert.deepEqual(api.navigation, LOCAL); sync.stop();
+  const restarted = controller(api, storage, () => !api.offline);
+  await restarted.initialize(); api.offline = false; await restarted.flush();
+  assert.deepEqual(api.navigation, CLOUD);
+  api.navigation = clone(LOCAL); api.revision += 1;
+  const recovery = backup.readNavigationRecovery(storage);
+  backup.applyNavigationImport(storage, backup.createNavigationImportPreview(backup.readNavigationSnapshot(storage), recovery.data, "recovery", "recovery"), "replace");
+  // Make the restored navigation intentionally differ from the latest remote edit.
+  api.navigation = clone(EMPTY); api.revision += 1;
+  restarted.localChanged(); await restarted.flush();
+  assert.equal(restarted.getSnapshot().phase, "conflict");
+  assert.deepEqual(api.navigation, EMPTY); assert.deepEqual(data.readNavigationData(storage), LOCAL);
 });
 
 test("first-login merge uploads navigation only and leaves local history and preferences untouched", async () => {
