@@ -1,6 +1,6 @@
 # Cloudflare 图片中心（Image Center）
 
-> 更新时间：2026-07-30
+> 更新时间：2026-09-17（账号鉴权改造待配置发布）
 
 Image Center 是 SGAO Platform 的统一图片存储与访问服务。当前方案以 Cloudflare R2 作为主要存储，通过 Cloudflare Worker 提供上传、管理、访问和缓存能力，并统一使用 `img.sgao.cc` 对外提供图片地址。
 
@@ -107,7 +107,7 @@ Worker 负责：
   ↓
 管理后台调用上传 API
   ↓
-验证上传 Token
+验证 Cloudflare Access 登录凭证与管理账号
   ↓
 Worker 写入 R2
   ↓
@@ -139,27 +139,13 @@ https://img.sgao.cc/admin/
 
 ## 六、上传鉴权
 
-上传和管理操作使用独立 Token，Token 只保存在运行环境中。
+账号鉴权改造完成后，上传与文件管理只允许 `gsios602@gmail.com` 的 Cloudflare Access 登录身份，网页不再要求上传密钥。登录检查通过后自动读取目录和文件；未登录或登录过期时显示登录入口。旧 Bearer 密钥不再授权管理操作，线上旧密钥暂不删除，以便必要时回滚。
 
-生成随机 Token：
+上线前须在现有 Zero Trust 团队配置路径级图片应用，保护 `img.sgao.cc/admin`、`img.sgao.cc/admin/*` 和 `img.sgao.cc/api/*`，Allow 策略仅包含该邮箱。不能保护整个图片域名或整个 Worker，公开图片访问必须保持不变。
 
-```bash
-openssl rand -hex 32
-```
+Worker 配置 `ACCESS_TEAM_DOMAIN` 和该图片应用的 `ACCESS_AUD`，通过 `jose` 验证 JWT 签名、issuer、audience、有效期和邮箱，而不是信任网页传入的邮箱。配置为空时管理请求会被拒绝；当前改造尚未配置或发布，线上暂仍使用旧版。登录入口为 `/api/login`，会返回固定上传页或文件管理页，不允许任意外部跳转。所有写入还必须通过同源校验。
 
-设置线上密钥：
-
-```bash
-npx wrangler secret put UPLOAD_TOKEN
-```
-
-本地开发可以放入 `.dev.vars`：
-
-```text
-UPLOAD_TOKEN=本地开发密钥
-```
-
-`.dev.vars` 必须加入 `.gitignore`，不得提交到仓库或写入文档。
+本地验证：图片中心项目执行 `npx vitest run`、`npm run test:auth-ui` 和 TypeScript 检查。真实账号登录及公开图片访问须在配置和发布后再次验证；没有数据库迁移，不修改 Todo 或主站 API。
 
 ## 七、目录规范
 
