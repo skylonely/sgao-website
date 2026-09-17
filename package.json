@@ -17,6 +17,7 @@
     "backup:test": "node --test tests/navigation-backup.test.mjs",
     "edit:test": "node --test tests/navigation-edit.test.mjs",
     "order:test": "node --test tests/navigation-order.test.mjs",
+    "delete:test": "node --test tests/navigation-delete.test.mjs",
     "pwa:test": "npm run build && node --test tests/navigation-pwa.test.mjs",
     "lint": "eslint . --ignore-pattern dist --ignore-pattern .next",
     "db:generate": "drizzle-kit generate",

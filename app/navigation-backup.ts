@@ -67,7 +67,7 @@ export class NavigationPreviewChangedError extends Error {
 export class NavigationImportStorageError extends Error {
   constructor(message: string, public recoveryRequired: boolean) { super(message); }
 }
-export function applyNavigationImport(storage: BackupStorage, preview: NavigationImportPreview, mode: NavigationImportMode): { data: NavigationLocalSnapshot; backup: NavigationRecoveryBackup } {
+export function applyNavigationImport(storage: BackupStorage, preview: NavigationImportPreview, mode: NavigationImportMode, operation = "导入"): { data: NavigationLocalSnapshot; backup: NavigationRecoveryBackup } {
   const current = readNavigationSnapshot(storage);
   if (JSON.stringify(current) !== JSON.stringify(preview.current)) throw new NavigationPreviewChangedError();
   const selected = mode === "merge" ? preview.merged : preview.replacement;
@@ -77,7 +77,7 @@ export function applyNavigationImport(storage: BackupStorage, preview: Navigatio
   const previous = DATA_KEYS.map((key) => [key, storage.getItem(key)] as const);
   // Abort before changing anything if the recovery snapshot cannot be persisted.
   try { storage.setItem(NAVIGATION_IMPORT_BACKUP_KEY, JSON.stringify(backup)); }
-  catch { throw new Error("无法保存导入前备份（可能存储空间不足），操作已取消，本机导航未修改。"); }
+  catch { throw new Error(`无法保存${operation}前备份（可能存储空间不足），操作已取消，本机导航未修改。`); }
   try {
     for (const key of NAVIGATION_STORAGE_KEYS) {
       const field = key === "qifei-favorites" ? "favorites" : key === "qifei-custom-sites" ? "customSites" : "customNavigations";
@@ -91,7 +91,7 @@ export function applyNavigationImport(storage: BackupStorage, preview: Navigatio
       catch { rolledBack = false; }
     }
     throw new NavigationImportStorageError(rolledBack ? "保存失败，已还原操作前数据；请检查浏览器存储后重试。"
-      : "保存失败，部分本机数据可能未还原；导入前备份仍保留，已暂停同步，请先下载备份。", !rolledBack);
+      : `保存失败，部分本机数据可能未还原；${operation}前备份仍保留，已暂停同步，请先下载备份。`, !rolledBack);
   }
   return { data, backup };
 }

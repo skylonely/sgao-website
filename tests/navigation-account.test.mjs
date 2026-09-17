@@ -11,6 +11,7 @@ const { NavigationSyncController, NAVIGATION_SYNC_KEY } = await loadModule("../a
 const backup = await loadModule("../app/navigation-backup.ts");
 const edit = await loadModule("../app/navigation-edit.ts");
 const order = await loadModule("../app/navigation-order.ts");
+const deletion = await loadModule("../app/navigation-delete.ts");
 const ACCOUNT = { id: "owner-account", email: "owner@sgao.cc" };
 const clone = (value) => JSON.parse(JSON.stringify(value));
 const EMPTY = data.emptyNavigationData();
@@ -120,6 +121,47 @@ test("first login does not upload or replace local navigation without a choice",
   assert.deepEqual(data.readNavigationData(storage), LOCAL);
   assert.equal(posts(api).length, 0);
   assert.equal(storage.getItem(NAVIGATION_SYNC_KEY), null);
+});
+
+test("site deletion and undo each sync the final snapshot, retaining local history and excluding undo/backup data", async () => {
+  const api = server(ORDERED, true), storage = new MemoryStorage(); data.writeNavigationData(storage, ORDERED);
+  storage.setItem("qifei-history", '["github","custom-local"]');
+  const sync = controller(api, storage); await sync.initialize(); await sync.choose("cloud");
+  const plan = deletion.prepareNavigationDeletion(backup.readNavigationSnapshot(storage), ORDERED.customSites[0], "site");
+  deletion.saveNavigationDeletion(storage, plan.before, plan.after); sync.localChanged(); await sync.flush();
+  assert.equal(api.navigation.customSites.some((site) => site.id === "custom-local"), false);
+  assert.equal(api.navigation.favorites.includes("custom-local"), false);
+  const now = backup.readNavigationSnapshot(storage), restored = deletion.restoreNavigationDeletion(now, plan);
+  deletion.saveNavigationDeletion(storage, now, restored); sync.localChanged(); await sync.flush();
+  assert.deepEqual(api.navigation, ORDERED); assert.equal(posts(api).length, 2);
+  assert.deepEqual(JSON.parse(storage.getItem("qifei-history")), ["github", "custom-local"]);
+  assert.doesNotMatch(JSON.stringify(posts(api)), /history|before-import|undo|deletion/);
+});
+
+test("offline category deletion and undo survive sync pending reload and never upload an intermediate state", async () => {
+  const api = server(ORDERED, true), storage = new MemoryStorage(); data.writeNavigationData(storage, ORDERED);
+  const sync = controller(api, storage, () => !api.offline); await sync.initialize(); await sync.choose("cloud");
+  api.offline = true;
+  const plan = deletion.prepareNavigationDeletion(backup.readNavigationSnapshot(storage), ORDERED.customNavigations[0], "category");
+  deletion.saveNavigationDeletion(storage, plan.before, plan.after); sync.localChanged(); await sync.flush();
+  assert.equal(sync.getSnapshot().phase, "offline"); assert.deepEqual(api.navigation, ORDERED);
+  const now = backup.readNavigationSnapshot(storage), restored = deletion.restoreNavigationDeletion(now, plan);
+  deletion.saveNavigationDeletion(storage, now, restored); sync.localChanged(); sync.stop();
+  const restarted = controller(api, storage, () => !api.offline); await restarted.initialize();
+  api.offline = false; await restarted.flush();
+  assert.deepEqual(api.navigation, ORDERED); assert.equal(restarted.getSnapshot().phase, "synced");
+});
+
+test("undo after a successful delete cannot overwrite subsequent remote changes without conflict choice", async () => {
+  const api = server(ORDERED, true), storage = new MemoryStorage(); data.writeNavigationData(storage, ORDERED);
+  const sync = controller(api, storage); await sync.initialize(); await sync.choose("cloud");
+  const plan = deletion.prepareNavigationDeletion(backup.readNavigationSnapshot(storage), ORDERED.customSites[0], "site");
+  deletion.saveNavigationDeletion(storage, plan.before, plan.after); sync.localChanged(); await sync.flush();
+  api.navigation.customSites[0].name = "远端新名称"; api.revision += 1;
+  const remote = clone(api.navigation), now = backup.readNavigationSnapshot(storage);
+  deletion.saveNavigationDeletion(storage, now, deletion.restoreNavigationDeletion(now, plan)); sync.localChanged(); await sync.flush();
+  assert.equal(sync.getSnapshot().phase, "conflict"); assert.deepEqual(api.navigation, remote);
+  assert.equal(data.readNavigationData(storage).customSites.some((site) => site.id === "custom-local"), true);
 });
 
 test("site and category ordering persists offline and syncs after reload without uploading history", async () => {

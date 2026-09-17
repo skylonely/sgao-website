@@ -20,6 +20,7 @@ import NavigationPwaPanel from "./NavigationPwaPanel";
 import { navigationPwa } from "./navigation-pwa";
 import { editNavigationCategory, editNavigationSite, normalizeNavigationUrl } from "./navigation-edit";
 import { canMoveNavigationSite, moveNavigationCategory, moveNavigationSite, type NavigationMoveDirection } from "./navigation-order";
+import { prepareNavigationDeletion, restoreNavigationDeletion, saveNavigationDeletion, type NavigationDeletion } from "./navigation-delete";
 import NavigationImportDialog from "./NavigationImportDialog";
 import {
   applyNavigationImport, createNavigationImportPreview, NAVIGATION_IMPORT_BACKUP_KEY,
@@ -138,6 +139,7 @@ export default function Navigator() {
   );
   const [engineOpen, setEngineOpen] = useState(false);
   const [toast, setToast] = useState("");
+  const [deletionUndo, setDeletionUndo] = useState<{ deletion: NavigationDeletion; account: string } | null>(null);
   const [showTop, setShowTop] = useState(false);
   const [newSite, setNewSite] = useState({
     name: "",
@@ -513,17 +515,45 @@ export default function Navigator() {
   }
 
   function deleteNavigation(id: string) {
-    const nextNavigations = customNavigations.filter((item) => item.id !== id);
-    const nextSites = customSites.map((site) =>
-      site.category === id ? { ...site, category: "tools" } : site,
-    );
-    setCustomNavigations(nextNavigations);
-    setCustomSites(nextSites);
-    writeStorage("qifei-custom-navigations", nextNavigations);
-    writeStorage("qifei-custom-sites", nextSites);
-    if (activeCategory === id) setActiveCategory("tools");
-    setDeleteNavigationConfirm(null);
-    showToast("导航已删除，其中的网站已移至实用工具");
+    if (deleteNavigationConfirm?.id !== id) return;
+    performDeletion(deleteNavigationConfirm, "category");
+  }
+
+  function updateAfterDeletion(data: ReturnType<typeof readNavigationSnapshot>, backup: NavigationRecoveryBackup) {
+    setCustomSites(data.customSites); setCustomNavigations(data.customNavigations);
+    setFavorites(data.favorites); setHistory(data.history);
+    setRecoveryBackup(backup); setRecoveryError("");
+    window.dispatchEvent(new CustomEvent(NAVIGATION_LOCAL_CHANGED_EVENT));
+    window.dispatchEvent(new CustomEvent(NAVIGATION_DATA_CHANGED_EVENT));
+  }
+
+  function deletionError(error: unknown) {
+    if (error instanceof NavigationImportStorageError && error.recoveryRequired) navigationAccount.pauseForLocalReset();
+    refreshRecoveryBackup();
+    showToast(error instanceof Error ? error.message : "操作失败，请检查浏览器存储后重试。");
+  }
+
+  function performDeletion(original: NavSite | NavigationItem, kind: NavigationDeletion["kind"]) {
+    try {
+      const deletion = prepareNavigationDeletion(readNavigationSnapshot(window.localStorage), original, kind);
+      const { data, backup } = saveNavigationDeletion(window.localStorage, deletion.before, deletion.after);
+      updateAfterDeletion(data, backup);
+      setDeletionUndo({ deletion, account: accountState.email });
+      if (kind === "category" && activeCategory === original.id) setActiveCategory("tools");
+      setDeleteNavigationConfirm(null); setDeleteSiteConfirm(null);
+    } catch (error) { deletionError(error); }
+  }
+
+  function undoDeletion() {
+    if (!deletionUndo || deletionUndo.account !== accountState.email) return;
+    try {
+      const current = readNavigationSnapshot(window.localStorage);
+      const restored = restoreNavigationDeletion(current, deletionUndo.deletion);
+      const { data, backup } = saveNavigationDeletion(window.localStorage, current, restored);
+      updateAfterDeletion(data, backup);
+      setDeletionUndo(null);
+      showToast("已撤销删除，相关数据已恢复。");
+    } catch (error) { deletionError(error); }
   }
 
   function requestDeleteSite(event: MouseEvent, site: NavSite) {
@@ -558,21 +588,8 @@ export default function Navigator() {
   }
 
   function deleteSite(id: string) {
-    const next = customSites.filter((item) => item.id !== id);
-    setCustomSites(next);
-    writeStorage("qifei-custom-sites", next);
-    setFavorites((current) => {
-      const nextFavorites = current.filter((siteId) => siteId !== id);
-      writeStorage("qifei-favorites", nextFavorites);
-      return nextFavorites;
-    });
-    setHistory((current) => {
-      const nextHistory = current.filter((siteId) => siteId !== id);
-      writeStorage("qifei-history", nextHistory);
-      return nextHistory;
-    });
-    setDeleteSiteConfirm(null);
-    showToast("自定义网站已移除");
+    if (deleteSiteConfirm?.id !== id) return;
+    performDeletion(deleteSiteConfirm, "site");
   }
 
   function downloadBackup(value: unknown, filename: string) {
@@ -635,6 +652,7 @@ export default function Navigator() {
       setCustomSites(data.customSites); setCustomNavigations(data.customNavigations);
       setRecoveryBackup(backup); setRecoveryError("");
       setImportPreview(null); setImportError("");
+      setDeletionUndo(null);
       // Notify only after all four keys have been saved; never sync an intermediate snapshot.
       window.dispatchEvent(new CustomEvent(NAVIGATION_LOCAL_CHANGED_EVENT));
       window.dispatchEvent(new CustomEvent(NAVIGATION_DATA_CHANGED_EVENT));
@@ -665,6 +683,7 @@ export default function Navigator() {
   }
 
   function resetData() {
+    setDeletionUndo(null);
     navigationAccount.pauseForLocalReset();
     setFavorites([]);
     setHistory([]);
@@ -677,6 +696,9 @@ export default function Navigator() {
     setResetConfirmOpen(false);
     showToast("本机数据已清空，账号同步已暂停；云端数据未删除。");
   }
+
+  const showDeletionUndo = deletionUndo && deletionUndo.account === accountState.email && !addOpen && !addNavigationOpen
+    && !deleteSiteConfirm && !deleteNavigationConfirm && !importPreview && !resetConfirmOpen;
 
   const currentCategory =
     navCategories.find((item) => item.id === activeCategory) ||
@@ -1577,7 +1599,7 @@ export default function Navigator() {
               删除“{deleteNavigationConfirm.name}”导航？
             </h2>
             <p id="delete-navigation-description">
-              导航删除后无法恢复，其中的网站不会丢失，会统一移动到“实用工具”分类。
+              其中的网站不会丢失，会统一移动到“实用工具”分类。删除后可撤销最近一次删除；刷新页面后撤销入口消失，请及时操作。
             </p>
             <div className="delete-navigation-preview">
               <span>{deleteNavigationConfirm.icon}</span>
@@ -1633,7 +1655,7 @@ export default function Navigator() {
               删除“{deleteSiteConfirm.name}”？
             </h2>
             <p id="delete-site-description">
-              删除后将无法恢复，这个网站的收藏和访问记录也会一并移除。
+              这个网站的收藏和访问记录也会一并移除。删除后可撤销最近一次删除；刷新页面后撤销入口消失，请及时操作。
             </p>
             <div className="delete-navigation-preview">
               <SiteMark site={deleteSiteConfirm} />
@@ -1663,8 +1685,15 @@ export default function Navigator() {
         ↑
       </button>
 
+      {showDeletionUndo && deletionUndo && (
+        <div className="deletion-undo" role="status" aria-live="polite">
+          <div><strong>已删除“{deletionUndo.deletion.name}”</strong><small>{deletionUndo.deletion.kind === "category" ? "所属网站已移至实用工具。" : "网站的收藏与足迹已移除。"}仅可撤销最近一次删除，刷新后入口消失。</small></div>
+          <button onClick={undoDeletion}>撤销</button>
+          <button className="deletion-undo-dismiss" onClick={() => setDeletionUndo(null)} aria-label="关闭撤销删除提示">×</button>
+        </div>
+      )}
       {toast && (
-        <div className="toast" role="status">
+        <div className={`toast ${showDeletionUndo ? "toast-with-undo" : ""}`} role="status">
           <span>✓</span>
           {toast}
         </div>

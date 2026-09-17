@@ -939,6 +939,13 @@ footer { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center
 .delete-navigation-preview small { margin-top: 3px; color: var(--muted); font-size: 8px; }
 .toast { position: fixed; z-index: 200; bottom: 28px; left: calc(50% + 125px); display: flex; align-items: center; gap: 9px; padding: 11px 17px; border: 1px solid var(--line); border-radius: 22px; background: var(--ink); box-shadow: 0 14px 40px rgba(0,0,0,.22); color: var(--paper); font-size: 10px; transform: translateX(-50%); animation: toastIn 180ms ease both; }
 .toast span { display: grid; width: 17px; height: 17px; place-items: center; border-radius: 50%; background: var(--accent); color: #fff; font-size: 9px; }
+.deletion-undo { position: fixed; z-index: 199; bottom: calc(20px + env(safe-area-inset-bottom,0px)); left: calc(50% + 125px); transform: translateX(-50%); display: flex; align-items: center; gap: 12px; width: min(440px,calc(100vw - 32px)); padding: 14px 16px; border: 1px solid var(--line); border-radius: 14px; background: var(--surface); color: var(--ink); box-shadow: 0 14px 40px rgba(0,0,0,.18); }
+.deletion-undo > div { flex: 1; min-width: 0; }
+.deletion-undo strong { display: block; font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.deletion-undo small { display: block; margin-top: 5px; font-size: 10px; line-height: 1.6; color: var(--muted); }
+.deletion-undo button { flex: 0 0 auto; min-width: 44px; min-height: 44px; border: 1px solid var(--line); border-radius: 9px; background: var(--accent-soft); color: var(--accent-dark); cursor: pointer; }
+.deletion-undo .deletion-undo-dismiss { background: transparent; color: var(--muted); font-size: 18px; }
+.toast-with-undo { bottom: calc(156px + env(safe-area-inset-bottom,0px)); max-width: calc(100vw - 32px); }
 @keyframes toastIn { from { opacity: 0; transform: translate(-50%,8px); } }
 .scroll-top { position: fixed; z-index: 40; right: 24px; bottom: 24px; display: grid; width: 39px; height: 39px; place-items: center; border: 1px solid var(--line); border-radius: 50%; background: var(--surface); box-shadow: var(--shadow); color: var(--muted); opacity: 0; pointer-events: none; cursor: pointer; transform: translateY(8px); transition: opacity 160ms ease, transform 160ms ease; }
 .scroll-top.show { opacity: 1; pointer-events: auto; transform: none; }
@@ -959,6 +966,7 @@ footer { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center
   .mobile-menu { display: grid; }
   .breadcrumb { margin-right: auto; margin-left: 13px; }
   .toast { left: 50%; }
+  .deletion-undo { left: 50%; }
   .hero { padding-inline: 7vw; }
   .hero-content { width: 82%; }
 }
