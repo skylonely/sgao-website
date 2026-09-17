@@ -28,9 +28,14 @@ export async function generateMetadata(): Promise<Metadata> {
     title,
     description,
     keywords: ["网址导航", "影视", "动漫", "工具", "拾光导航"],
+    manifest: "/navigation.webmanifest",
+    applicationName: "拾光导航",
+    appleWebApp: { capable: true, title: "拾光导航", statusBarStyle: "default" },
+    other: { "apple-mobile-web-app-capable": "yes" },
     icons: {
       icon: "/favicon.svg",
       shortcut: "/favicon.svg",
+      apple: [{ url: "/icons/navigation-apple-180.png", sizes: "180x180", type: "image/png" }],
     },
     openGraph: {
       type: "website",

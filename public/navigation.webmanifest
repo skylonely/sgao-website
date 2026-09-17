@@ -1,0 +1,17 @@
+{
+  "id": "/",
+  "name": "拾光导航",
+  "short_name": "拾光导航",
+  "description": "收藏常用入口，离线查看和编辑本机导航。",
+  "lang": "zh-CN",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#f5f3ee",
+  "theme_color": "#f5f3ee",
+  "icons": [
+    { "src": "/icons/navigation-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/navigation-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/navigation-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

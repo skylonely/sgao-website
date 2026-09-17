@@ -16,6 +16,8 @@ import {
   parseNavigationData, readNavigationData, type NavigationItem,
 } from "./navigation-data";
 import { navigationAccount } from "./navigation-sync";
+import NavigationPwaPanel from "./NavigationPwaPanel";
+import { navigationPwa } from "./navigation-pwa";
 
 type SearchEngine = "local" | "baidu" | "bing" | "google";
 type ViewMode = "all" | "favorites" | "history";
@@ -90,6 +92,7 @@ export default function Navigator() {
   const accountState = useSyncExternalStore(
     navigationAccount.subscribe, navigationAccount.getSnapshot, navigationAccount.getServerSnapshot,
   );
+  const pwaState = useSyncExternalStore(navigationPwa.subscribe, navigationPwa.getSnapshot, navigationPwa.getServerSnapshot);
   const [theme, setTheme] = useState<Theme>("light");
   const [cardMode, setCardMode] = useState<CardMode>("grid");
   const [engine, setEngine] = useState<SearchEngine>("local");
@@ -164,9 +167,11 @@ export default function Navigator() {
     };
     window.addEventListener(NAVIGATION_DATA_CHANGED_EVENT, refreshNavigation);
     navigationAccount.start();
+    void navigationPwa.start();
     return () => {
       window.removeEventListener(NAVIGATION_DATA_CHANGED_EVENT, refreshNavigation);
       navigationAccount.stop();
+      navigationPwa.stop();
     };
   }, [mounted]);
 
@@ -1028,6 +1033,10 @@ export default function Navigator() {
 
             <div className="setting-group">
               <NavigationAccountPanel state={accountState} />
+            </div>
+
+            <div className="setting-group">
+              <NavigationPwaPanel state={pwaState} />
             </div>
 
             <div className="setting-group">

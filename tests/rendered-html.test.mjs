@@ -41,6 +41,9 @@ test("server-renders the navigation product and metadata", async () => {
   assert.match(html, /最近访问/);
   assert.match(html, /添加网站/);
   assert.match(html, /https:\/\/qifei\.example\/og\.png/);
+  assert.match(html, /rel="manifest"[^>]*navigation\.webmanifest/);
+  assert.match(html, /rel="apple-touch-icon"[^>]*navigation-apple-180\.png/);
+  assert.match(html, /name="apple-mobile-web-app-capable" content="yes"/);
   assert.doesNotMatch(html, /codex-preview|react-loading-skeleton/i);
   assert.match(html, /class="hero-decoration" aria-hidden="true"/);
   assert.match(html, /<\/span><\/div><\/div><div class="hero-content">/);

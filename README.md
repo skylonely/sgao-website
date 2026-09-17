@@ -111,7 +111,15 @@ npm run docs:build
 
 本地验证：`npm run navigation:test`、`npm test`、`npm run build:static`。登录与真实跨设备同步仍需发布后验证。
 
-首次发布须先在独立 API 项目应用新增的 `migrations/0005_account_navigation.sql`，再发布 API，最后构建并发布主站。新增表 `account_navigation_profiles` 使用现有 D1 绑定，不修改 Todo 表；生产迁移和发布须单独确认。
+首次发布账号同步须先在独立 API 项目应用 `migrations/0005_account_navigation.sql`，再发布 API，最后构建并发布主站。新增表 `account_navigation_profiles` 使用现有 D1 绑定，不修改 Todo 表；生产迁移和发布须单独确认。
+
+### 主站安装与离线导航
+
+“偏好与数据”提供安装与离线资源状态。支持原生安装提示的浏览器可点击安装；iPhone Safari 可通过分享菜单“添加到主屏幕”。首次联网须等到“离线导航已准备好”，此后断网重开仍可搜索、编辑本机导航。登录和第三方网站需要联网；账号同步沿用现有逻辑，恢复网络后需保持页面打开。
+
+主站构建额外生成独立静态离线页面和版本化 `navigation-sw.js`，仅预缓存公开离线页面、其 JS/CSS、图标和 manifest。不缓存 SSR 页面、RSC、API、登录凭据或第三方响应，不影响 Todo 缓存。在线首页优先访问服务器，网络失败或服务端 5xx 时使用离线页面。新版本等待用户点击“应用更新并刷新”，不会自动打断编辑。
+
+浏览器清理或回收缓存后需要联网重新准备；清理站点数据还可能删除本机导航，应定期导出备份。验证命令：`npm run pwa:test`（构建及缓存/安装/更新回归测试）。
 
 主站和知识库使用不同的 Worker，可以独立部署。
 
