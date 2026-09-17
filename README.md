@@ -18,7 +18,6 @@
 
 - [Docker + Kubernetes 云原生专题](https://docs.sgao.cc/cloud-native/)（2026-08-11～2026-08-12）：共 50 章，从容器与 Docker 基础逐步延伸到 Kubernetes 工作负载、网络存储、安全治理、GitOps、可观测性、多集群和故障排查。
 - [系统架构设计师专题](https://docs.sgao.cc/ruankao/system-architect/)（2026-08-08～2026-08-10）：新增“案例分析二”第 12～151 篇，覆盖云原生、分布式系统、企业架构、数据治理及 AI Agent 等案例，并提供专题冲刺总结。
-- [沈阳・丹东・大连旅行专题](https://travel.sgao.cc/shenyang-dandong-dalian/)（2026-08-06～2026-08-07）：整理 6 日 5 晚行程攻略、城市路线和出发准备清单，并通过独立的 VitePress 旅行站发布。
 
 ## 文档目录
 
