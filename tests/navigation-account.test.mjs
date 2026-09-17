@@ -9,6 +9,7 @@ async function loadModule(path) {
 const data = await loadModule("../app/navigation-data.ts");
 const { NavigationSyncController, NAVIGATION_SYNC_KEY } = await loadModule("../app/navigation-sync.ts");
 const backup = await loadModule("../app/navigation-backup.ts");
+const edit = await loadModule("../app/navigation-edit.ts");
 const ACCOUNT = { id: "owner-account", email: "owner@sgao.cc" };
 const clone = (value) => JSON.parse(JSON.stringify(value));
 const EMPTY = data.emptyNavigationData();
@@ -112,6 +113,33 @@ test("first login does not upload or replace local navigation without a choice",
   assert.deepEqual(data.readNavigationData(storage), LOCAL);
   assert.equal(posts(api).length, 0);
   assert.equal(storage.getItem(NAVIGATION_SYNC_KEY), null);
+});
+
+test("site editing remains pending offline, preserves favorites/history and syncs the same ID after reconnect", async () => {
+  const api = server(LOCAL, true), storage = new MemoryStorage();
+  data.writeNavigationData(storage, LOCAL); storage.setItem("qifei-history", '["custom-local"]');
+  const sync = controller(api, storage, () => !api.offline);
+  await sync.initialize(); await sync.choose("cloud"); api.offline = true;
+  const current = data.readNavigationData(storage);
+  const next = edit.editNavigationSite(current, current.customSites[0], { name: "已修改", url: "edited.example", desc: "修改描述", category: "dev" });
+  data.writeNavigationData(storage, next); sync.localChanged(); await sync.flush();
+  assert.equal(sync.getSnapshot().phase, "offline"); assert.deepEqual(api.navigation, LOCAL);
+  assert.equal(storage.getItem("qifei-history"), '["custom-local"]'); assert.deepEqual(next.favorites, LOCAL.favorites);
+  sync.stop(); const restarted = controller(api, storage, () => !api.offline); await restarted.initialize();
+  api.offline = false; await restarted.flush();
+  assert.equal(api.navigation.customSites[0].id, "custom-local"); assert.equal(api.navigation.customSites[0].name, "已修改");
+  assert.deepEqual(api.navigation.favorites, LOCAL.favorites); assert.doesNotMatch(JSON.stringify(posts(api)), /history/);
+});
+
+test("editing a custom category syncs its name/icon without moving any site or changing favorites", async () => {
+  const navigation = data.parseNavigationData({ ...LOCAL, customNavigations: [{ id: "custom-nav-work", name: "工作", icon: "⌘", eyebrow: "MY NAVIGATION", isCustom: true }], customSites: [{ ...LOCAL.customSites[0], category: "custom-nav-work" }] });
+  const api = server(navigation, true), storage = new MemoryStorage(); data.writeNavigationData(storage, navigation);
+  const sync = controller(api, storage); await sync.initialize(); await sync.choose("cloud");
+  const current = data.readNavigationData(storage);
+  data.writeNavigationData(storage, edit.editNavigationCategory(current, current.customNavigations[0], { name: "公司", icon: "✦" }));
+  sync.localChanged(); await sync.flush();
+  assert.deepEqual(api.navigation.customSites, navigation.customSites); assert.deepEqual(api.navigation.favorites, navigation.favorites);
+  assert.equal(api.navigation.customNavigations[0].id, "custom-nav-work"); assert.equal(api.navigation.customNavigations[0].name, "公司");
 });
 
 test("confirmed import syncs only the final navigation snapshot; recovery data and history never upload", async () => {

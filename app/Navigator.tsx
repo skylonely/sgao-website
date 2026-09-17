@@ -18,6 +18,7 @@ import {
 import { navigationAccount } from "./navigation-sync";
 import NavigationPwaPanel from "./NavigationPwaPanel";
 import { navigationPwa } from "./navigation-pwa";
+import { editNavigationCategory, editNavigationSite, normalizeNavigationUrl } from "./navigation-edit";
 import NavigationImportDialog from "./NavigationImportDialog";
 import {
   applyNavigationImport, createNavigationImportPreview, NAVIGATION_IMPORT_BACKUP_KEY,
@@ -78,8 +79,12 @@ function writeStorage(key: string, value: unknown) {
   }
 }
 
-function normalizeUrl(url: string) {
-  return /^https?:\/\//i.test(url) ? url : `https://${url}`;
+function trapEditorFocus(event: React.KeyboardEvent<HTMLFormElement>) {
+  if (event.key !== "Tab") return;
+  const controls = event.currentTarget.querySelectorAll<HTMLElement>('button:not(:disabled), input:not(:disabled), select:not(:disabled)');
+  const first = controls[0], last = controls[controls.length - 1];
+  if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last?.focus(); }
+  else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first?.focus(); }
 }
 
 function SiteMark({ site, index = 0 }: { site: NavSite; index?: number }) {
@@ -115,6 +120,10 @@ export default function Navigator() {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [addOpen, setAddOpen] = useState(false);
   const [addNavigationOpen, setAddNavigationOpen] = useState(false);
+  const [editingSite, setEditingSite] = useState<NavSite | null>(null);
+  const [editingNavigation, setEditingNavigation] = useState<NavigationItem | null>(null);
+  const [siteFormError, setSiteFormError] = useState("");
+  const [navigationFormError, setNavigationFormError] = useState("");
   const [resetConfirmOpen, setResetConfirmOpen] = useState(false);
   const [importPreview, setImportPreview] = useState<NavigationImportPreview | null>(null);
   const [importMode, setImportMode] = useState<NavigationImportMode>("merge");
@@ -142,6 +151,17 @@ export default function Navigator() {
   const searchRef = useRef<HTMLInputElement>(null);
   const importRef = useRef<HTMLInputElement>(null);
   const importRequest = useRef(0);
+  const siteFormRef = useRef<HTMLFormElement>(null);
+  const navigationFormRef = useRef<HTMLFormElement>(null);
+
+  useEffect(() => {
+    if (!addOpen && !addNavigationOpen) return;
+    const previous = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    const overflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    (addOpen ? siteFormRef : navigationFormRef).current?.querySelector<HTMLInputElement>("input")?.focus();
+    return () => { document.body.style.overflow = overflow; if (previous?.isConnected) previous.focus(); };
+  }, [addOpen, addNavigationOpen]);
 
   useEffect(() => {
     let cancelled = false;
@@ -205,13 +225,13 @@ export default function Navigator() {
 
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
-      if (
+      if (!siteFormRef.current && !navigationFormRef.current && (
         (event.key === "/" &&
           !["INPUT", "TEXTAREA", "SELECT"].includes(
             (event.target as HTMLElement).tagName,
           )) ||
         ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k")
-      ) {
+      )) {
         event.preventDefault();
         searchRef.current?.focus();
       }
@@ -409,59 +429,86 @@ export default function Navigator() {
     showToast("链接已复制");
   }
 
+  function openAddSite(category = "tools") {
+    setEditingSite(null); setSiteFormError("");
+    setNewSite({ name: "", url: "", desc: "", category }); setAddOpen(true);
+  }
+
+  function openAddNavigation() {
+    setEditingNavigation(null); setNavigationFormError("");
+    setNewNavigation({ name: "", icon: "◇" }); setAddNavigationOpen(true);
+  }
+
+  function requestEditSite(event: MouseEvent, site: NavSite) {
+    event.preventDefault(); event.stopPropagation();
+    if (!site.isCustom) return;
+    try {
+      const current = readNavigationData(window.localStorage).customSites.find((item) => item.id === site.id);
+      if (!current) { showToast("此网站已移除，请刷新导航后重试。"); return; }
+      setEditingSite(current); setNewSite({ name: current.name, url: current.url, desc: current.desc, category: current.category });
+      setSiteFormError(""); setAddOpen(true);
+    } catch { showToast("无法读取本机导航，原数据未修改。"); }
+  }
+
+  function requestEditNavigation(item: NavigationItem) {
+    try {
+      const current = readNavigationData(window.localStorage).customNavigations.find((category) => category.id === item.id);
+      if (!current) { showToast("此导航已移除，请刷新导航后重试。"); return; }
+      setEditingNavigation(current); setNewNavigation({ name: current.name, icon: current.icon });
+      setNavigationFormError(""); setAddNavigationOpen(true);
+    } catch { showToast("无法读取本机导航，原数据未修改。"); }
+  }
+
   function saveSite(event: FormEvent) {
     event.preventDefault();
-    if (!newSite.name.trim() || !newSite.url.trim()) return;
-    const site: NavSite = {
-      id: `custom-${crypto.randomUUID()}`,
-      name: newSite.name.trim(),
-      url: normalizeUrl(newSite.url.trim()),
-      desc: newSite.desc.trim() || "我的自定义网站",
-      category: newSite.category,
-      tags: ["自定义"],
-      mark: newSite.name.trim().slice(0, 1),
-      isCustom: true,
-    };
-    const next = [...customSites, site];
-    try { parseNavigationData({ favorites, customSites: next, customNavigations }); }
-    catch { showToast("请检查网站信息：仅支持不含账号密码的 HTTP/HTTPS 地址，并有数量和长度限制。"); return; }
-    setCustomSites(next);
-    writeStorage("qifei-custom-sites", next);
-    setNewSite({ name: "", url: "", desc: "", category: "tools" });
-    setAddOpen(false);
-    showToast("网站已添加");
+    if (!newSite.name.trim() || !newSite.url.trim()) { setSiteFormError("请填写网站名称和地址。"); return; }
+    try {
+      const current = readNavigationData(window.localStorage);
+      let next: NavSite[];
+      if (editingSite) next = editNavigationSite(current, editingSite, newSite).customSites;
+      else {
+        const site: NavSite = {
+          id: `custom-${crypto.randomUUID()}`, name: newSite.name.trim(),
+          url: normalizeNavigationUrl(newSite.url), desc: newSite.desc.trim() || "我的自定义网站",
+          category: newSite.category, tags: ["自定义"], mark: newSite.name.trim().slice(0, 1), isCustom: true,
+        };
+        next = parseNavigationData({ ...current, customSites: [...current.customSites, site] }).customSites;
+      }
+      writeStorage("qifei-custom-sites", next);
+      setCustomSites(next);
+      window.dispatchEvent(new CustomEvent(NAVIGATION_DATA_CHANGED_EVENT));
+      setNewSite({ name: "", url: "", desc: "", category: "tools" });
+      setAddOpen(false); setEditingSite(null); setSiteFormError("");
+      showToast(editingSite ? "网站已更新，收藏与访问足迹已保留。" : "网站已添加");
+    } catch (error) { setSiteFormError(error instanceof DOMException ? "网站保存失败，请检查浏览器存储空间或权限。原数据未修改。" : error instanceof Error ? error.message : "网站保存失败，本机原数据未修改。"); }
   }
 
   function saveNavigation(event: FormEvent) {
     event.preventDefault();
     const name = newNavigation.name.trim();
-    if (!name) return;
-    if (
-      navCategories.some(
-        (item) => item.name.trim().toLowerCase() === name.toLowerCase(),
-      )
-    ) {
-      showToast("这个导航名称已经存在");
-      return;
-    }
-    const navigation: NavigationItem = {
-      id: `custom-nav-${crypto.randomUUID()}`,
-      name,
-      icon: newNavigation.icon.trim().slice(0, 2) || "◇",
-      eyebrow: "MY NAVIGATION",
-      isCustom: true,
-    };
-    const next = [...customNavigations, navigation];
-    try { parseNavigationData({ favorites, customSites, customNavigations: next }); }
-    catch { showToast("分类名称过长或数量已达到上限。"); return; }
-    setCustomNavigations(next);
-    writeStorage("qifei-custom-navigations", next);
-    setNewNavigation({ name: "", icon: "◇" });
-    setAddNavigationOpen(false);
-    setViewMode("all");
-    setActiveCategory(navigation.id);
-    setQuery("");
-    showToast("新导航已添加");
+    if (!name) { setNavigationFormError("请填写导航名称。"); return; }
+    try {
+      const current = readNavigationData(window.localStorage);
+      if ([...categories, ...current.customNavigations].some((item) => item.id !== editingNavigation?.id && item.name.trim().toLowerCase() === name.toLowerCase())) {
+        setNavigationFormError("这个导航名称已经存在"); return;
+      }
+      let next: NavigationItem[];
+      let createdId = "";
+      if (editingNavigation) next = editNavigationCategory(current, editingNavigation, newNavigation).customNavigations;
+      else {
+        createdId = `custom-nav-${crypto.randomUUID()}`;
+        const navigation: NavigationItem = { id: createdId, name,
+          icon: newNavigation.icon.trim().slice(0, 2) || "◇", eyebrow: "MY NAVIGATION", isCustom: true };
+        next = parseNavigationData({ ...current, customNavigations: [...current.customNavigations, navigation] }).customNavigations;
+      }
+      writeStorage("qifei-custom-navigations", next);
+      setCustomNavigations(next);
+      window.dispatchEvent(new CustomEvent(NAVIGATION_DATA_CHANGED_EVENT));
+      setNewNavigation({ name: "", icon: "◇" }); setAddNavigationOpen(false);
+      if (createdId) { setViewMode("all"); setActiveCategory(createdId); setQuery(""); }
+      setEditingNavigation(null); setNavigationFormError("");
+      showToast(editingNavigation ? "导航已更新，所属网站保持不变。" : "新导航已添加");
+    } catch (error) { setNavigationFormError(error instanceof DOMException ? "导航保存失败，请检查浏览器存储空间或权限。原数据未修改。" : error instanceof Error ? error.message : "导航保存失败，本机原数据未修改。"); }
   }
 
   function deleteNavigation(id: string) {
@@ -680,8 +727,8 @@ export default function Navigator() {
             <strong>发现好网站</strong>
             <p>收藏你常用的入口，下次一键直达。</p>
             <div className="side-card-actions">
-              <button onClick={() => setAddOpen(true)}>＋ 添加网站</button>
-              <button onClick={() => setAddNavigationOpen(true)}>
+              <button onClick={() => openAddSite()}>＋ 添加网站</button>
+              <button onClick={openAddNavigation}>
                 ＋ 添加导航
               </button>
             </div>
@@ -737,7 +784,7 @@ export default function Navigator() {
             >
               {theme === "light" ? "☼" : "☾"}
             </button>
-            <button className="add-button" onClick={() => setAddOpen(true)}>
+            <button className="add-button" onClick={() => openAddSite()}>
               <span>＋</span> 添加网站
             </button>
           </div>
@@ -884,7 +931,7 @@ export default function Navigator() {
                 ))}
               <button
                 className="add-navigation-pill"
-                onClick={() => setAddNavigationOpen(true)}
+                onClick={openAddNavigation}
               >
                 ＋ 添加导航
               </button>
@@ -939,7 +986,7 @@ export default function Navigator() {
                       href={site.url}
                       target="_blank"
                       rel="noreferrer"
-                      className="site-card"
+                      className={`site-card${site.isCustom ? " is-custom" : ""}`}
                       key={site.id}
                       onClick={() => recordVisit(site)}
                       style={
@@ -972,11 +1019,13 @@ export default function Navigator() {
                           {favorites.includes(site.id) ? "♥" : "♡"}
                         </button>
                         <button
+                          className="site-copy-button"
                           onClick={(event) => copyUrl(event, site)}
                           aria-label="复制链接"
                         >
                           ⧉
                         </button>
+                        {site.isCustom && <button onClick={(event) => requestEditSite(event, site)} aria-label={`编辑${site.name}`} title="编辑网站">✎</button>}
                         {site.isCustom && (
                           <button
                             className="danger"
@@ -1023,13 +1072,7 @@ export default function Navigator() {
                         viewMode === "all" &&
                         !query.trim()
                       ) {
-                        setNewSite({
-                          name: "",
-                          url: "",
-                          desc: "",
-                          category: currentCategory.id,
-                        });
-                        setAddOpen(true);
+                        openAddSite(currentCategory.id);
                       } else if (viewMode === "favorites") {
                         selectCategory("featured");
                       } else {
@@ -1063,7 +1106,7 @@ export default function Navigator() {
             链接均指向第三方站点，请自行甄别内容与服务。
           </p>
           <div className="footer-links">
-            <button onClick={() => setAddOpen(true)}>推荐网站</button>
+            <button onClick={() => openAddSite()}>推荐网站</button>
             <button onClick={() => setSettingsOpen(true)}>数据管理</button>
             <a
               href="https://github.com/skylonely/sgao-website"
@@ -1143,7 +1186,7 @@ export default function Navigator() {
             <div className="setting-group">
               <div className="setting-title-row">
                 <h3>自定义导航</h3>
-                <button onClick={() => setAddNavigationOpen(true)}>
+                <button onClick={openAddNavigation}>
                   ＋ 新建
                 </button>
               </div>
@@ -1171,6 +1214,7 @@ export default function Navigator() {
                           个网站
                         </small>
                       </button>
+                      <button className="custom-navigation-edit" onClick={() => requestEditNavigation(item)} aria-label={`编辑${item.name}导航`} title="编辑分类">✎</button>
                       <button
                         className="custom-navigation-delete"
                         onClick={() => setDeleteNavigationConfirm(item)}
@@ -1184,7 +1228,7 @@ export default function Navigator() {
               ) : (
                 <button
                   className="empty-navigation-button"
-                  onClick={() => setAddNavigationOpen(true)}
+                  onClick={openAddNavigation}
                 >
                   <span>＋</span>
                   <strong>创建第一个自定义导航</strong>
@@ -1249,24 +1293,24 @@ export default function Navigator() {
       {importPreview && <NavigationImportDialog preview={importPreview} mode={importMode} error={importError} onMode={(mode) => { setImportMode(mode); setImportError(""); }} onCancel={() => { setImportPreview(null); importRequest.current += 1; }} onConfirm={confirmImport} />}
 
       {addOpen && (
-        <div className="modal-layer">
+        <div className="modal-layer editor-layer">
           <button
             className="modal-mask"
-            aria-label="关闭添加网站窗口"
+            aria-label={editingSite ? "关闭编辑网站窗口" : "关闭添加网站窗口"}
             onClick={() => setAddOpen(false)}
           />
-          <form className="add-modal" onSubmit={saveSite}>
+          <form ref={siteFormRef} className="add-modal" onSubmit={saveSite} onKeyDown={trapEditorFocus} role="dialog" aria-modal="true" aria-labelledby="site-editor-title">
             <div className="modal-art">
               <span>↗</span>
               <i />
             </div>
             <div className="modal-head">
               <div>
-                <span>ADD A NEW STOP</span>
-                <h2>添加一个网站</h2>
-                <p>把常用入口加入导航；启用账号同步后可跨设备使用。</p>
+                <span>{editingSite ? "EDIT A STOP" : "ADD A NEW STOP"}</span>
+                <h2 id="site-editor-title">{editingSite ? "编辑网站" : "添加一个网站"}</h2>
+                <p>{editingSite ? "保存后保留收藏和访问足迹；启用账号同步时会同步修改。" : "把常用入口加入导航；启用账号同步后可跨设备使用。"}</p>
               </div>
-              <button type="button" onClick={() => setAddOpen(false)}>
+              <button type="button" aria-label="关闭网站窗口" onClick={() => setAddOpen(false)}>
                 ×
               </button>
             </div>
@@ -1274,6 +1318,7 @@ export default function Navigator() {
               网站名称
               <input
                 required
+                maxLength={100}
                 value={newSite.name}
                 onChange={(event) =>
                   setNewSite({ ...newSite, name: event.target.value })
@@ -1285,6 +1330,7 @@ export default function Navigator() {
               网站地址
               <input
                 required
+                maxLength={2048}
                 value={newSite.url}
                 onChange={(event) =>
                   setNewSite({ ...newSite, url: event.target.value })
@@ -1296,6 +1342,7 @@ export default function Navigator() {
               <label>
                 简短描述
                 <input
+                  maxLength={500}
                   value={newSite.desc}
                   onChange={(event) =>
                     setNewSite({ ...newSite, desc: event.target.value })
@@ -1321,26 +1368,30 @@ export default function Navigator() {
                 </select>
               </label>
             </div>
+            {siteFormError && <p className="editor-error" role="alert">{siteFormError}</p>}
             <div className="modal-actions">
               <button type="button" onClick={() => setAddOpen(false)}>
                 取消
               </button>
-              <button type="submit">添加到导航 →</button>
+              <button type="submit">{editingSite ? "保存修改" : "添加到导航 →"}</button>
             </div>
           </form>
         </div>
       )}
 
       {addNavigationOpen && (
-        <div className="modal-layer">
+        <div className="modal-layer editor-layer">
           <button
             className="modal-mask"
-            aria-label="关闭添加导航窗口"
+            aria-label={editingNavigation ? "关闭编辑导航窗口" : "关闭添加导航窗口"}
             onClick={() => setAddNavigationOpen(false)}
           />
           <form
+            ref={navigationFormRef}
             className="add-modal navigation-modal"
             onSubmit={saveNavigation}
+            onKeyDown={trapEditorFocus}
+            role="dialog" aria-modal="true" aria-labelledby="navigation-editor-title"
           >
             <div className="modal-art navigation-art">
               <span>{newNavigation.icon || "◇"}</span>
@@ -1348,12 +1399,13 @@ export default function Navigator() {
             </div>
             <div className="modal-head">
               <div>
-                <span>CREATE A NAVIGATION</span>
-                <h2>添加一个导航</h2>
-                <p>创建新的分类入口，用来整理一组相关网站。</p>
+                <span>{editingNavigation ? "EDIT A NAVIGATION" : "CREATE A NAVIGATION"}</span>
+                <h2 id="navigation-editor-title">{editingNavigation ? "编辑导航" : "添加一个导航"}</h2>
+                <p>{editingNavigation ? "仅修改名称和图标，所属网站不变；启用账号同步时会同步修改。" : "创建新的分类入口，用来整理一组相关网站。"}</p>
               </div>
               <button
                 type="button"
+                aria-label="关闭导航窗口"
                 onClick={() => setAddNavigationOpen(false)}
               >
                 ×
@@ -1363,7 +1415,7 @@ export default function Navigator() {
               导航名称
               <input
                 required
-                maxLength={12}
+                maxLength={editingNavigation ? 100 : 12}
                 autoFocus
                 value={newNavigation.name}
                 onChange={(event) =>
@@ -1403,8 +1455,9 @@ export default function Navigator() {
                 <small>导航预览</small>
                 <strong>{newNavigation.name.trim() || "新的导航"}</strong>
               </div>
-              <i>0</i>
+              <i>{editingNavigation ? customSites.filter((site) => site.category === editingNavigation.id).length : 0}</i>
             </div>
+            {navigationFormError && <p className="editor-error" role="alert">{navigationFormError}</p>}
             <div className="modal-actions">
               <button
                 type="button"
@@ -1412,7 +1465,7 @@ export default function Navigator() {
               >
                 取消
               </button>
-              <button type="submit">创建导航 →</button>
+              <button type="submit">{editingNavigation ? "保存修改" : "创建导航 →"}</button>
             </div>
           </form>
         </div>
