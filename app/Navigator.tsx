@@ -1688,7 +1688,10 @@ export default function Navigator() {
       {showDeletionUndo && deletionUndo && (
         <div className="deletion-undo" role="status" aria-live="polite">
           <div><strong>已删除“{deletionUndo.deletion.name}”</strong><small>{deletionUndo.deletion.kind === "category" ? "所属网站已移至实用工具。" : "网站的收藏与足迹已移除。"}仅可撤销最近一次删除，刷新后入口消失。</small></div>
-          <button onClick={undoDeletion}>撤销</button>
+          <button className="deletion-undo-action" onClick={undoDeletion}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M9 5 4 10l5 5" /><path d="M4 10h10a6 6 0 0 1 0 12" /></svg>
+            撤销
+          </button>
           <button className="deletion-undo-dismiss" onClick={() => setDeletionUndo(null)} aria-label="关闭撤销删除提示">×</button>
         </div>
       )}
