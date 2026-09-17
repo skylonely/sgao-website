@@ -164,8 +164,11 @@ test("offline edits persist across reload and upload after reconnect", async () 
   await sync.initialize(); await sync.choose("merge");
   const before = posts(api).length;
   online = false;
+  api.offline = true;
   data.writeNavigationData(storage, LOCAL); sync.localChanged(); await sync.flush();
-  assert.equal(posts(api).length, before);
+  assert.equal(posts(api).length, before + 1);
+  assert.deepEqual(api.navigation, EMPTY);
+  assert.equal(sync.getSnapshot().phase, "offline");
   assert.equal(JSON.parse(storage.getItem(NAVIGATION_SYNC_KEY)).pending, true);
   sync.stop();
   const reloadedOffline = controller(api, storage, () => false);
@@ -174,11 +177,91 @@ test("offline edits persist across reload and upload after reconnect", async () 
   assert.deepEqual(data.readNavigationData(storage), LOCAL);
   reloadedOffline.stop();
   online = true;
+  api.offline = false;
   const reloaded = controller(api, storage, () => online);
   await reloaded.initialize();
   assert.equal(reloaded.getSnapshot().phase, "synced");
   assert.deepEqual(api.navigation, LOCAL);
   assert.equal(JSON.parse(storage.getItem(NAVIGATION_SYNC_KEY)).pending, false);
+});
+
+test("browser offline hints do not prevent first login or the explicit merge upload", async () => {
+  const api = server(), storage = new MemoryStorage(), sync = controller(api, storage, () => false);
+  data.writeNavigationData(storage, LOCAL);
+  await sync.initialize();
+  assert.equal(sync.getSnapshot().phase, "choice");
+  assert.equal(posts(api).length, 0);
+  await sync.choose("merge");
+  assert.equal(sync.getSnapshot().phase, "synced");
+  assert.deepEqual(api.navigation, LOCAL);
+});
+
+test("initialization checks the cloud even when the browser incorrectly reports offline", async () => {
+  const api = server(), storage = new MemoryStorage(), first = controller(api, storage);
+  await first.initialize(); await first.choose("merge"); first.stop();
+  api.navigation = CLOUD; api.revision += 1;
+  const next = controller(api, storage, () => false);
+  await next.initialize();
+  assert.equal(next.getSnapshot().phase, "synced");
+  assert.deepEqual(data.readNavigationData(storage), CLOUD);
+});
+
+test("manual sync recovers pending edits without a browser online event", async () => {
+  const api = server(), storage = new MemoryStorage(), sync = controller(api, storage, () => false);
+  await sync.initialize(); await sync.choose("merge");
+  api.offline = true;
+  data.writeNavigationData(storage, LOCAL); sync.localChanged(); await sync.flush();
+  assert.equal(sync.getSnapshot().phase, "offline");
+  assert.equal(JSON.parse(storage.getItem(NAVIGATION_SYNC_KEY)).pending, true);
+  api.offline = false;
+  const before = posts(api).length;
+  await sync.refresh(); // Same entry point as the "立即同步" button.
+  assert.equal(posts(api).length, before + 1);
+  assert.equal(sync.getSnapshot().phase, "synced");
+  assert.deepEqual(api.navigation, LOCAL);
+  assert.equal(JSON.parse(storage.getItem(NAVIGATION_SYNC_KEY)).pending, false);
+});
+
+test("background refresh clears an offline status without any pending edits", async () => {
+  const api = server(), storage = new MemoryStorage(), sync = controller(api, storage, () => false);
+  await sync.initialize(); await sync.choose("merge");
+  api.offline = true; await sync.refresh();
+  assert.equal(sync.getSnapshot().phase, "offline");
+  api.offline = false;
+  const before = api.requests.length;
+  await sync.refresh();
+  assert.equal(api.requests.length, before + 1);
+  assert.equal(sync.getSnapshot().phase, "synced");
+});
+
+test("local edits automatically upload despite a false browser offline hint", async () => {
+  const api = server(), storage = new MemoryStorage(), sync = controller(api, storage, () => false);
+  await sync.initialize(); await sync.choose("merge");
+  data.writeNavigationData(storage, LOCAL); sync.localChanged();
+  await new Promise((resolve) => setTimeout(resolve, 450));
+  assert.equal(sync.getSnapshot().phase, "synced");
+  assert.deepEqual(api.navigation, LOCAL);
+});
+
+test("an offline browser event probes the service instead of setting an unverified offline status", async () => {
+  const api = server(), storage = new MemoryStorage(), sync = controller(api, storage, () => false);
+  await sync.initialize(); await sync.choose("merge");
+  const before = api.requests.length;
+  sync.networkChanged(); await sync.refresh();
+  assert.equal(api.requests.length, before + 1);
+  assert.equal(sync.getSnapshot().phase, "synced");
+});
+
+test("HTTP authentication failures are not mislabeled offline by a false browser hint", async () => {
+  const api = server(), storage = new MemoryStorage(), sync = controller(api, storage, () => false);
+  await sync.initialize(); await sync.choose("merge");
+  api.fetcher = async () => new Response(null, { status: 403 });
+  sync.dependencies.fetcher = api.fetcher;
+  data.writeNavigationData(storage, LOCAL); sync.localChanged(); await sync.refresh();
+  assert.equal(sync.getSnapshot().phase, "error");
+  assert.match(sync.getSnapshot().message, /重新登录/);
+  assert.equal(JSON.parse(storage.getItem(NAVIGATION_SYNC_KEY)).pending, true);
+  assert.deepEqual(data.readNavigationData(storage), LOCAL);
 });
 
 test("cloud changes during offline edits require a conflict choice instead of overwriting", async () => {

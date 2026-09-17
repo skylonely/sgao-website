@@ -63,6 +63,10 @@ class NavigationRequestError extends Error {
   constructor(public status: number) { super(`Navigation API status ${status}`); }
 }
 
+function isNetworkFailure(error: unknown) {
+  return error instanceof TypeError || (error instanceof Error && ["AbortError", "TimeoutError"].includes(error.name));
+}
+
 export class NavigationSyncController {
   private state = INITIAL_STATE;
   private listeners = new Set<() => void>();
@@ -145,7 +149,6 @@ export class NavigationSyncController {
       this.cache = this.readCache();
       try {
         readNavigationData(this.storage);
-        if (!this.online()) throw new Error("Offline");
         const snapshot = await this.request();
         if (this.stopped || sessionGeneration !== this.sessionGeneration) return;
         if (!this.cache || this.cache.account.id !== snapshot.account.id) {
@@ -172,8 +175,8 @@ export class NavigationSyncController {
           catch { this.pending = this.cache.pending; }
           this.persist();
           this.update({ ready: true, signedIn: true, email: this.cache.account.email, updatedAt: this.cache.updatedAt ?? "",
-            phase: this.online() ? "error" : "offline", message: this.online()
-              ? "暂时无法连接账号，本机数据不会丢失；可重试或重新登录。" : "当前离线，本机修改会在联网后同步。" });
+            phase: isNetworkFailure(error) && !this.online() ? "offline" : "error",
+            message: "暂时无法连接账号，本机数据已保留；会自动重试，也可立即同步或重新登录。" });
         } else this.update({ ready: true, signedIn: false, phase: "signed-out", message: "未登录或暂时无法连接，导航数据只保存在本机。" });
       }
     })();
@@ -244,9 +247,8 @@ export class NavigationSyncController {
     this.generation += 1;
     this.persist();
     if (this.state.phase === "conflict") return;
-    this.update({ phase: this.online() ? "syncing" : "offline", message: this.online()
-      ? "正在同步导航修改…" : "离线修改已保存，联网后自动同步。" });
-    if (this.online()) this.schedule(350);
+    this.update({ phase: "syncing", message: "本机修改已保存，正在尝试同步…" });
+    this.schedule(350);
   };
 
   private schedule(delay: number) {
@@ -259,7 +261,6 @@ export class NavigationSyncController {
     if (this.timer) { clearTimeout(this.timer); this.timer = undefined; }
     if (this.saving) return this.saving;
     if (!this.active || !this.pending || !this.cache || this.choosing || this.state.phase === "conflict" || this.stopped) return;
-    if (!this.online()) { this.update({ phase: "offline", message: "离线修改已保存，联网后自动同步。" }); return; }
     const generation = this.generation;
     const cache = this.cache;
     const sessionGeneration = this.sessionGeneration;
@@ -296,16 +297,16 @@ export class NavigationSyncController {
         if (this.pending) this.schedule(100);
       } catch (error) {
         if (!this.active || sessionGeneration !== this.sessionGeneration) return;
-        this.update({ phase: this.online() ? "error" : "offline", message: error instanceof NavigationRequestError && [401, 403].includes(error.status)
+        this.update({ phase: isNetworkFailure(error) && !this.online() ? "offline" : "error", message: error instanceof NavigationRequestError && [401, 403].includes(error.status)
           ? "登录可能已过期，本机修改已保留，请重新登录。" : "同步暂未完成，本机修改已保留，联网后会重试。" });
-        if (this.online() && !(error instanceof NavigationRequestError && [400, 401, 403, 413].includes(error.status))) this.schedule(5000);
+        if (!(error instanceof NavigationRequestError && [400, 401, 403, 413].includes(error.status))) this.schedule(5000);
       } finally { this.saving = undefined; }
     })();
     return this.saving;
   }
 
   async refresh() {
-    if (!this.active || !this.online() || this.saving || this.state.phase === "conflict" || this.stopped) return;
+    if (!this.active || this.saving || this.state.phase === "conflict" || this.stopped) return;
     if (this.pending) return this.flush();
     if (this.refreshing) return this.refreshing;
     const generation = this.generation;
@@ -316,9 +317,12 @@ export class NavigationSyncController {
         if (!this.active || this.pending || generation !== this.generation || this.stopped) return;
         if (snapshot.account.id !== this.cache?.account.id) this.requireChoice(snapshot);
         else if (snapshot.revision !== this.cache.revision || this.state.phase !== "synced") this.applyRemote(snapshot);
-      } catch {
+      } catch (error) {
         if (!this.active || sessionGeneration !== this.sessionGeneration || this.stopped) return;
-        this.update({ phase: "error", message: "自动刷新暂未完成，本机数据仍可使用；可重试或重新登录。" });
+        this.update({ phase: isNetworkFailure(error) && !this.online() ? "offline" : "error",
+          message: error instanceof NavigationRequestError && [401, 403].includes(error.status)
+            ? "登录可能已过期，本机数据已保留，请重新登录。"
+            : "暂时无法连接同步服务，本机数据已保留；会自动重试，也可立即同步。" });
       }
       finally { this.refreshing = undefined; }
     })();
@@ -342,8 +346,8 @@ export class NavigationSyncController {
   private refreshWhenVisible = () => { if (document.visibilityState === "visible") void this.refresh(); };
   private networkChanged = () => {
     if (!this.active) return;
-    if (this.online()) void this.refresh();
-    else this.update({ phase: "offline", message: "当前离线，本机修改会在联网后同步。" });
+    // Browser connectivity is only a hint; a successful API request is authoritative.
+    void this.refresh();
   };
 
   start() {
