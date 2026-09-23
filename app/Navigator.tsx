@@ -11,6 +11,7 @@ import {
 } from "react";
 import { categories, defaultSites, type NavSite } from "./data";
 import NavigationAccountPanel from "./NavigationAccountPanel";
+import Workbench from "./Workbench";
 import {
   NAVIGATION_DATA_CHANGED_EVENT, NAVIGATION_LOCAL_CHANGED_EVENT, NAVIGATION_STORAGE_KEYS,
   parseNavigationData, readNavigationData, type NavigationItem,
@@ -394,6 +395,14 @@ export default function Navigator() {
     }, 0);
   }
 
+  function openWorkbench() {
+    setViewMode("all");
+    setActiveCategory("all");
+    setQuery("");
+    setMobileNav(false);
+    window.setTimeout(() => document.getElementById("workbench")?.scrollIntoView({ behavior: "smooth", block: "start" }), 0);
+  }
+
   function selectView(mode: ViewMode) {
     setViewMode(mode);
     setQuery("");
@@ -750,6 +759,10 @@ export default function Navigator() {
             ))}
 
           <span className="side-label personal-label">个人</span>
+          <button onClick={openWorkbench}>
+            <span className="nav-icon">▦</span>
+            我的工作台
+          </button>
           <button
             className={viewMode === "favorites" ? "active" : ""}
             onClick={() => selectView("favorites")}
@@ -949,6 +962,10 @@ export default function Navigator() {
             </div>
           </div>
         </section>
+
+        {viewMode === "all" && activeCategory === "all" && !query.trim() && (
+          <Workbench key={accountState.signedIn ? accountState.email.toLowerCase() : "signed-out"} accountState={accountState} />
+        )}
 
         <section className="content" id="content">
           <div className="content-toolbar">

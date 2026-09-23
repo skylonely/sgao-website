@@ -14,6 +14,7 @@
     "start": "WRANGLER_LOG_PATH=.wrangler/wrangler.log vinext start",
     "test": "npm run build && node --test tests/rendered-html.test.mjs",
     "navigation:test": "node --test tests/navigation-account.test.mjs",
+    "workbench:test": "node --test tests/workbench.test.mjs",
     "backup:test": "node --test tests/navigation-backup.test.mjs",
     "edit:test": "node --test tests/navigation-edit.test.mjs",
     "order:test": "node --test tests/navigation-order.test.mjs",

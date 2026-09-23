@@ -37,6 +37,9 @@ test("server-renders the navigation product and metadata", async () => {
   assert.match(html, /<title>拾光导航｜从这里，起飞。<\/title>/i);
   assert.match(html, /从这里，<em>起飞。<\/em>/);
   assert.match(html, /今日推荐/);
+  assert.match(html, /我的工作台/);
+  assert.match(html, /https:\/\/todo\.sgao\.cc\//);
+  assert.match(html, /https:\/\/img\.sgao\.cc\/admin\//);
   assert.match(html, /我的收藏/);
   assert.match(html, /最近访问/);
   assert.match(html, /添加网站/);
