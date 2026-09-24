@@ -963,10 +963,6 @@ export default function Navigator() {
           </div>
         </section>
 
-        {viewMode === "all" && activeCategory === "all" && !query.trim() && (
-          <Workbench key={accountState.signedIn ? accountState.email.toLowerCase() : "signed-out"} accountState={accountState} />
-        )}
-
         <section className="content" id="content">
           <div className="content-toolbar">
             <div className="category-pills">
@@ -1160,6 +1156,10 @@ export default function Navigator() {
               )}
             </div>
           ))}
+
+          {viewMode === "all" && activeCategory === "all" && !query.trim() && (
+            <Workbench key={accountState.signedIn ? accountState.email.toLowerCase() : "signed-out"} accountState={accountState} />
+          )}
         </section>
 
         <footer>

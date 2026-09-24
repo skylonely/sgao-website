@@ -40,6 +40,8 @@ test("server-renders the navigation product and metadata", async () => {
   assert.match(html, /我的工作台/);
   assert.match(html, /https:\/\/todo\.sgao\.cc\//);
   assert.match(html, /https:\/\/img\.sgao\.cc\/admin\//);
+  assert.ok(html.indexOf('id="workbench"') > html.indexOf("READING ROOM"));
+  assert.ok(html.indexOf('id="workbench"') < html.indexOf("<footer"));
   assert.match(html, /我的收藏/);
   assert.match(html, /最近访问/);
   assert.match(html, /添加网站/);
