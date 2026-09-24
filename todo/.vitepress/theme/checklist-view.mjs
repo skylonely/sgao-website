@@ -7,6 +7,16 @@ function matchesTerms(text, terms) {
   return terms.every((term) => normalized.includes(term));
 }
 
+export function shouldOpenCreateChecklist(search) {
+  return new URLSearchParams(search).get("create") === "1";
+}
+
+export function withoutCreateChecklistParam(url) {
+  const next = new URL(url, "https://todo.sgao.cc/");
+  next.searchParams.delete("create");
+  return `${next.pathname}${next.search}${next.hash}`;
+}
+
 /** @template {{ title: string, description: string, items: Array<{ label: string }> }} T
  * @param {T[]} lists
  * @param {string} query

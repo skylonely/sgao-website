@@ -27,7 +27,12 @@ import {
 } from "./checklist-backup";
 import AccountStatus from "./AccountStatus.vue";
 import PwaStatus from "./PwaStatus.vue";
-import { matchingChecklistItems, searchChecklists } from "./checklist-view.mjs";
+import {
+  matchingChecklistItems,
+  searchChecklists,
+  shouldOpenCreateChecklist,
+  withoutCreateChecklistParam,
+} from "./checklist-view.mjs";
 import { initializeAccountSync, scheduleAccountSync, TODO_DATA_CHANGED_EVENT } from "./account-sync";
 
 const checklists = ref<Checklist[]>(defaultLists());
@@ -230,6 +235,14 @@ function restoreDefaults() {
 
 onMounted(async () => {
   refresh();
+  if (shouldOpenCreateChecklist(window.location.search)) {
+    creating.value = true;
+    window.history.replaceState(
+      window.history.state,
+      "",
+      withoutCreateChecklistParam(window.location.href),
+    );
+  }
   window.addEventListener("storage", refresh);
   window.addEventListener(TODO_DATA_CHANGED_EVENT, refresh);
   await initializeAccountSync();

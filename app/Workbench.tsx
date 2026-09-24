@@ -5,7 +5,13 @@ import { startNavigationLogin, type NavigationAccountState } from "./navigation-
 import { fetchTodoOverview, type TodoOverview } from "./workbench-data";
 
 const shortcuts = [
-  { name: "Todo 清单", description: "查看和整理你的待办", href: "https://todo.sgao.cc/", mark: "✓" },
+  {
+    name: "Todo 清单",
+    description: "查看和整理你的待办",
+    href: "https://todo.sgao.cc/",
+    action: { label: "＋ 新建", ariaLabel: "新建 Todo 清单", href: "https://todo.sgao.cc/?create=1" },
+    mark: "✓",
+  },
   { name: "旅行计划", description: "行程、攻略与出发准备", href: "https://travel.sgao.cc/", mark: "↗" },
   { name: "知识库", description: "查阅收藏的技术笔记", href: "https://docs.sgao.cc/", mark: "▤" },
   { name: "图片上传", description: "打开图片中心管理文件", href: "https://img.sgao.cc/admin/", mark: "▧" },
@@ -61,14 +67,20 @@ export default function Workbench({ accountState }: { accountState: NavigationAc
       </div>
       <div className="workbench-grid">
         {shortcuts.map((shortcut) => (
-          <a className="workbench-shortcut" href={shortcut.href} key={shortcut.href}>
-            <span className="workbench-shortcut-mark" aria-hidden="true">{shortcut.mark}</span>
-            <span className="workbench-shortcut-copy">
-              <strong>{shortcut.name}</strong>
-              <small>{shortcut.description}</small>
-            </span>
-            <span className="workbench-shortcut-arrow" aria-hidden="true">↗</span>
-          </a>
+          <article className="workbench-shortcut" key={shortcut.href}>
+            <a className="workbench-shortcut-main" href={shortcut.href}>
+              <span className="workbench-shortcut-mark" aria-hidden="true">{shortcut.mark}</span>
+              <span className="workbench-shortcut-copy">
+                <strong>{shortcut.name}</strong>
+                <small>{shortcut.description}</small>
+              </span>
+            </a>
+            {"action" in shortcut ? (
+              <a className="workbench-shortcut-action" href={shortcut.action.href} aria-label={shortcut.action.ariaLabel}>
+                {shortcut.action.label}
+              </a>
+            ) : <span className="workbench-shortcut-arrow" aria-hidden="true">↗</span>}
+          </article>
         ))}
       </div>
 
