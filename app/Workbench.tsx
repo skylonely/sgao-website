@@ -9,12 +9,21 @@ const shortcuts = [
     name: "Todo 清单",
     description: "查看和整理你的待办",
     href: "https://todo.sgao.cc/",
-    action: { label: "＋ 新建", ariaLabel: "新建 Todo 清单", href: "https://todo.sgao.cc/?create=1" },
+    actions: [{ label: "＋ 新建", ariaLabel: "新建 Todo 清单", href: "https://todo.sgao.cc/?create=1" }],
     mark: "✓",
   },
   { name: "旅行计划", description: "行程、攻略与出发准备", href: "https://travel.sgao.cc/", mark: "↗" },
   { name: "知识库", description: "查阅收藏的技术笔记", href: "https://docs.sgao.cc/", mark: "▤" },
-  { name: "图片上传", description: "打开图片中心管理文件", href: "https://img.sgao.cc/admin/", mark: "▧" },
+  {
+    name: "图片管理",
+    description: "上传、整理与恢复图片",
+    href: "https://img.sgao.cc/admin/files/",
+    actions: [
+      { label: "上传图片", ariaLabel: "上传图片", href: "https://img.sgao.cc/admin/" },
+      { label: "查看回收站", ariaLabel: "查看图片回收站", href: "https://img.sgao.cc/admin/files/?view=trash" },
+    ],
+    mark: "▧",
+  },
 ] as const;
 
 export default function Workbench({ accountState }: { accountState: NavigationAccountState }) {
@@ -75,10 +84,14 @@ export default function Workbench({ accountState }: { accountState: NavigationAc
                 <small>{shortcut.description}</small>
               </span>
             </a>
-            {"action" in shortcut ? (
-              <a className="workbench-shortcut-action" href={shortcut.action.href} aria-label={shortcut.action.ariaLabel}>
-                {shortcut.action.label}
-              </a>
+            {"actions" in shortcut ? (
+              <span className="workbench-shortcut-actions">
+                {shortcut.actions.map((action) => (
+                  <a className="workbench-shortcut-action" href={action.href} aria-label={action.ariaLabel} key={action.href}>
+                    {action.label}
+                  </a>
+                ))}
+              </span>
             ) : <span className="workbench-shortcut-arrow" aria-hidden="true">↗</span>}
           </article>
         ))}
