@@ -20,7 +20,6 @@ const shortcuts = [
     href: "https://img.sgao.cc/admin/files/",
     actions: [
       { label: "上传图片", ariaLabel: "上传图片", href: "https://img.sgao.cc/admin/" },
-      { label: "查看回收站", ariaLabel: "查看图片回收站", href: "https://img.sgao.cc/admin/files/?view=trash" },
     ],
     mark: "▧",
   },
