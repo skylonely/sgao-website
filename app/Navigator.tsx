@@ -157,6 +157,7 @@ export default function Navigator() {
   const importRequest = useRef(0);
   const siteFormRef = useRef<HTMLFormElement>(null);
   const navigationFormRef = useRef<HTMLFormElement>(null);
+  const navigationBackupRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!addOpen && !addNavigationOpen) return;
@@ -623,6 +624,14 @@ export default function Navigator() {
       "sgao-website-backup.json",
     );
     showToast("导航数据已导出");
+  }
+
+  function openNavigationBackupSettings() {
+    setSettingsOpen(true);
+    window.requestAnimationFrame(() => {
+      navigationBackupRef.current?.scrollIntoView({ block: "start", behavior: "smooth" });
+      navigationBackupRef.current?.focus({ preventScroll: true });
+    });
   }
 
   function refreshRecoveryBackup() {
@@ -1158,7 +1167,12 @@ export default function Navigator() {
           ))}
 
           {viewMode === "all" && activeCategory === "all" && !query.trim() && (
-            <Workbench key={accountState.signedIn ? accountState.email.toLowerCase() : "signed-out"} accountState={accountState} />
+            <Workbench
+              key={accountState.signedIn ? accountState.email.toLowerCase() : "signed-out"}
+              accountState={accountState}
+              onExportNavigation={exportData}
+              onManageNavigationBackup={openNavigationBackupSettings}
+            />
           )}
         </section>
 
@@ -1310,7 +1324,7 @@ export default function Navigator() {
               <p className="privacy-note">↑ ↓ 调整自定义分类顺序，内置分类固定在前。网站卡片的箭头只调整同分类自定义网站；搜索、收藏和足迹页不提供排序。启用账号同步时顺序也会同步。</p>
             </div>
 
-            <div className="setting-group">
+            <div className="setting-group" id="navigation-backup-settings" ref={navigationBackupRef} tabIndex={-1}>
               <h3>我的数据</h3>
               <div className="data-summary">
                 <div>

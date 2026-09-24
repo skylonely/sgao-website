@@ -38,10 +38,15 @@ test("server-renders the navigation product and metadata", async () => {
   assert.match(html, /从这里，<em>起飞。<\/em>/);
   assert.match(html, /今日推荐/);
   assert.match(html, /我的工作台/);
+  assert.match(html, /统一备份中心/);
+  assert.match(html, /下载备份/);
+  assert.match(html, /导入 \/ 恢复/);
   assert.match(html, /https:\/\/todo\.sgao\.cc\//);
   assert.match(html, /https:\/\/todo\.sgao\.cc\/\?create=1/);
+  assert.match(html, /https:\/\/todo\.sgao\.cc\/\?backup=1/);
   assert.match(html, /新建 Todo 清单/);
   assert.match(html, /https:\/\/img\.sgao\.cc\/admin\//);
+  assert.match(html, /https:\/\/img\.sgao\.cc\/admin\/#backup/);
   assert.doesNotMatch(html, /https:\/\/img\.sgao\.cc\/admin\/files\/\?view=trash/);
   assert.doesNotMatch(html, /查看图片回收站/);
   assert.ok(html.indexOf('id="workbench"') > html.indexOf("READING ROOM"));

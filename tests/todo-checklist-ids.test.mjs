@@ -6,7 +6,9 @@ import {
   filterChecklistItems,
   matchingChecklistItems,
   searchChecklists,
+  shouldOpenChecklistBackup,
   shouldOpenCreateChecklist,
+  withoutChecklistActionParams,
   withoutCreateChecklistParam,
 } from "../todo/.vitepress/theme/checklist-view.mjs";
 
@@ -63,6 +65,16 @@ test("create-list deep link opens once and preserves unrelated URL state", () =>
   );
 });
 
+test("backup-center deep link opens once and removes all one-time Todo actions", () => {
+  assert.equal(shouldOpenChecklistBackup("?backup=1"), true);
+  assert.equal(shouldOpenChecklistBackup("?backup=0"), false);
+  assert.equal(shouldOpenChecklistBackup("?other=1"), false);
+  assert.equal(
+    withoutChecklistActionParams("https://todo.sgao.cc/?backup=1&create=1&source=workbench#lists"),
+    "/?source=workbench#lists",
+  );
+});
+
 test("completion filters preserve item order and react to check changes", () => {
   const items = searchFixtures[0].items;
   const checkedIds = new Set(["passport", "deleted-item"]);
@@ -88,7 +100,8 @@ test("search and completion controls are integrated into the todo pages", async 
   assert.match(index, /if \(searching\.value\) return;/);
   assert.match(index, /没有找到匹配的清单/);
   assert.match(index, /shouldOpenCreateChecklist\(window\.location\.search\)/);
-  assert.match(index, /withoutCreateChecklistParam\(window\.location\.href\)/);
+  assert.match(index, /shouldOpenChecklistBackup\(window\.location\.search\)/);
+  assert.match(index, /withoutChecklistActionParams\(window\.location\.href\)/);
   assert.match(page, /in visibleItems/);
   assert.match(page, /aria-pressed="itemFilter/);
   assert.match(page, /checklistProgress/);

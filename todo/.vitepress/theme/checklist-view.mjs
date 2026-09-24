@@ -11,9 +11,20 @@ export function shouldOpenCreateChecklist(search) {
   return new URLSearchParams(search).get("create") === "1";
 }
 
+export function shouldOpenChecklistBackup(search) {
+  return new URLSearchParams(search).get("backup") === "1";
+}
+
 export function withoutCreateChecklistParam(url) {
   const next = new URL(url, "https://todo.sgao.cc/");
   next.searchParams.delete("create");
+  return `${next.pathname}${next.search}${next.hash}`;
+}
+
+export function withoutChecklistActionParams(url) {
+  const next = new URL(url, "https://todo.sgao.cc/");
+  next.searchParams.delete("create");
+  next.searchParams.delete("backup");
   return `${next.pathname}${next.search}${next.hash}`;
 }
 

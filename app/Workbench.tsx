@@ -25,7 +25,11 @@ const shortcuts = [
   },
 ] as const;
 
-export default function Workbench({ accountState }: { accountState: NavigationAccountState }) {
+export default function Workbench({ accountState, onExportNavigation, onManageNavigationBackup }: {
+  accountState: NavigationAccountState;
+  onExportNavigation: () => void;
+  onManageNavigationBackup: () => void;
+}) {
   const [overview, setOverview] = useState<TodoOverview | null>(null);
   const [status, setStatus] = useState<"idle" | "loading" | "ready" | "error">("idle");
   const [refresh, setRefresh] = useState(0);
@@ -132,6 +136,51 @@ export default function Workbench({ accountState }: { accountState: NavigationAc
       {accountState.ready && !signedInEmail && (
         <button className="workbench-login" type="button" onClick={startNavigationLogin}>登录后查看我的清单概览 ↗</button>
       )}
+
+      <div className="workbench-backup" aria-labelledby="workbench-backup-heading">
+        <div className="workbench-backup-head">
+          <div>
+            <span>BACKUP CENTER</span>
+            <h3 id="workbench-backup-heading">统一备份中心</h3>
+          </div>
+          <p>各系统独立备份，文件只下载到本机。</p>
+        </div>
+        <div className="workbench-backup-grid">
+          <article className="workbench-backup-card">
+            <span className="workbench-backup-mark" aria-hidden="true">⌁</span>
+            <div className="workbench-backup-copy">
+              <h4>导航数据</h4>
+              <p>收藏、自定义网站、分类与本机足迹。</p>
+            </div>
+            <div className="workbench-backup-actions">
+              <button type="button" onClick={onExportNavigation}>下载备份</button>
+              <button type="button" onClick={onManageNavigationBackup}>导入 / 恢复</button>
+            </div>
+          </article>
+          <article className="workbench-backup-card">
+            <span className="workbench-backup-mark" aria-hidden="true">✓</span>
+            <div className="workbench-backup-copy">
+              <h4>Todo 清单</h4>
+              <p>全部清单、勾选状态和回收站内容。</p>
+            </div>
+            <div className="workbench-backup-actions">
+              <a href="https://todo.sgao.cc/?backup=1">备份与恢复 ↗</a>
+            </div>
+          </article>
+          <article className="workbench-backup-card">
+            <span className="workbench-backup-mark" aria-hidden="true">▧</span>
+            <div className="workbench-backup-copy">
+              <h4>图片库</h4>
+              <p>按需导出原图 ZIP，或从备份安全恢复。</p>
+            </div>
+            <div className="workbench-backup-actions">
+              <a href="https://img.sgao.cc/admin/files/">选择并导出 ↗</a>
+              <a href="https://img.sgao.cc/admin/#backup">导入并恢复 ↗</a>
+            </div>
+          </article>
+        </div>
+        <p className="workbench-backup-note">三个系统使用各自的备份文件；恢复前请确认文件来源与内容，不要交叉导入。</p>
+      </div>
     </section>
   );
 }

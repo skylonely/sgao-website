@@ -30,8 +30,9 @@ import PwaStatus from "./PwaStatus.vue";
 import {
   matchingChecklistItems,
   searchChecklists,
+  shouldOpenChecklistBackup,
   shouldOpenCreateChecklist,
-  withoutCreateChecklistParam,
+  withoutChecklistActionParams,
 } from "./checklist-view.mjs";
 import { initializeAccountSync, scheduleAccountSync, TODO_DATA_CHANGED_EVENT } from "./account-sync";
 
@@ -235,12 +236,18 @@ function restoreDefaults() {
 
 onMounted(async () => {
   refresh();
-  if (shouldOpenCreateChecklist(window.location.search)) {
+  const openBackupFromLink = shouldOpenChecklistBackup(window.location.search);
+  const openCreateFromLink = shouldOpenCreateChecklist(window.location.search);
+  if (openBackupFromLink) {
+    openBackup();
+  } else if (openCreateFromLink) {
     creating.value = true;
+  }
+  if (openBackupFromLink || openCreateFromLink) {
     window.history.replaceState(
       window.history.state,
       "",
-      withoutCreateChecklistParam(window.location.href),
+      withoutChecklistActionParams(window.location.href),
     );
   }
   window.addEventListener("storage", refresh);
