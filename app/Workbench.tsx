@@ -1,8 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { startNavigationLogin, type NavigationAccountState } from "./navigation-sync";
-import { fetchTodoOverview, type TodoOverview } from "./workbench-data";
+import { type TodoOverview, type TodoOverviewStatus } from "./workbench-data";
 
 const shortcuts = [
   {
@@ -25,48 +24,17 @@ const shortcuts = [
   },
 ] as const;
 
-export default function Workbench({ accountState, onExportNavigation, onManageNavigationBackup }: {
+export default function Workbench({ accountState, todoOverview, todoStatus, onRefreshTodo, onExportNavigation, onManageNavigationBackup }: {
   accountState: NavigationAccountState;
+  todoOverview: TodoOverview | null;
+  todoStatus: TodoOverviewStatus;
+  onRefreshTodo: () => void;
   onExportNavigation: () => void;
   onManageNavigationBackup: () => void;
 }) {
-  const [overview, setOverview] = useState<TodoOverview | null>(null);
-  const [status, setStatus] = useState<"idle" | "loading" | "ready" | "error">("idle");
-  const [refresh, setRefresh] = useState(0);
   const signedInEmail = accountState.signedIn ? accountState.email.trim().toLowerCase() : "";
-
-  useEffect(() => {
-    if (!signedInEmail) return;
-    const controller = new AbortController();
-    fetchTodoOverview(signedInEmail, controller.signal).then((result) => {
-      if (controller.signal.aborted) return;
-      setOverview(result);
-      setStatus("ready");
-    }).catch(() => {
-      if (controller.signal.aborted) return;
-      setOverview(null);
-      setStatus("error");
-    });
-    return () => controller.abort();
-  }, [signedInEmail, refresh]);
-
-  useEffect(() => {
-    if (!signedInEmail) return;
-    let lastRefresh = Date.now();
-    const refreshWhenVisible = () => {
-      if (document.visibilityState !== "visible" || Date.now() - lastRefresh < 30_000) return;
-      lastRefresh = Date.now();
-      setRefresh((value) => value + 1);
-    };
-    window.addEventListener("focus", refreshWhenVisible);
-    document.addEventListener("visibilitychange", refreshWhenVisible);
-    return () => {
-      window.removeEventListener("focus", refreshWhenVisible);
-      document.removeEventListener("visibilitychange", refreshWhenVisible);
-    };
-  }, [signedInEmail]);
-
-  const currentOverview = status === "ready" && overview?.email === signedInEmail ? overview : null;
+  const currentOverview = todoStatus === "ready" && todoOverview?.email === signedInEmail ? todoOverview : null;
+  const previewLists = currentOverview?.lists.slice(0, 3) ?? [];
 
   return (
     <section className="workbench" id="workbench" aria-labelledby="workbench-heading">
@@ -108,27 +76,27 @@ export default function Workbench({ accountState, onExportNavigation, onManageNa
               <h3>清单概览</h3>
             </div>
             <div className="workbench-todo-actions">
-              <button type="button" onClick={() => { setStatus("loading"); setRefresh((value) => value + 1); }}>刷新</button>
+              <button type="button" onClick={onRefreshTodo}>刷新</button>
               <a href="https://todo.sgao.cc/">打开 Todo ↗</a>
             </div>
           </div>
           {currentOverview ? (
             <>
               <p className="workbench-todo-summary">{currentOverview.listCount} 张清单 · {currentOverview.remaining} 项待完成</p>
-              {currentOverview.lists.length > 0 ? (
+              {previewLists.length > 0 ? (
                 <ul className="workbench-todo-lists">
-                  {currentOverview.lists.map((list) => (
+                  {previewLists.map((list) => (
                     <li key={list.id}>
                       <a href={list.href}><span>{list.title}</span><small>待完成 {list.remaining}/{list.total} ↗</small></a>
                     </li>
                   ))}
                 </ul>
               ) : <p className="workbench-todo-message">还没有清单，可以去 Todo 创建。</p>}
-              {currentOverview.listCount > currentOverview.lists.length && <small className="workbench-todo-note">按 Todo 中的顺序展示前 3 张清单。</small>}
+              {currentOverview.listCount > previewLists.length && <small className="workbench-todo-note">按 Todo 中的顺序展示前 3 张清单。</small>}
             </>
           ) : (
             <p className="workbench-todo-message">
-              {status === "error" ? "暂时无法读取清单。可以重试，或打开 Todo 检查登录状态。" : "正在读取清单…"}
+              {todoStatus === "error" ? "暂时无法读取清单。可以重试，或打开 Todo 检查登录状态。" : "正在读取清单…"}
             </p>
           )}
         </div>

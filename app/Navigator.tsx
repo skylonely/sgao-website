@@ -10,6 +10,7 @@ import {
   useSyncExternalStore,
 } from "react";
 import { categories, defaultSites, type NavSite } from "./data";
+import GlobalSearchResults from "./GlobalSearchResults";
 import NavigationAccountPanel from "./NavigationAccountPanel";
 import Workbench from "./Workbench";
 import {
@@ -28,6 +29,7 @@ import {
   NavigationImportStorageError, NavigationPreviewChangedError, parseNavigationBackup, readNavigationRecovery, readNavigationSnapshot,
   type NavigationImportMode, type NavigationImportPreview, type NavigationRecoveryBackup,
 } from "./navigation-backup";
+import { fetchTodoOverview, matchesGlobalSearch, type TodoOverview, type TodoOverviewStatus } from "./workbench-data";
 
 type SearchEngine = "local" | "baidu" | "bing" | "google";
 type ViewMode = "all" | "favorites" | "history";
@@ -142,6 +144,9 @@ export default function Navigator() {
   const [toast, setToast] = useState("");
   const [deletionUndo, setDeletionUndo] = useState<{ deletion: NavigationDeletion; account: string } | null>(null);
   const [showTop, setShowTop] = useState(false);
+  const [todoOverview, setTodoOverview] = useState<TodoOverview | null>(null);
+  const [todoStatus, setTodoStatus] = useState<TodoOverviewStatus>("idle");
+  const [todoRefresh, setTodoRefresh] = useState(0);
   const [newSite, setNewSite] = useState({
     name: "",
     url: "",
@@ -213,6 +218,50 @@ export default function Navigator() {
     };
   }, [mounted]);
 
+  const todoEmail = accountState.signedIn ? accountState.email.trim().toLowerCase() : "";
+
+  useEffect(() => {
+    let cancelled = false;
+    if (!todoEmail) {
+      queueMicrotask(() => {
+        if (cancelled) return;
+        setTodoOverview(null);
+        setTodoStatus("idle");
+      });
+      return () => { cancelled = true; };
+    }
+    const controller = new AbortController();
+    queueMicrotask(() => {
+      if (!cancelled) setTodoStatus("loading");
+    });
+    fetchTodoOverview(todoEmail, controller.signal).then((result) => {
+      if (controller.signal.aborted) return;
+      setTodoOverview(result);
+      setTodoStatus("ready");
+    }).catch(() => {
+      if (controller.signal.aborted) return;
+      setTodoOverview(null);
+      setTodoStatus("error");
+    });
+    return () => { cancelled = true; controller.abort(); };
+  }, [todoEmail, todoRefresh]);
+
+  useEffect(() => {
+    if (!todoEmail) return;
+    let lastRefresh = Date.now();
+    const refreshWhenVisible = () => {
+      if (document.visibilityState !== "visible" || Date.now() - lastRefresh < 30_000) return;
+      lastRefresh = Date.now();
+      setTodoRefresh((value) => value + 1);
+    };
+    window.addEventListener("focus", refreshWhenVisible);
+    document.addEventListener("visibilitychange", refreshWhenVisible);
+    return () => {
+      window.removeEventListener("focus", refreshWhenVisible);
+      document.removeEventListener("visibilitychange", refreshWhenVisible);
+    };
+  }, [todoEmail]);
+
   useEffect(() => {
     const onStorage = (event: StorageEvent) => {
       if (event.key === NAVIGATION_IMPORT_BACKUP_KEY || event.key === null) refreshRecoveryBackup();
@@ -282,7 +331,6 @@ export default function Navigator() {
   );
 
   const visibleSites = useMemo(() => {
-    const normalizedQuery = query.trim().toLowerCase();
     let sites = allSites;
 
     if (viewMode === "favorites") {
@@ -295,12 +343,9 @@ export default function Navigator() {
       sites = sites.filter((site) => site.category === activeCategory);
     }
 
-    if (normalizedQuery && engine === "local") {
+    if (query.trim() && engine === "local") {
       sites = sites.filter((site) =>
-        [site.name, site.desc, site.tags.join(" "), site.url]
-          .join(" ")
-          .toLowerCase()
-          .includes(normalizedQuery),
+        matchesGlobalSearch([site.name, site.desc, site.tags.join(" "), site.url].join(" "), query),
       );
     }
     return sites;
@@ -926,7 +971,7 @@ export default function Navigator() {
                 onChange={(event) => setQuery(event.target.value)}
                 placeholder={
                   engine === "local"
-                    ? "搜索网站、工具或关键词..."
+                    ? "搜索网站、Todo 清单或待办..."
                     : `使用 ${engineMap[engine].label}...`
                 }
                 aria-label="搜索"
@@ -1028,6 +1073,15 @@ export default function Navigator() {
               </button>
             </div>
           </div>
+
+          {engine === "local" && query.trim() && (
+            <GlobalSearchResults
+              query={query}
+              signedIn={Boolean(todoEmail)}
+              overview={todoStatus === "ready" && todoOverview?.email === todoEmail ? todoOverview : null}
+              status={todoStatus}
+            />
+          )}
 
           {groupedSites.map((group, groupIndex) => (
             <div className="site-section" key={group.id}>
@@ -1170,6 +1224,9 @@ export default function Navigator() {
             <Workbench
               key={accountState.signedIn ? accountState.email.toLowerCase() : "signed-out"}
               accountState={accountState}
+              todoOverview={todoOverview}
+              todoStatus={todoStatus}
+              onRefreshTodo={() => setTodoRefresh((value) => value + 1)}
               onExportNavigation={exportData}
               onManageNavigationBackup={openNavigationBackupSettings}
             />
