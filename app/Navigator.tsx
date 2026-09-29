@@ -331,6 +331,11 @@ export default function Navigator() {
   );
 
   const visibleSites = useMemo(() => {
+    if (query.trim() && engine === "local") {
+      return allSites.filter((site) =>
+        matchesGlobalSearch([site.name, site.desc, site.tags.join(" "), site.url].join(" "), query),
+      );
+    }
     let sites = allSites;
 
     if (viewMode === "favorites") {
@@ -343,11 +348,6 @@ export default function Navigator() {
       sites = sites.filter((site) => site.category === activeCategory);
     }
 
-    if (query.trim() && engine === "local") {
-      sites = sites.filter((site) =>
-        matchesGlobalSearch([site.name, site.desc, site.tags.join(" "), site.url].join(" "), query),
-      );
-    }
     return sites;
   }, [
     activeCategory,
@@ -360,6 +360,14 @@ export default function Navigator() {
   ]);
 
   const groupedSites = useMemo(() => {
+    if (query.trim() && engine === "local") {
+      return [{
+        id: "results",
+        name: `“${query.trim()}”的搜索结果`,
+        eyebrow: "DISCOVER",
+        sites: visibleSites,
+      }];
+    }
     if (viewMode !== "all" || activeCategory !== "all" || query.trim()) {
       return [
         {
@@ -393,6 +401,7 @@ export default function Navigator() {
   }, [
     activeCategory,
     allSites,
+    engine,
     navCategories,
     query,
     viewMode,
@@ -948,6 +957,10 @@ export default function Navigator() {
                         className={engine === key ? "selected" : ""}
                         onClick={() => {
                           setEngine(key);
+                          if (key === "local" && query.trim()) {
+                            setViewMode("all");
+                            setActiveCategory("all");
+                          }
                           setEngineOpen(false);
                           searchRef.current?.focus();
                         }}
@@ -968,7 +981,14 @@ export default function Navigator() {
               <input
                 ref={searchRef}
                 value={query}
-                onChange={(event) => setQuery(event.target.value)}
+                onChange={(event) => {
+                  const nextQuery = event.target.value;
+                  setQuery(nextQuery);
+                  if (engine === "local" && nextQuery.trim()) {
+                    setViewMode("all");
+                    setActiveCategory("all");
+                  }
+                }}
                 placeholder={
                   engine === "local"
                     ? "搜索网站、Todo 清单或待办..."
