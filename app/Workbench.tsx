@@ -4,6 +4,7 @@ import { startNavigationLogin, type NavigationAccountState } from "./navigation-
 import { type TodoOverview, type TodoOverviewStatus } from "./workbench-data";
 
 const shortcuts = [
+  { name: "随手记", description: "记录灵感、搜索与整理笔记", href: "https://notes.sgao.cc/", mark: "✎" },
   {
     name: "Todo 清单",
     description: "查看和整理你的待办",
@@ -115,6 +116,11 @@ export default function Workbench({ accountState, todoOverview, todoStatus, onRe
         </div>
         <div className="workbench-backup-grid">
           <article className="workbench-backup-card">
+            <span className="workbench-backup-mark" aria-hidden="true">✎</span>
+            <div className="workbench-backup-copy"><h4>随手记</h4><p>全部笔记、回收站与 Markdown 导出。</p></div>
+            <div className="workbench-backup-actions"><a href="https://notes.sgao.cc/?backup=1">备份与恢复 ↗</a></div>
+          </article>
+          <article className="workbench-backup-card">
             <span className="workbench-backup-mark" aria-hidden="true">⌁</span>
             <div className="workbench-backup-copy">
               <h4>导航数据</h4>
@@ -147,7 +153,7 @@ export default function Workbench({ accountState, todoOverview, todoStatus, onRe
             </div>
           </article>
         </div>
-        <p className="workbench-backup-note">三个系统使用各自的备份文件；恢复前请确认文件来源与内容，不要交叉导入。</p>
+        <p className="workbench-backup-note">各系统使用各自的备份文件；恢复前请确认文件来源与内容，不要交叉导入。</p>
       </div>
     </section>
   );
